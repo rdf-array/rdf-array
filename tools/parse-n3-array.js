@@ -15,6 +15,7 @@ function nt(t) {
       t.datatype.value === XSD_STRING ? '' : `^^<${t.datatype.value}>`);
     case 'Quad': return `<<( ${nt(t.subject)} ${nt(t.predicate)} ${nt(t.object)} )>>`;
     case 'Sequence': return t.elements.length ? `(${t.elements.map(nt).join(' ')})` : '()';
+    case 'Undef': return 'undef'; // the empty slot of rdf-undef, as a member of a Sequence
     default: return '';
   }
 }
