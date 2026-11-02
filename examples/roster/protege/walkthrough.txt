@@ -1,0 +1,183 @@
+
+== 1. Loaded
+active ontology: https://rdf-array.github.io/rdf-array/examples/roster/roster.ttl
+imports closure: 2 ontologies, 160 axioms
+  https://rdf-array.github.io/rdf-array/examples/roster/roster.ttl  Turtle Syntax, 94 axioms, unparsed triples: 0
+  https://rdf-array.github.io/rdf-array/vocab/owl-array.ttl  Turtle Syntax, 66 axioms, unparsed triples: 0
+rdf:first in a signature: 0
+distinct sequence terms: 9, in 10 axioms
+
+== 2. How Protégé renders an axiom holding a sequence
+  Dee week _:seq_KCB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiAp
+  Dee hours _:seq_KCB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiAp
+  Ann hours _:seq_KCAiOCJeXjxodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSNpbnRlZ2VyPiB1bmRlZiAiMTIiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gdW5kZWYgdW5kZWYgIjgiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gIjgiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gKQ
+  :ann: Ann week _:seq_KCA8aHR0cHM6Ly9yZGYtYXJyYXkuZ2l0aHViLmlvL3JkZi1hcnJheS9leGFtcGxlcy9yb3N0ZXIvcm9zdGVyLnR0bCNkYXk-IHVuZGVmIDxodHRwczovL3JkZi1hcnJheS5naXRodWIuaW8vcmRmLWFycmF5L2V4YW1wbGVzL3Jvc3Rlci9yb3N0ZXIudHRsI25pZ2h0PiB1bmRlZiB1bmRlZiA8aHR0cHM6Ly9yZGYtYXJyYXkuZ2l0aHViLmlvL3JkZi1hcnJheS9leGFtcGxlcy9yb3N0ZXIvcm9zdGVyLnR0bCNkYXk-IDxodHRwczovL3JkZi1hcnJheS5naXRodWIuaW8vcmRmLWFycmF5L2V4YW1wbGVzL3Jvc3Rlci9yb3N0ZXIudHRsI2RheT4gKQ
+  :ann: Individual: Ann
+  :ann: Ann hours _:seq_KCAiOCJeXjxodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSNpbnRlZ2VyPiB1bmRlZiAiMTIiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gdW5kZWYgdW5kZWYgIjgiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gIjgiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gKQ
+  :ann: Ann Type Worker
+  :dee: Dee Type Worker
+  :dee: Individual: Dee
+  :dee: Dee hours _:seq_KCB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiAp
+  :dee: Dee week _:seq_KCB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiAp
+  :eve: Individual: Eve
+  :eve: Eve Type Worker
+  :eve: Eve week _:seq_KCA8aHR0cHM6Ly9yZGYtYXJyYXkuZ2l0aHViLmlvL3JkZi1hcnJheS9leGFtcGxlcy9yb3N0ZXIvcm9zdGVyLnR0bCNuaWdodD4gXzpnZW5pZDIxNDc0ODM3MjYgPGh0dHBzOi8vcmRmLWFycmF5LmdpdGh1Yi5pby9yZGYtYXJyYXkvZXhhbXBsZXMvcm9zdGVyL3Jvc3Rlci50dGwjZGF5PiB1bmRlZiB1bmRlZiA8aHR0cHM6Ly9yZGYtYXJyYXkuZ2l0aHViLmlvL3JkZi1hcnJheS9leGFtcGxlcy9yb3N0ZXIvcm9zdGVyLnR0bCNkYXk-IDxodHRwczovL3JkZi1hcnJheS5naXRodWIuaW8vcmRmLWFycmF5L2V4YW1wbGVzL3Jvc3Rlci9yb3N0ZXIudHRsI2RheT4gKQ
+
+== 3. The reasoner
+  reasoner menu: HermiT 1.4.3.456  (org.semanticweb.hermit.HermiT.reasoner.factory)
+  reasoner menu: None  (org.protege.editor.owl.NoOpReasoner)
+  reasoner menu: HermiT 1.4.3 (OWL-array)  (org.rdfarray.protege.hermit-owl-array)
+  reasoner menu: ELK 0.6.0 (OWL-array)  (org.rdfarray.protege.elk-owl-array)
+  reasoner menu: ELK 0.6.0  (org.semanticweb.elk.elk.reasoner.factory)
+current reasoner: HermiT (rdf-array sequences); status: INITIALIZED; 2026 ms
+consistent: true
+  renderer: Render by prefixed annotation property
+  inferred types of Ann: ['Ends with a day', 'Long days', 'Night worker', 'Rested worker', Assigned, Person, Worker, owl:Thing]
+  inferred types of Dee: ['Monday off', 'On leave', 'Rested worker', 'Short days only', Assigned, Person, Worker, owl:Thing]
+  inferred types of Eve: ['Ends with a day', 'Night worker', 'Rested worker', 'Starts with a night', Person, Worker, owl:Thing]
+
+== 4. The DL Query tab, the names typed as the example spells them
+  renderer: Render by prefixed annotation property
+query: :Worker
+  Execute disabled: the expression does not parse
+
+== 5. The DL Query tab, the names typed as Protégé displays them
+prefixes of the active ontology before: [:, ra:, owl:, rdf:, xml:, xsd:, rdfs:]
+prefixes added to the active ontology by hand: false
+  renderer: Render by prefixed annotation property
+  rendering of :FullWeekWorker: 'Full-week worker'
+  rendering of :OnLeave: 'On leave'
+  rendering of :RestedWorker: 'Rested worker'
+  rendering of :Worker: Worker
+  rendering of :ann: Ann
+  rendering of :dee: Dee
+  rendering of :eve: Eve
+  rendering of :week: week
+  rendering of ra:DenseSequence: ra:DenseSequence
+  rendering of ra:holes: ra:holes
+  rendering of ra:length: ra:length
+  rendering of xsd:nonNegativeInteger: xsd:nonNegativeInteger
+      typed as: Worker
+PASS 10-query-01  :Worker
+      tab lists: :ann :bob :cy :dee :eve
+      typed as: 'Rested worker'
+PASS 10-query-02  :RestedWorker
+      tab lists: :ann :dee :eve
+      typed as: Worker and week some (ra:holes some xsd:nonNegativeInteger[>= 2])
+PASS 10-query-03  :Worker and :week some (ra:holes some xsd:nonNegativeInteger[>= 2])
+      tab lists: :ann :dee :eve
+      typed as: 'Full-week worker'
+PASS 10-query-04  :FullWeekWorker
+      tab lists: :cy
+      typed as: Worker and week some ra:DenseSequence
+PASS 10-query-05  :Worker and :week some ra:DenseSequence
+      tab lists: :cy
+      typed as: 'On leave'
+PASS 10-query-06  :OnLeave
+      tab lists: :dee
+      typed as: Worker and week some (ra:length value 7 and ra:holes value 7)
+PASS 10-query-07  :Worker and :week some (ra:length value 7 and ra:holes value 7)
+      tab lists: :dee
+      typed as: 'Night worker'
+PASS 10-query-08  :NightWorker
+      tab lists: :ann :bob :eve
+      typed as: 'Days only'
+PASS 10-query-09  :DaysOnly
+      tab lists: :cy
+      typed as: Assigned
+PASS 10-query-10  :Assigned
+      tab lists: :ann :bob :cy :dee
+      typed as: Worker and week some (ra:member only {day , night})
+PASS 10-query-11  :Worker and :week some (ra:member only {:day , :night})
+      tab lists: :ann :bob :cy :dee
+      typed as: 'Starts with a night'
+PASS 10-query-12  :StartsWithANight
+      tab lists: :eve
+      typed as: 'Ends with a day'
+PASS 10-query-13  :EndsWithADay
+      tab lists: :ann :bob :cy :eve
+      typed as: 'Monday off'
+PASS 10-query-14  :MondayOff
+      tab lists: :bob :dee
+      typed as: Worker and week some (ra:first max 0 owl:Thing)
+PASS 10-query-15  :Worker and :week some (ra:first max 0 owl:Thing)
+      tab lists: :bob :dee
+      typed as: 'Long days'
+PASS 10-query-16  :LongDays
+      tab lists: :ann :bob
+      typed as: 'Short days only'
+PASS 10-query-17  :ShortDaysOnly
+      tab lists: :cy :dee
+      typed as: 'Worked every day'
+PASS 10-query-18  :WorkedEveryDay
+      tab lists: :cy
+      typed as: Worker and hours some (ra:DenseSequence and ra:memberValue only xsd:integer[<= 8])
+PASS 10-query-19  :Worker and :hours some (ra:DenseSequence and ra:memberValue only xsd:integer[<= 8])
+      tab lists: :cy
+      typed as: Worker and week some (ra:member some 'Day shift')
+PASS 10-query-20  :Worker and :week some (ra:member some :Day)
+      tab lists: :ann :bob :cy :eve
+      typed as: Worker and week some (ra:holes value 0)
+PASS 10-query-21  :Worker and :week some (ra:holes value 0)
+      tab lists: :cy
+      typed as: Worker and week some ra:EmptySequence
+PASS 10-query-22  :Worker and :week some ra:EmptySequence
+      tab lists: (none)
+      typed as: Person and week some (ra:length value 3)
+PASS 10-query-23  :Person and :week some (ra:length value 3)
+      tab lists: :fay
+23 of 23 queries list the expected instances
+
+== 6. The same queries with ELK (OWL-array), closure off
+current reasoner: ELK Reasoner (rdf-array sequences); status: INITIALIZED; 2026 ms
+PASS 01 :Worker
+DIFF 02 :RestedWorker
+      tab lists: (none)    expected: [:ann, :dee, :eve]
+DIFF 03 :Worker and :week some (ra:holes some xsd:nonNegativeInteger[>= 2])
+      tab lists: (none)    expected: [:ann, :dee, :eve]
+DIFF 04 :FullWeekWorker
+      tab lists: (none)    expected: [:cy]
+DIFF 05 :Worker and :week some ra:DenseSequence
+      tab lists: (none)    expected: [:cy]
+DIFF 06 :OnLeave
+      tab lists: (none)    expected: [:dee]
+DIFF 07 :Worker and :week some (ra:length value 7 and ra:holes value 7)
+      tab lists: (none)    expected: [:dee]
+DIFF 08 :NightWorker
+      tab lists: :ann :bob    expected: [:ann, :bob, :eve]
+DIFF 09 :DaysOnly
+      tab lists: (none)    expected: [:cy]
+DIFF 10 :Assigned
+      tab lists: (none)    expected: [:ann, :bob, :cy, :dee]
+DIFF 11 :Worker and :week some (ra:member only {:day , :night})
+      tab lists: (none)    expected: [:ann, :bob, :cy, :dee]
+DIFF 12 :StartsWithANight
+      tab lists: (none)    expected: [:eve]
+DIFF 13 :EndsWithADay
+      tab lists: :ann :bob :cy    expected: [:ann, :bob, :cy, :eve]
+DIFF 14 :MondayOff
+      tab lists: (none)    expected: [:bob, :dee]
+DIFF 15 :Worker and :week some (ra:first max 0 owl:Thing)
+      tab lists: (none)    expected: [:bob, :dee]
+DIFF 16 :LongDays
+      tab lists: (none)    expected: [:ann, :bob]
+DIFF 17 :ShortDaysOnly
+      tab lists: (none)    expected: [:cy, :dee]
+DIFF 18 :WorkedEveryDay
+      tab lists: (none)    expected: [:cy]
+DIFF 19 :Worker and :hours some (ra:DenseSequence and ra:memberValue only xsd:integer[<= 8])
+      tab lists: (none)    expected: [:cy]
+DIFF 20 :Worker and :week some (ra:member some :Day)
+      tab lists: :ann :bob :cy    expected: [:ann, :bob, :cy, :eve]
+DIFF 21 :Worker and :week some (ra:holes value 0)
+      tab lists: (none)    expected: [:cy]
+PASS 22 :Worker and :week some ra:EmptySequence
+DIFF 23 :Person and :week some (ra:length value 3)
+      tab lists: (none)    expected: [:fay]
+2 of 23 queries list the expected instances with ELK
+
+== 7. Saving
+  roster.ttl as Turtle Syntax: saved, reopened, axioms the same by type ({AnnotationAssertion=29, ClassAssertion=9, DisjointClasses=1, EquivalentClasses=12, FunctionalObjectProperty=2, ObjectPropertyAssertion=10, SubClassOf=4}), declarations aside
+  roster.ttl as RDF/XML Syntax: OWLRendererException: RDF/XML-array cannot write the sequence ( "8"^^<http://www.w3.org/2001/XMLSchema#integer> undef "12"^^<http://www.w3.org/2001/XMLSchema#integer> undef undef "8"^^<http://www.w3.org/2001/XMLSchema#integer> "8"^^<http://www.w3.org/2001/XMLSchema#integer> ) holding an empty slot (undef): rdf:parseType="Collection" holds only node elements; save the ontology as Turtle
+format the active ontology would be saved in: Turtle Syntax
+done

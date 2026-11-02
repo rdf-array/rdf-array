@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <!-- Protégé reads this file beside roster.ttl and maps the import to the file in this checkout -->
+    <uri name="https://rdf-array.github.io/rdf-array/vocab/owl-array.ttl" uri="../../vocab/owl-array.ttl"/>
+</catalog>

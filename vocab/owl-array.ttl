@@ -12,25 +12,33 @@
 <https://rdf-array.github.io/rdf-array/vocab/owl-array.ttl>
     a owl:Ontology ;
     rdfs:label "OWL-array vocabulary" ;
-    rdfs:comment "Declarations and axioms of the built-in entities of OWL-array: ra:Sequence, ra:member, ra:memberValue, ra:length, ra:first, ra:last, ra:firstValue, ra:lastValue, and the definable classes ra:EmptySequence, ra:ObjectSequence and ra:DataSequence. Import it so that an editor knows the entities; their meaning is fixed by the OWL-array definition." ;
-    rdfs:seeAlso <https://rdf-array.github.io/rdf-array/docs/owl-array.html> ;
-    owl:versionInfo "2026-10-26" .
+    rdfs:comment "Declarations and axioms of the built-in entities of OWL-array: ra:Sequence, ra:member, ra:memberValue, ra:length, ra:first, ra:last, ra:firstValue, ra:lastValue, and the definable classes ra:EmptySequence, ra:ObjectSequence and ra:DataSequence; with rdf-undef, ra:holes and ra:DenseSequence. Import it so that an editor knows the entities; their meaning is fixed by the OWL-array definition." ;
+    rdfs:seeAlso <https://rdf-array.github.io/rdf-array/docs/owl-array.html> , <https://rdf-array.github.io/rdf-array/docs/rdf-undef.html> ;
+    owl:versionInfo "2026-11-02 (rdf-undef)" .
 
 # Classes
 
 ra:Sequence a owl:Class ;
     rdfs:label "Sequence" ;
-    rdfs:comment "Built-in: the class of the sequences, the denotations of ( … ) terms, and of nothing else. Every sequence has exactly one ra:length." ;
-    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty ra:length ; owl:someValuesFrom xsd:nonNegativeInteger ] .
+    rdfs:comment "Built-in: the class of the sequences, the denotations of ( … ) terms, and of nothing else. Every sequence has exactly one ra:length and, with rdf-undef, exactly one ra:holes." ;
+    rdfs:subClassOf
+        [ a owl:Restriction ; owl:onProperty ra:length ; owl:someValuesFrom xsd:nonNegativeInteger ] ,
+        [ a owl:Restriction ; owl:onProperty ra:holes ; owl:someValuesFrom xsd:nonNegativeInteger ] .
 
 ra:EmptySequence a owl:Class ;
     rdfs:label "EmptySequence" ;
-    rdfs:comment "The class of the empty sequence, (): a sequence of length 0, which has no members." ;
+    rdfs:comment "The class of the empty sequence, (): a sequence of length 0, which has no members and no empty slots. With rdf-undef, a sequence with no members need not be empty: ( undef ) has none." ;
     owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( ra:Sequence
         [ a owl:Restriction ; owl:onProperty ra:length ; owl:hasValue "0"^^xsd:nonNegativeInteger ] ) ] ;
-    rdfs:subClassOf
+    rdfs:subClassOf ra:DenseSequence ,
         [ a owl:Restriction ; owl:onProperty ra:member ; owl:maxCardinality "0"^^xsd:nonNegativeInteger ] ,
         [ a owl:Restriction ; owl:onProperty ra:memberValue ; owl:maxCardinality "0"^^xsd:nonNegativeInteger ] .
+
+ra:DenseSequence a owl:Class ;
+    rdfs:label "DenseSequence" ;
+    rdfs:comment "rdf-undef: a sequence with no empty slot, ra:holes 0, so that every position holds a member: ra:DenseSequence and ra:ObjectSequence and ra:member only C says that every position holds a C." ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( ra:Sequence
+        [ a owl:Restriction ; owl:onProperty ra:holes ; owl:hasValue "0"^^xsd:nonNegativeInteger ] ) ] .
 
 ra:ObjectSequence a owl:Class ;
     rdfs:label "ObjectSequence" ;
@@ -44,10 +52,12 @@ ra:DataSequence a owl:Class ;
     owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( ra:Sequence
         [ a owl:Class ; owl:complementOf [ a owl:Restriction ; owl:onProperty ra:member ; owl:someValuesFrom owl:Thing ] ] ) ] .
 
-# A non-empty sequence has a first and a last element, one of them an individual or a literal.
+# A non-empty sequence has a first and a last element, one of them an individual or a literal, when
+# neither end is an empty slot (rdf-undef): ( undef 2 3 ) has no first. Which position is a slot is
+# not told by the counts, so the axiom is stated for the dense sequences.
 
 [] a owl:Class ;
-    owl:intersectionOf ( ra:Sequence [ a owl:Class ; owl:complementOf ra:EmptySequence ] ) ;
+    owl:intersectionOf ( ra:DenseSequence [ a owl:Class ; owl:complementOf ra:EmptySequence ] ) ;
     rdfs:subClassOf
         [ a owl:Class ; owl:unionOf (
             [ a owl:Restriction ; owl:onProperty ra:first ; owl:someValuesFrom owl:Thing ]
@@ -92,6 +102,12 @@ ra:lastValue a owl:DatatypeProperty , owl:FunctionalProperty ;
 
 ra:length a owl:DatatypeProperty , owl:FunctionalProperty ;
     rdfs:label "length" ;
-    rdfs:comment "Built-in: the number of elements of a sequence, an xsd:nonNegativeInteger." ;
+    rdfs:comment "Built-in: the number of elements of a sequence, an xsd:nonNegativeInteger; with rdf-undef, the empty slots count." ;
+    rdfs:domain ra:Sequence ;
+    rdfs:range xsd:nonNegativeInteger .
+
+ra:holes a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "holes" ;
+    rdfs:comment "rdf-undef, built-in: the number of empty slots of a sequence itself (not of the sequences inside it), an xsd:nonNegativeInteger. 0 for a dense sequence." ;
     rdfs:domain ra:Sequence ;
     rdfs:range xsd:nonNegativeInteger .

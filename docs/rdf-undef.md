@@ -1,8 +1,9 @@
 # rdf-undef: empty slots in sequences
 
 *Design note, 2026-11-01, on the `rdf-undef` branch of the repositories, which branches from
-`rdf-sequences`. Prototyped in jena-array, branch `rdf-undef`, with the tests in `TestUndefSlots`. This
-is a strawman: §6 lists the decisions that are still open. OWL is planned here (§4) and not implemented.*
+`rdf-sequences`. Prototyped in jena-array (the tests in `TestUndefSlots`), owlapi-array
+(`UndefReasoningTestCase`) and protege-owl-array (the [roster](../examples/roster/) walk-through), each
+on its branch `rdf-undef`. This is a strawman: §6 lists the decisions that are still open.*
 
 rdf-undef extends the data model of [rdf-array.md](rdf-array.html) with one thing: a position in a
 sequence may be empty.
@@ -77,9 +78,10 @@ and two things in Jena had to change for that:
   too, so that joins and filter placement stay correct. Queries without slots return the same answers,
   though some joins may now use a less specialised strategy.
 
-## 4. A plan for OWL
+## 4. OWL
 
-Nothing here is implemented. The point of writing it now is to check that §1 and §3 leave it possible.
+Implemented in owlapi-array and run in Protégé on 2026-11-02 (§4.1). The point of writing the plan
+before the code was to check that §1 and §3 leave it possible; §4.2 has what the reasoner then found.
 
 The direct semantics of owl-array.md §3.1 gives sequences as tuples of denotations. rdf-undef adds one
 thing to what a tuple's element may be, a distinguished *hole*, which is not in the object or data
@@ -122,8 +124,64 @@ Entailments, given `ex:r ex:rgb ( 255 undef 0 )`:
 
 The expansion of owl-array.md §6 stays linear and stays within OWL 2 DL: it emits no member assertion
 for a hole, it counts holes for `ra:length` and `ra:holes`, it spells `undef` in the canonical IRI so
-that equal terms keep one individual, and the `HasKey` axioms per length apply per pattern of holes,
-since sequences with holes in different places are different.
+that equal terms keep one individual, and the `HasKey` axioms per length (still not implemented) would
+apply per pattern of holes, since sequences with holes in different places are different.
+
+### 4.1 As implemented
+
+owlapi-array, branch `rdf-undef` (its `doc/rdf-array.md` has the detail): `OWLUndef` is an element
+of an `OWLSequence` and nothing else, one object, spelled `undef` in the node ID; the Turtle parser and
+writer take it, RDF/XML refuses it as it refuses a literal element, and a slot in one of OWL's own
+lists is a parse error. `SequenceAxioms` expands as above, plus one thing the plan missed: with the
+closure, an end that is a hole gets `ra:first max 0 and ra:firstValue max 0` (or `last`). The
+vocabulary (vocab/owl-array.ttl on this branch) gains `ra:holes` and `ra:DenseSequence`, and its
+axiom "a non-empty sequence has a first and a last" is restated for dense sequences. Protégé runs it
+through protege-owl-array's bundle; [protege-undef.md](protege-undef.html) walks through the
+[roster example](../examples/roster/), a week's shifts with days off as slots.
+
+### 4.2 What the reasoner found
+
+Each is a test in `UndefReasoningTestCase`, against HermiT.
+
+- **The phantom first.** `( undef 2 3 )` has no first. The vocabulary said that a non-empty sequence
+  has a first or a first value, and the closure said the values are 2 and 3, so HermiT concluded
+  `ra:firstValue some {2, 3}`; and `( undef )`, non-empty with no members, was inconsistent. Two
+  changes: the axiom now speaks of `ra:DenseSequence and not ra:EmptySequence`, and the expansion
+  says of a hole at an end that there is no first (last). `ra:first` over `( undef 2 3 )` is then
+  undefined, `ra:last` is 3, and `ra:first max 0` holds: "Monday off" is `ra:first max 0 and not
+  ra:EmptySequence`.
+- **"No members" no longer means empty.** `( undef )` is `ra:member max 0 and ra:memberValue max 0`,
+  not `ra:EmptySequence` (length 1), and vacuously both `ra:ObjectSequence` and `ra:DataSequence`, as
+  `()` is. An ontology that defined emptiness by the absence of members now admits every all-slot
+  sequence; `ra:EmptySequence` is defined by length and is unchanged.
+- **`ra:member` counts members, `ra:length` positions.** `( ex:a undef ex:b )` with `ex:a` and
+  `ex:b` different is `ra:member exactly 2` and `ra:length value 3`. "Every position holds a `C`" is
+  now three conjuncts: `ra:DenseSequence and ra:ObjectSequence and ra:member only C`.
+- **`only` is vacuous at a slot.** `ra:memberValue only xsd:integer[<= 8]` holds of a sequence of
+  slots, so "short days only" lists a worker on leave; `ra:member only :Shift` holds of a week of
+  days off but not of a week holding a blank node, which is the difference between a slot and an
+  unknown made visible.
+- **Which sequences the expansion tells apart.** `( 1 undef ) owl:differentFrom ( 1 2 )` follows from
+  `ra:holes` being functional, `( 1 undef ) owl:differentFrom ( undef 1 )` and
+  `( undef 2 3 ) owl:differentFrom ( 2 undef 3 )` from the end closure. `( 1 undef 2 3 )` and
+  `( 1 2 undef 3 )` are not told apart, as `( 1 2 3 4 )` and `( 1 3 2 4 )` were not before: the
+  expansion is sound and incomplete for `owl:differentFrom`, and the inner positions are what it
+  cannot see. Positional properties, if ever added, would close this; a slot is simply a position
+  without a value for them.
+- **Holes are not counted through nesting.** `( ( undef ) )` is `ra:DenseSequence` and
+  `ra:member some (ra:holes value 1)`. Depth-two density is `ra:member only ra:DenseSequence`.
+- **A sequence with a slot is a nominal like any.** `ex:Holey EquivalentTo: ex:rgb value ( 1 undef )`
+  classifies the individuals with that value, and `( 1 undef )` written twice is one individual.
+- **OWL 2 EL (closure off).** `ra:DenseSequence` is `ra:holes value 0`, which EL has, and functional
+  data properties are in EL too, so density and sparseness are decided without the closure; `only`
+  and `max 0` still need it. (Moving the functional data properties out of the closure-only set also
+  cured a HermiT oddity: its first `isEntailed` about `ra:DenseSequence`, before any realisation,
+  answered false.)
+- **A slot in one of OWL's own lists** (`owl:unionOf ( ex:A undef )`) is an error, not an empty
+  union: the lax reading of a non-list hid it.
+- **Found on the way**: owlapi-array's reasoner decorator expanded a sequence named only by a query
+  once and then forgot it had not, so a second `isEntailed` naming the same foreign sequence answered
+  over an individual with no axioms. Fixed on `rdf-undef`; `rdf-sequences` has it too.
 
 ### How the SPARQL semantics keeps this open
 
@@ -144,8 +202,8 @@ gives. That is the case against it.
 
 ## 5. The rest of the stack
 
-The prototype covers Jena's RDF parsers and writers, SPARQL and its result formats. These are still to
-do, on their own `rdf-undef` branches:
+The prototype covers Jena's RDF parsers and writers, SPARQL and its result formats, the OWL API and
+Protégé (§4). These are still to do, on their own `rdf-undef` branches:
 
 | Area | Question |
 |---|---|
@@ -154,6 +212,8 @@ do, on their own `rdf-undef` branches:
 | JSON-LD | `null` in a list is the natural spelling, though JSON-LD 1.1 drops it, so this needs a flag or a new keyword. |
 | RDF/XML, RDF Thrift, Protobuf, TDB | Sequences need checking in each first; a slot is one more case once they carry sequences. |
 | Jena's model API | `Node.UNDEF` can reach callers of `getSeq()` and `GraphList`; these should say what they return at a slot. |
+| OWL `HasKey` | Not implemented without slots either; with them, one key per length and pattern of holes (§4). |
+| Protégé's display | A sequence shows as its `_:seq_…` node ID, slots inside it invisible; the Manchester renderer should write `( 1 undef 3 )`. |
 | Shared suites | `*-contrib` and the `*-array` suites gain the tests, once §6 is settled, from `TestUndefSlots`. |
 
 ## 6. Open decisions

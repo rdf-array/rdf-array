@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>rdf-undef: empty slots in sequences</title>
+  <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
+  <script class="remove">
+    var respecConfig = {
+      specStatus: "unofficial",
+      shortName: "rdf-undef",
+      editors: [{ name: "Eric Prud'hommeaux" }],
+      edDraftURI: "https://rdf-array.github.io/rdf-array/docs/rdf-undef.html",
+      latestVersion: null,
+      overrideCopyright: "<p class='copyright'>Copyright &copy; 2026 the rdf-array project. This document is licensed under a <a href='https://creativecommons.org/licenses/by/4.0/'>Creative Commons Attribution 4.0 License</a>.</p>",
+      lint: { "no-unused-dfns": false },
+      localBiblio: {
+        "RML-CORE": { title: "RML-Core: Generic Mapping Language for RDF", href: "https://w3id.org/rml/core/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "RML-CC": { title: "RML-CC: RML Collections and Containers", href: "https://w3id.org/rml/cc/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "RML-LV": { title: "RML-LV: RML Logical Views", href: "https://w3id.org/rml/lv/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "RML-FNML": { title: "RML-FNML: RML Functions", href: "https://w3id.org/rml/fnml/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "YARRRML": { title: "YARRRML", href: "https://rml.io/yarrrml/spec/", publisher: "IDLab, Ghent University" }
+      }
+    };
+  </script>
+  <style>
+    table.simple { font-size: 0.9em; }
+    table.simple td, table.simple th { vertical-align: top; }
+    pre.example { font-size: 0.9em; line-height: 1.35; }
+    .hljs-iri { color: #0b5394; }
+    .hljs-pname { color: #38761d; }
+    .hljs-lit { color: #a61c00; }
+    .hljs-kw { color: #741b47; font-weight: bold; }
+    .hljs-var { color: #b45f06; }
+    .hljs-cmt { color: #777; font-style: italic; }
+    .hljs-bnode { color: #666; }
+    .hljs-num, .hljs-number { color: #a61c00; }
+    .hljs-attr { color: #0b5394; }
+    .hljs-string { color: #38761d; }
+    .hljs-literal { color: #741b47; }
+  </style>
+</head>
+<body>
+  <section id="abstract">
+    <p>rdf-undef extends the data model of <a href="rdf-array.html">rdf-array.md</a> with one thing: a position in a sequence may be empty.</p>
+  </section>
+  <section id="sotd">
+    <p>This is a working document of the <a href="https://github.com/rdf-array">rdf-array</a> project, generated from <a href="https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/rdf-undef.md">docs/rdf-undef.md</a> by <code>tools/md-to-respec.py</code> in the same repository. It is not a W3C document and has no standing anywhere.</p>
+  </section>
+  <section class="introductory" id="introduction">
+    <h2>Introduction</h2>
+    <p><em>Design note, 2026-11-01, on the <code>rdf-undef</code> branch of the repositories, which branches from <code>rdf-sequences</code>. Prototyped in jena-array (the tests in <code>TestUndefSlots</code>), owlapi-array (<code>UndefReasoningTestCase</code>) and protege-owl-array (the <a href="../examples/roster/">roster</a> walk-through), each on its branch <code>rdf-undef</code>. This is a strawman: §6 lists the decisions that are still open.</em></p>
+    <pre class="example turtle nohighlight">:x :p ( 1 undef 3 ) .</pre>
+    <p>That sequence has three positions and nothing at the second. The marker is <code>undef</code>, the word SPARQL already uses for "no value here" in <code>VALUES</code>.</p>
+  </section>
+  <section id="what-a-slot-is">
+  <h2>What a slot is</h2>
+  <p>A slot is a position with no value. Three consequences carry through everything below:</p>
+  <ul><li><strong>It is not a term.</strong> <code>undef</code> occurs only as a member of a sequence, at any depth. <code>:s :p undef</code> and <code>undef :p 1</code> are syntax errors, in Turtle, N-Triples and SPARQL alike. A variable is never bound to it.</li><li><strong>It is not an unknown value.</strong> <code>( 1 _:b 3 )</code> already says "there is something at the second position and I am not saying what". <code>undef</code> says there is nothing there, so <code>( 1 2 3 )</code> does not entail <code>( 1 undef 3 )</code>, nor the reverse. This follows from <a href="owl-array.html">owl-array.md</a> §3.1, "a sequence is closed".</li><li><strong>It counts.</strong> <code>( 1 undef 3 )</code> has length 3. Two sequences are the same term when their members and their slots line up: <code>( 1 undef )</code> is <code>( 1 undef )</code>, and is different from <code>( 1 )</code>, <code>( undef 1 )</code> and <code>( 1 2 )</code>.</li></ul>
+  </section>
+  <section id="syntax">
+  <h2>Syntax</h2>
+  <p>Turtle, TriG, N-Triples and N-Quads take <code>undef</code> as a sequence member, in any case, as SPARQL does. Writers emit <code>undef</code>. A prefix may still be called <code>undef:</code>, since the tokenizer reads <code>undef:x</code> as a prefixed name.</p>
+  <p>SPARQL takes it as a member of a sequence in patterns, templates and data blocks, and as an argument of <code>SEQ</code>: <code>( ?a undef ?c )</code>, <code>SEQ(1, undef, 3)</code>. It is not an expression elsewhere, so <code>BIND(undef AS ?x)</code> is a syntax error. <code>VALUES ?x { undef }</code> keeps its meaning.</p>
+  <p>Result formats reuse their own word for no value: <code>{ "type": "undef" }</code> as a member of a JSON <code>seq</code>, and <code>&lt;unbound/&gt;</code> as a child of an XML <code>&lt;seq&gt;</code>. SSE writes <code>(seqterm 1 undef 3)</code>.</p>
+  </section>
+  <section id="sparql">
+  <h2>SPARQL</h2>
+  <p>The rule for variables comes from <code>VALUES</code>: <code>UNDEF</code> there leaves a variable unbound, and an unbound variable joins with anything. A slot does the same. Over <code>:x :p ( 1 undef 3 )</code> and <code>:y :p ( 1 2 3 )</code>:</p>
+  <table class="simple">
+  <thead><tr><th>Query part</th><th>Result</th></tr></thead>
+  <tbody>
+  <tr><td><code>?s :p ( ?a ?b ?c )</code></td><td>at <code>:x</code>, <code>?a</code> is 1, <code>?c</code> is 3 and <code>?b</code> is unbound; at <code>:y</code>, all three are bound</td></tr>
+  <tr><td><code>?s :p ( ?a undef ?c )</code></td><td>only <code>:x</code>: <code>undef</code> in a pattern matches only a slot</td></tr>
+  <tr><td><code>?s :p ( 1 2 3 )</code></td><td>only <code>:y</code>: a constant does not match a slot</td></tr>
+  <tr><td><code>?s :p ( ?a ?b )</code></td><td>nothing: the length still has to match</td></tr>
+  <tr><td><code>VALUES ?b { 5 } ?s :p ( ?a ?b ?c )</code></td><td><code>:x</code> with <code>?b</code> 5, joined as with any unbound variable; not <code>:y</code>, which has 2</td></tr>
+  <tr><td><code>:x :p ( ... ?m ... )</code></td><td>three solutions, one with <code>?m</code> unbound</td></tr>
+  <tr><td><code>:x :p ( ?h ...?t )</code></td><td><code>?t</code> is <code>( undef 3 )</code>: a named gap keeps slots</td></tr>
+  <tr><td><code>UNNEST(?s AS ?m AT ?i)</code></td><td>three solutions; at <code>?i</code> 2, <code>?m</code> is unbound; <code>FILTER(BOUND(?m))</code> drops it</td></tr>
+  <tr><td><code>?s[2]</code></td><td>an error, as out of range is, so <code>BIND</code> leaves its variable unbound and <code>COALESCE(?s[2], 0)</code> gives a default</td></tr>
+  <tr><td><code>?s[2...3]</code></td><td><code>( undef 3 )</code>: slices keep slots</td></tr>
+  <tr><td><code>SEQLEN(?s)</code></td><td>3</td></tr>
+  <tr><td><code>3 IN ?s</code>, <code>2 IN ?s</code></td><td>true, false: <code>IN</code> looks at members, and a slot has none</td></tr>
+  <tr><td><code>?s = SEQ(1, undef, 3)</code>, <code>?s = SEQ(1, 2, 3)</code></td><td>true, false</td></tr>
+  <tr><td><code>SEQ(?c, ?b, ?a)</code></td><td><code>( 3 undef 1 )</code> when <code>?b</code> is unbound; any other error in an argument is the error of the whole <code>SEQ</code></td></tr>
+  <tr><td><code>CONSTRUCT { ?s :q ( ?c ?b ?a ) }</code></td><td><code>:x :q ( 3 undef 1 )</code>: an unbound variable in a template's sequence is a slot, so what a pattern reads, a template writes back</td></tr>
+  <tr><td><code>ORDER BY ?s</code></td><td>a slot sorts before every term, member by member</td></tr>
+  </tbody></table>
+  <p>Bottom-up evaluation has to give the same answer as an engine that substitutes bindings into a pattern, and two things in Jena had to change for that:</p>
+  <ul><li>A variable bound earlier is compatible with a slot, yet a written constant must not match one. So the matcher works from the pattern before substitution, and a sequence pattern is not looked up in the graph by its substituted form.</li><li>A variable inside a sequence pattern is no longer certain to be bound. The optimizer's analyses (<code>VarFinder</code>, <code>OpVars.fixedVars</code>) now count those variables as optional, and so the <code>UNNEST</code> variable too, so that joins and filter placement stay correct. Queries without slots return the same answers, though some joins may now use a less specialised strategy.</li></ul>
+  </section>
+  <section id="owl">
+  <h2>OWL</h2>
+  <p>Implemented in owlapi-array and run in Protégé on 2026-11-02 (§4.1). The point of writing the plan before the code was to check that §1 and §3 leave it possible; §4.2 has what the reasoner then found.</p>
+  <p>The direct semantics of owl-array.md §3.1 gives sequences as tuples of denotations. rdf-undef adds one thing to what a tuple's element may be, a distinguished <em>hole</em>, which is not in the object or data domain:</p>
+  <ul><li><strong>Denotation.</strong> <code>( t1 … undef … tn )</code> denotes the tuple with a hole at that position. A hole denotes itself in every interpretation.</li><li><strong>Identity.</strong> Still by elements, pairwise, with a hole equal only to a hole. So <code>( 1 undef ) owl:differentFrom ( 1 2 )</code> holds in every interpretation, and <code>owl:sameAs</code> between members never reaches a hole.</li><li><strong>Closure.</strong> A sequence stays closed, and later data cannot fill a hole.</li></ul>
+  <p>The built-ins of owl-array.md §3.2 need no change of meaning, since each is already stated over elements that are individuals or values:</p>
+  <table class="simple">
+  <thead><tr><th>Term</th><th>At a hole</th></tr></thead>
+  <tbody>
+  <tr><td><code>ra:length</code></td><td>counts it: <code>( 1 undef 3 ) ra:length 3</code></td></tr>
+  <tr><td><code>ra:member</code>, <code>ra:memberValue</code></td><td>no assertion, so <code>ra:member only C</code> holds vacuously at a hole, as it already does at a literal (§3.5)</td></tr>
+  <tr><td><code>ra:first</code>, <code>ra:last</code> and the <code>Value</code> forms</td><td>no value when the first or last position is a hole; they are already partial</td></tr>
+  </tbody></table>
+  <p>One addition is needed, because <code>ra:member only C</code> can no longer say "every position holds a <code>C</code>":</p>
+  <table class="simple">
+  <thead><tr><th>New term</th><th>Kind</th><th>Meaning</th></tr></thead>
+  <tbody>
+  <tr><td><code>ra:holes</code></td><td>functional data property</td><td>the number of holes of <code>s</code>, an <code>xsd:nonNegativeInteger</code></td></tr>
+  <tr><td><code>ra:DenseSequence</code></td><td>defined class</td><td><code>ra:Sequence and ra:holes value 0</code></td></tr>
+  </tbody></table>
+  <p>Entailments, given <code>ex:r ex:rgb ( 255 undef 0 )</code>:</p>
+  <ul><li><code>( 255 undef 0 ) ra:length 3</code> and <code>ra:holes 1</code>;</li><li><code>( 255 undef 0 ) ra:memberValue 255</code>, and <code>ra:memberValue 0</code>;</li><li><code>( 255 undef 0 ) a ra:DataSequence</code>, and not <code>ra:DenseSequence</code>;</li><li>with <code>ex:r a ex:Swatch</code>, a class requiring <code>ex:rgb only (ra:length value 3 and ra:memberValue only xsd:integer)</code>, the ontology stays consistent; adding <code>ra:DenseSequence</code> to that requirement makes it inconsistent;</li><li><code>( undef ) a ra:ObjectSequence</code> and <code>ra:DataSequence</code>, vacuously, and not <code>ra:EmptySequence</code>, since its length is 1;</li><li><code>ex:r ex:rgb ( 255 7 0 )</code> is not entailed, for any value in place of the 7.</li></ul>
+  <p>The expansion of owl-array.md §6 stays linear and stays within OWL 2 DL: it emits no member assertion for a hole, it counts holes for <code>ra:length</code> and <code>ra:holes</code>, it spells <code>undef</code> in the canonical IRI so that equal terms keep one individual, and the <code>HasKey</code> axioms per length (still not implemented) would apply per pattern of holes, since sequences with holes in different places are different.</p>
+    <section id="as-implemented">
+    <h3>As implemented</h3>
+    <p>owlapi-array, branch <code>rdf-undef</code> (its <code>doc/rdf-array.md</code> has the detail): <code>OWLUndef</code> is an element of an <code>OWLSequence</code> and nothing else, one object, spelled <code>undef</code> in the node ID; the Turtle parser and writer take it, RDF/XML refuses it as it refuses a literal element, and a slot in one of OWL's own lists is a parse error. <code>SequenceAxioms</code> expands as above, plus one thing the plan missed: with the closure, an end that is a hole gets <code>ra:first max 0 and ra:firstValue max 0</code> (or <code>last</code>). The vocabulary (vocab/owl-array.ttl on this branch) gains <code>ra:holes</code> and <code>ra:DenseSequence</code>, and its axiom "a non-empty sequence has a first and a last" is restated for dense sequences. Protégé runs it through protege-owl-array's bundle; <a href="protege-undef.html">protege-undef.md</a> walks through the <a href="../examples/roster/">roster example</a>, a week's shifts with days off as slots.</p>
+    </section>
+    <section id="what-the-reasoner-found">
+    <h3>What the reasoner found</h3>
+    <p>Each is a test in <code>UndefReasoningTestCase</code>, against HermiT.</p>
+    <ul><li><strong>The phantom first.</strong> <code>( undef 2 3 )</code> has no first. The vocabulary said that a non-empty sequence has a first or a first value, and the closure said the values are 2 and 3, so HermiT concluded <code>ra:firstValue some {2, 3}</code>; and <code>( undef )</code>, non-empty with no members, was inconsistent. Two changes: the axiom now speaks of <code>ra:DenseSequence and not ra:EmptySequence</code>, and the expansion says of a hole at an end that there is no first (last). <code>ra:first</code> over <code>( undef 2 3 )</code> is then undefined, <code>ra:last</code> is 3, and <code>ra:first max 0</code> holds: "Monday off" is <code>ra:first max 0 and not ra:EmptySequence</code>.</li><li><strong>"No members" no longer means empty.</strong> <code>( undef )</code> is <code>ra:member max 0 and ra:memberValue max 0</code>, not <code>ra:EmptySequence</code> (length 1), and vacuously both <code>ra:ObjectSequence</code> and <code>ra:DataSequence</code>, as <code>()</code> is. An ontology that defined emptiness by the absence of members now admits every all-slot sequence; <code>ra:EmptySequence</code> is defined by length and is unchanged.</li><li><strong><code>ra:member</code> counts members, <code>ra:length</code> positions.</strong> <code>( ex:a undef ex:b )</code> with <code>ex:a</code> and <code>ex:b</code> different is <code>ra:member exactly 2</code> and <code>ra:length value 3</code>. "Every position holds a <code>C</code>" is now three conjuncts: <code>ra:DenseSequence and ra:ObjectSequence and ra:member only C</code>.</li><li><strong><code>only</code> is vacuous at a slot.</strong> <code>ra:memberValue only xsd:integer[&lt;= 8]</code> holds of a sequence of slots, so "short days only" lists a worker on leave; <code>ra:member only :Shift</code> holds of a week of days off but not of a week holding a blank node, which is the difference between a slot and an unknown made visible.</li><li><strong>Which sequences the expansion tells apart.</strong> <code>( 1 undef ) owl:differentFrom ( 1 2 )</code> follows from <code>ra:holes</code> being functional, <code>( 1 undef ) owl:differentFrom ( undef 1 )</code> and <code>( undef 2 3 ) owl:differentFrom ( 2 undef 3 )</code> from the end closure. <code>( 1 undef 2 3 )</code> and <code>( 1 2 undef 3 )</code> are not told apart, as <code>( 1 2 3 4 )</code> and <code>( 1 3 2 4 )</code> were not before: the expansion is sound and incomplete for <code>owl:differentFrom</code>, and the inner positions are what it cannot see. Positional properties, if ever added, would close this; a slot is simply a position without a value for them.</li><li><strong>Holes are not counted through nesting.</strong> <code>( ( undef ) )</code> is <code>ra:DenseSequence</code> and <code>ra:member some (ra:holes value 1)</code>. Depth-two density is <code>ra:member only ra:DenseSequence</code>.</li><li><strong>A sequence with a slot is a nominal like any.</strong> <code>ex:Holey EquivalentTo: ex:rgb value ( 1 undef )</code> classifies the individuals with that value, and <code>( 1 undef )</code> written twice is one individual.</li><li><strong>OWL 2 EL (closure off).</strong> <code>ra:DenseSequence</code> is <code>ra:holes value 0</code>, which EL has, and functional data properties are in EL too, so density and sparseness are decided without the closure; <code>only</code> and <code>max 0</code> still need it. (Moving the functional data properties out of the closure-only set also cured a HermiT oddity: its first <code>isEntailed</code> about <code>ra:DenseSequence</code>, before any realisation, answered false.)</li><li><strong>A slot in one of OWL's own lists</strong> (<code>owl:unionOf ( ex:A undef )</code>) is an error, not an empty union: the lax reading of a non-list hid it.</li><li><strong>Found on the way</strong>: owlapi-array's reasoner decorator expanded a sequence named only by a query once and then forgot it had not, so a second <code>isEntailed</code> naming the same foreign sequence answered over an individual with no axioms. Fixed on <code>rdf-undef</code>; <code>rdf-sequences</code> has it too.</li></ul>
+    </section>
+    <section id="how-the-sparql-semantics-keeps-this-open">
+    <h3>How the SPARQL semantics keeps this open</h3>
+    <table class="simple">
+    <thead><tr><th>Choice in §1 and §3</th><th>What it preserves</th></tr></thead>
+    <tbody>
+    <tr><td>A slot is never a term and a variable never binds it</td><td>OWL needs no individual for it, and <code>ra:member</code> needs no exception</td></tr>
+    <tr><td>A constant does not match a slot</td><td>An entailment regime stays sound: <code>( 1 2 3 )</code> is not entailed by <code>( 1 undef 3 )</code>, and SPARQL does not claim it</td></tr>
+    <tr><td><code>=</code> is false between a slot and a value</td><td>The same answer as <code>owl:differentFrom</code></td></tr>
+    <tr><td><code>IN</code> skips slots</td><td>The same answer as <code>ra:member</code> and <code>ra:memberValue</code></td></tr>
+    <tr><td>Length counts slots</td><td>The same answer as <code>ra:length</code></td></tr>
+    <tr><td><code>undef</code> matches only a slot, by term</td><td><code>( 1 undef ) owl:sameAs ( 1 undef )</code> is simple identity</td></tr>
+    </tbody></table>
+    <p>The one thing that would have to change is the reading of <code>undef</code> itself. If it meant "unknown", then <code>( 1 undef ) = ( 1 2 )</code> would be an error and not false, <code>2 IN ( 1 undef )</code> likewise, and a sequence with a slot would be anonymous under owl-array.md §3.1, barred from <code>owl:hasValue</code> and <code>owl:oneOf</code>. Those are few changes in code, but the OWL semantics would need an existential reading, which <code>( 1 _:b )</code> already gives. That is the case against it.</p>
+    </section>
+  </section>
+  <section id="the-rest-of-the-stack">
+  <h2>The rest of the stack</h2>
+  <p>The prototype covers Jena's RDF parsers and writers, SPARQL and its result formats, the OWL API and Protégé (§4). These are still to do, on their own <code>rdf-undef</code> branches:</p>
+  <table class="simple">
+  <thead><tr><th>Area</th><th>Question</th></tr></thead>
+  <tbody>
+  <tr><td>ShEx <code>LIST</code></td><td>Does a slot satisfy a member? Suggested: no value constraint is met at a slot, and a member expression says <code>undef</code> to allow one, as in <code>LIST ( xsd:integer | undef ) *</code>.</td></tr>
+  <tr><td>SHACL</td><td>Suggested: <code>sh:memberShape</code> skips slots, matching <code>ra:member</code>, and a separate constraint rules them out.</td></tr>
+  <tr><td>JSON-LD</td><td><code>null</code> in a list is the natural spelling, though JSON-LD 1.1 drops it, so this needs a flag or a new keyword.</td></tr>
+  <tr><td>RDF/XML, RDF Thrift, Protobuf, TDB</td><td>Sequences need checking in each first; a slot is one more case once they carry sequences.</td></tr>
+  <tr><td>Jena's model API</td><td><code>Node.UNDEF</code> can reach callers of <code>getSeq()</code> and <code>GraphList</code>; these should say what they return at a slot.</td></tr>
+  <tr><td>OWL <code>HasKey</code></td><td>Not implemented without slots either; with them, one key per length and pattern of holes (§4).</td></tr>
+  <tr><td>Protégé's display</td><td>A sequence shows as its <code>_:seq_…</code> node ID, slots inside it invisible; the Manchester renderer should write <code>( 1 undef 3 )</code>.</td></tr>
+  <tr><td>Shared suites</td><td><code>*-contrib</code> and the <code>*-array</code> suites gain the tests, once §6 is settled, from <code>TestUndefSlots</code>.</td></tr>
+  </tbody></table>
+  </section>
+  <section id="open-decisions">
+  <h2>Open decisions</h2>
+  <ol><li><strong>A variable at a slot stays unbound.</strong> The alternative is that <code>( ?a ?b ?c )</code> does not match <code>( 1 undef 3 )</code>, and only <code>undef</code> or a gap reaches past a slot. That keeps "a pattern binds all its variables", which the optimizer relies on, and it is simpler; but it treats <code>UNNEST</code> and <code>[i]</code> differently, and it hides the data from a query that does not expect slots.</li><li><strong>A variable bound elsewhere joins through a slot.</strong> <code>VALUES ?b { 5 } ?s :p ( ?a ?b ?c )</code> returns <code>:x</code> with <code>?b</code> 5, though <code>:x</code> has no 5. This follows from the join and from <code>VALUES</code>, and it may still surprise.</li><li><strong><code>( ... ?m ... )</code> and <code>UNNEST</code> give a solution at a slot.</strong> The alternative, like JavaScript's <code>forEach</code>, skips slots; <code>UNNEST</code> would then still have to number the rest by position.</li><li><strong>An unbound variable in a template's sequence writes a slot.</strong> It makes <code>CONSTRUCT</code> round-trip, but a mistyped variable now gives a hole where it used to drop the triple. The same holds for <code>SEQ(?unbound)</code>.</li><li><strong>A slot is a hole and not an unknown value</strong> (§4). The rest follows from this one.</li><li><strong><code>undef</code> is case insensitive in Turtle.</strong> This matches SPARQL, though <code>true</code> and <code>false</code> are case sensitive in Turtle.</li></ol>
+  </section>
+  <script>
+  // Turtle-array and SPARQL-array highlighting: a few token classes are enough for these examples.
+  (function () {
+    var token = /(<[^>\s]*>)|("""[\s\S]*?"""|"(?:[^"\\]|\\.)*")(@[A-Za-z0-9-]+|\^\^[^\s;,.()\]]+)?|(#[^\n]*)|(\?[A-Za-z_][\w]*)|(_:[A-Za-z0-9_-]+)|(\b(?:PREFIX|BASE|SELECT|CONSTRUCT|ASK|DESCRIBE|WHERE|DELETE|INSERT|DATA|FILTER|OPTIONAL|UNION|ORDER|BY|GROUP|LIMIT|OFFSET|BIND|VALUES|GRAPH|a)\b)|(\b-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b)|([A-Za-z][\w-]*:[\w#./-]*|[A-Za-z][\w-]*:)/g;
+    function paint(pre) {
+      var src = pre.textContent, out = '', last = 0, m;
+      token.lastIndex = 0;
+      while ((m = token.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        var cls = m[1] ? 'hljs-iri' : m[2] ? 'hljs-lit' : m[4] ? 'hljs-cmt' : m[5] ? 'hljs-var' : m[6] ? 'hljs-bnode' : m[7] ? 'hljs-kw' : m[8] ? 'hljs-num' : 'hljs-pname';
+        out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+        last = token.lastIndex;
+      }
+      out += esc(src.slice(last));
+      pre.innerHTML = out;
+    }
+    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    var jsonToken = /("(?:[^"\\]|\\.)*")(\s*:)?|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|\b(true|false|null)\b/g;
+    function paintJson(pre) {
+      var src = pre.textContent, out = '', last = 0, m;
+      jsonToken.lastIndex = 0;
+      while ((m = jsonToken.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        if (m[1]) { out += '<span class="' + (m[2] ? 'hljs-attr' : 'hljs-string') + '">' + esc(m[1]) + '</span>' + esc(m[2] || ''); }
+        else if (m[3]) { out += '<span class="hljs-number">' + esc(m[3]) + '</span>'; }
+        else { out += '<span class="hljs-literal">' + esc(m[4]) + '</span>'; }
+        last = jsonToken.lastIndex;
+      }
+      out += esc(src.slice(last));
+      pre.innerHTML = out;
+    }
+    function tidyHeader() {
+      // An unofficial draft has no published version; ReSpec prints the line anyway.
+      document.querySelectorAll('.head dt').forEach(function (dt) {
+        if (/^Latest published version/.test(dt.textContent)) { var dd = dt.nextElementSibling; dt.remove(); if (dd && dd.tagName === 'DD') dd.remove(); }
+      });
+    }
+    function run() { tidyHeader(); document.querySelectorAll('pre.turtle, pre.sparql').forEach(paint); document.querySelectorAll('pre.json').forEach(paintJson); }
+    if (document.respec && document.respec.ready) { document.respec.ready.then(run); } else { document.addEventListener('DOMContentLoaded', run); }
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# The scenario of protege-owl-array's walk-through harness for this example: prefixes, the
+# individuals to show, the ontologies to save, then the DL queries, tab-separated from the
+# instances expected (see README §3).
+@prefix :	<https://rdf-array.github.io/rdf-array/examples/roster/roster.ttl#>
+@prefix ra:	<https://rdf-array.github.io/rdf-array/vocab#>
+@prefix xsd:	<http://www.w3.org/2001/XMLSchema#>
+@prefix owl:	<http://www.w3.org/2002/07/owl#>
+@show :ann :dee :eve
+@save roster.ttl
+:Worker	:ann :bob :cy :dee :eve
+:RestedWorker	:ann :dee :eve
+:Worker and :week some (ra:holes some xsd:nonNegativeInteger[>= 2])	:ann :dee :eve
+:FullWeekWorker	:cy
+:Worker and :week some ra:DenseSequence	:cy
+:OnLeave	:dee
+:Worker and :week some (ra:length value 7 and ra:holes value 7)	:dee
+:NightWorker	:ann :bob :eve
+:DaysOnly	:cy
+:Assigned	:ann :bob :cy :dee
+:Worker and :week some (ra:member only {:day , :night})	:ann :bob :cy :dee
+:StartsWithANight	:eve
+:EndsWithADay	:ann :bob :cy :eve
+:MondayOff	:bob :dee
+:Worker and :week some (ra:first max 0 owl:Thing)	:bob :dee
+:LongDays	:ann :bob
+:ShortDaysOnly	:cy :dee
+:WorkedEveryDay	:cy
+:Worker and :hours some (ra:DenseSequence and ra:memberValue only xsd:integer[<= 8])	:cy
+:Worker and :week some (ra:member some :Day)	:ann :bob :cy :eve
+:Worker and :week some (ra:holes value 0)	:cy
+:Worker and :week some ra:EmptySequence	
+:Person and :week some (ra:length value 3)	:fay

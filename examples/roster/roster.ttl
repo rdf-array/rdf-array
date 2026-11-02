@@ -1,0 +1,165 @@
+@prefix :     <https://rdf-array.github.io/rdf-array/examples/roster/roster.ttl#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ra:   <https://rdf-array.github.io/rdf-array/vocab#> .
+
+# A week's shift roster, Monday to Sunday: one position per day, and a day off is an empty slot,
+# undef. The slot says that nothing is rostered that day; a blank node, as in Eve's Tuesday, says
+# that a shift is, and which one is not yet decided. rdf-undef's OWL-array built-ins tell the two
+# apart: ra:holes counts the slots, ra:DenseSequence is a week with none, ra:member sees the shifts
+# and nothing else, and ra:first is undefined when Monday is a slot.
+
+<https://rdf-array.github.io/rdf-array/examples/roster/roster.ttl>
+    a owl:Ontology ;
+    owl:imports <https://rdf-array.github.io/rdf-array/vocab/owl-array.ttl> ;
+    rdfs:label "A shift roster, with days off as empty slots" ;
+    rdfs:comment "rdf-undef example: workers' weeks as sequences of seven shifts, undef for a day off; the hours worked each day as a sequence of seven integers, undef for a day off. The defined classes are the questions a rota has to answer." .
+
+# --- Shifts ------------------------------------------------------------------------------------
+
+:Shift a owl:Class ; rdfs:label "Shift" .
+:Day   a owl:Class ; rdfs:label "Day shift"   ; rdfs:subClassOf :Shift .
+:Night a owl:Class ; rdfs:label "Night shift" ; rdfs:subClassOf :Shift ; owl:disjointWith :Day .
+
+:day   a owl:NamedIndividual , :Day   ; rdfs:label "day" .
+:night a owl:NamedIndividual , :Night ; rdfs:label "night" .
+
+# --- People and their weeks --------------------------------------------------------------------
+
+:week a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "week" ;
+    rdfs:comment "The shifts of a week, Monday to Sunday: a sequence of seven, a shift or undef for a day off." .
+
+:hours a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "hours" ;
+    rdfs:comment "The hours worked each day, Monday to Sunday: a sequence of seven integers, undef for a day off." .
+
+:Person a owl:Class ; rdfs:label "Person" .
+
+# A worker has a week: seven positions, each a shift or a slot.
+:Worker a owl:Class ; rdfs:label "Worker" ;
+    rdfs:subClassOf :Person ,
+        [ a owl:Restriction ; owl:onProperty :week ;
+          owl:someValuesFrom [ a owl:Class ; owl:intersectionOf ( ra:ObjectSequence
+              [ a owl:Restriction ; owl:onProperty ra:length ; owl:hasValue "7"^^xsd:nonNegativeInteger ]
+              [ a owl:Restriction ; owl:onProperty ra:member ; owl:allValuesFrom :Shift ] ) ] ] .
+
+# --- The questions a rota answers, as defined classes ------------------------------------------
+
+# At least two days off: ra:holes counts the slots.
+:RestedWorker a owl:Class ; rdfs:label "Rested worker" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :week ;
+          owl:someValuesFrom [ a owl:Restriction ; owl:onProperty ra:holes ;
+              owl:someValuesFrom [ a rdfs:Datatype ; owl:onDatatype xsd:nonNegativeInteger ;
+                  owl:withRestrictions ( [ xsd:minInclusive 2 ] ) ] ] ] ) ] .
+
+# No day off: a dense week.
+:FullWeekWorker a owl:Class ; rdfs:label "Full-week worker" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :week ; owl:someValuesFrom ra:DenseSequence ] ) ] .
+
+# A week of slots only: seven positions, seven holes. Not the empty sequence.
+:OnLeave a owl:Class ; rdfs:label "On leave" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :week ;
+          owl:someValuesFrom [ a owl:Class ; owl:intersectionOf (
+              [ a owl:Restriction ; owl:onProperty ra:length ; owl:hasValue "7"^^xsd:nonNegativeInteger ]
+              [ a owl:Restriction ; owl:onProperty ra:holes ; owl:hasValue "7"^^xsd:nonNegativeInteger ] ) ] ] ) ] .
+
+# A night somewhere in the week: ra:member looks past the slots.
+:NightWorker a owl:Class ; rdfs:label "Night worker" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :week ;
+          owl:someValuesFrom [ a owl:Restriction ; owl:onProperty ra:member ; owl:someValuesFrom :Night ] ] ) ] .
+
+# Day shifts and nothing else: "only" needs the closure, which a week holding a blank node has not.
+:DaysOnly a owl:Class ; rdfs:label "Days only" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :week ;
+          owl:someValuesFrom [ a owl:Class ; owl:intersectionOf (
+              [ a owl:Restriction ; owl:onProperty ra:member ; owl:allValuesFrom :Day ]
+              [ a owl:Restriction ; owl:onProperty ra:member ; owl:someValuesFrom :Day ] ) ] ] ) ] .
+
+# Every position decided: a day off or one of the two rostered shifts. True of a week of slots,
+# since a slot is not an unknown; not of a week holding a blank node, a shift still to be decided.
+:Assigned a owl:Class ; rdfs:label "Assigned" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :week ;
+          owl:someValuesFrom [ a owl:Restriction ; owl:onProperty ra:member ;
+              owl:allValuesFrom [ a owl:Class ; owl:oneOf ( :day :night ) ] ] ] ) ] .
+
+# Monday's shift: ra:first is the first shift, when Monday holds one.
+:StartsWithANight a owl:Class ; rdfs:label "Starts with a night" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :week ;
+          owl:someValuesFrom [ a owl:Restriction ; owl:onProperty ra:first ; owl:someValuesFrom :Night ] ] ) ] .
+
+:EndsWithADay a owl:Class ; rdfs:label "Ends with a day" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :week ;
+          owl:someValuesFrom [ a owl:Restriction ; owl:onProperty ra:last ; owl:someValuesFrom :Day ] ] ) ] .
+
+# Monday off: a non-empty week with no first shift.
+:MondayOff a owl:Class ; rdfs:label "Monday off" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :week ;
+          owl:someValuesFrom [ a owl:Class ; owl:intersectionOf (
+              [ a owl:Restriction ; owl:onProperty ra:first ; owl:maxCardinality "0"^^xsd:nonNegativeInteger ]
+              [ a owl:Class ; owl:complementOf ra:EmptySequence ] ) ] ] ) ] .
+
+# Hours: literal members, with the same slots.
+:LongDays a owl:Class ; rdfs:label "Long days" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :hours ;
+          owl:someValuesFrom [ a owl:Restriction ; owl:onProperty ra:memberValue ;
+              owl:someValuesFrom [ a rdfs:Datatype ; owl:onDatatype xsd:integer ;
+                  owl:withRestrictions ( [ xsd:minInclusive 12 ] ) ] ] ] ) ] .
+
+# "Only" over the values is vacuous at a slot: a week of days off has only short days.
+:ShortDaysOnly a owl:Class ; rdfs:label "Short days only" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :hours ;
+          owl:someValuesFrom [ a owl:Restriction ; owl:onProperty ra:memberValue ;
+              owl:allValuesFrom [ a rdfs:Datatype ; owl:onDatatype xsd:integer ;
+                  owl:withRestrictions ( [ xsd:maxInclusive 8 ] ) ] ] ] ) ] .
+
+# Hours every day: dense, and every value at least 1.
+:WorkedEveryDay a owl:Class ; rdfs:label "Worked every day" ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf ( :Worker
+        [ a owl:Restriction ; owl:onProperty :hours ;
+          owl:someValuesFrom [ a owl:Class ; owl:intersectionOf ( ra:DenseSequence
+              [ a owl:Restriction ; owl:onProperty ra:memberValue ;
+                owl:allValuesFrom [ a rdfs:Datatype ; owl:onDatatype xsd:integer ;
+                    owl:withRestrictions ( [ xsd:minInclusive 1 ] ) ] ] ) ] ] ) ] .
+
+# --- The roster --------------------------------------------------------------------------------
+#                 Mon    Tue    Wed    Thu    Fri    Sat    Sun
+
+:ann a owl:NamedIndividual , :Worker ; rdfs:label "Ann" ;
+    :week  ( :day   undef  :night undef  undef  :day   :day ) ;
+    :hours ( 8      undef  12     undef  undef  8      8 ) .
+
+:bob a owl:NamedIndividual , :Worker ; rdfs:label "Bob" ;
+    :week  ( undef  :day   :day   :night :day   :day   :day ) ;
+    :hours ( undef  8      8      12     8      8      8 ) .
+
+:cy a owl:NamedIndividual , :Worker ; rdfs:label "Cy" ;
+    :week  ( :day   :day   :day   :day   :day   :day   :day ) ;
+    :hours ( 8      8      8      8      8      8      8 ) .
+
+# On leave: seven days, nothing rostered on any of them.
+:dee a owl:NamedIndividual , :Worker ; rdfs:label "Dee" ;
+    :week  ( undef  undef  undef  undef  undef  undef  undef ) ;
+    :hours ( undef  undef  undef  undef  undef  undef  undef ) .
+
+# Eve's Tuesday is a shift still to be decided (a blank node), not a day off (undef).
+:eve a owl:NamedIndividual , :Worker ; rdfs:label "Eve" ;
+    :week  ( :night [ a :Shift ] :day undef undef :day :day ) .
+
+# A record that is not a week. Add ":fay a :Worker ." and the reasoner reports the ontology
+# inconsistent: a Worker's week has seven positions, slots included, and this one has three.
+:fay a owl:NamedIndividual , :Person ; rdfs:label "Fay" ;
+    :week ( :day :day :night ) .

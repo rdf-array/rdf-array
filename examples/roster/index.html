@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>A shift roster with days off as empty slots</title>
+  <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
+  <script class="remove">
+    var respecConfig = {
+      specStatus: "unofficial",
+      shortName: "index",
+      editors: [{ name: "Eric Prud'hommeaux" }],
+      edDraftURI: "https://rdf-array.github.io/rdf-array/examples/roster/index.html",
+      latestVersion: null,
+      overrideCopyright: "<p class='copyright'>Copyright &copy; 2026 the rdf-array project. This document is licensed under a <a href='https://creativecommons.org/licenses/by/4.0/'>Creative Commons Attribution 4.0 License</a>.</p>",
+      lint: { "no-unused-dfns": false },
+      localBiblio: {
+        "RML-CORE": { title: "RML-Core: Generic Mapping Language for RDF", href: "https://w3id.org/rml/core/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "RML-CC": { title: "RML-CC: RML Collections and Containers", href: "https://w3id.org/rml/cc/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "RML-LV": { title: "RML-LV: RML Logical Views", href: "https://w3id.org/rml/lv/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "RML-FNML": { title: "RML-FNML: RML Functions", href: "https://w3id.org/rml/fnml/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "YARRRML": { title: "YARRRML", href: "https://rml.io/yarrrml/spec/", publisher: "IDLab, Ghent University" }
+      }
+    };
+  </script>
+  <style>
+    table.simple { font-size: 0.9em; }
+    table.simple td, table.simple th { vertical-align: top; }
+    pre.example { font-size: 0.9em; line-height: 1.35; }
+    .hljs-iri { color: #0b5394; }
+    .hljs-pname { color: #38761d; }
+    .hljs-lit { color: #a61c00; }
+    .hljs-kw { color: #741b47; font-weight: bold; }
+    .hljs-var { color: #b45f06; }
+    .hljs-cmt { color: #777; font-style: italic; }
+    .hljs-bnode { color: #666; }
+    .hljs-num, .hljs-number { color: #a61c00; }
+    .hljs-attr { color: #0b5394; }
+    .hljs-string { color: #38761d; }
+    .hljs-literal { color: #741b47; }
+  </style>
+</head>
+<body>
+  <section id="abstract">
+    <p>FHIR, the data of the <a href="../fhir/">first example</a>, has no notion of a missing element: a list has the elements it has. A roster does. "Nothing on Tuesday" is not "something on Tuesday we have not been told", and a format that cannot write the difference makes the reader guess. Here the two are written differently and the reasoner keeps them apart.</p>
+  </section>
+  <section id="sotd">
+    <p>This is a working document of the <a href="https://github.com/rdf-array">rdf-array</a> project, generated from <a href="https://github.com/rdf-array/rdf-array/blob/rdf-sequences/examples/roster/README.md">examples/roster/README.md</a> by <code>tools/md-to-respec.py</code> in the same repository. It is not a W3C document and has no standing anywhere.</p>
+  </section>
+  <section class="introductory" id="introduction">
+    <h2>Introduction</h2>
+    <p><em>Example, 2026-11-02, on the <code>rdf-undef</code> branch. A week's roster is a sequence of seven shifts, Monday to Sunday, and a day off is an empty slot, <code>undef</code>; the hours worked each day are a sequence of seven integers with the same slots. <a href="../../docs/rdf-undef.html">rdf-undef</a> gives the slot its meaning, a hole that is not a term and not an unknown, and its OWL built-ins (<code>ra:holes</code>, <code>ra:DenseSequence</code>, and <code>ra:first</code> undefined at a hole) let HermiT answer the questions a rota has to answer. Run through <a href="https://github.com/rdf-array/owlapi-array">owlapi-array</a> (<code>UndefReasoningTestCase</code>) and in Protégé 5.6.9 with owlapi-array's bundle and the <a href="https://github.com/rdf-array/protege-owl-array">protege-owl-array</a> reasoner plugin, whose DL Query tab lists the answers of §3 (<a href="../../docs/protege-undef.html">the walk-through</a>).</em></p>
+  </section>
+  <section id="the-files">
+  <h2>The files</h2>
+  <table class="simple">
+  <thead><tr><th>File</th><th>What it is</th></tr></thead>
+  <tbody>
+  <tr><td><a href="roster.ttl"><code>roster.ttl</code></a></td><td>the shifts, the workers with their weeks and hours, and the defined classes of §3. Imports the <a href="../../vocab/owl-array.ttl">OWL-array vocabulary</a>, which on this branch declares <code>ra:holes</code> and <code>ra:DenseSequence</code>. Open this one.</td></tr>
+  <tr><td><a href="catalog-v001.xml"><code>catalog-v001.xml</code></a></td><td>maps the import to the file beside it, in the form Protégé reads.</td></tr>
+  <tr><td><a href="walkthrough.tsv"><code>walkthrough.tsv</code></a></td><td>the scenario of protege-owl-array's walk-through harness: the queries of §3 with the instances expected, the prefixes, the individuals to show.</td></tr>
+  <tr><td><a href="protege/"><code>protege/</code></a></td><td>what the harness recorded: <code>walkthrough.txt</code> and the screenshots.</td></tr>
+  </tbody></table>
+  </section>
+  <section id="the-roster">
+  <h2>The roster</h2>
+  <pre class="example turtle nohighlight">#                 Mon    Tue    Wed    Thu    Fri    Sat    Sun
+  :ann :week  ( :day   undef  :night undef  undef  :day   :day ) ;
+       :hours ( 8      undef  12     undef  undef  8      8 ) .
+  :bob :week  ( undef  :day   :day   :night :day   :day   :day ) .
+  :cy  :week  ( :day   :day   :day   :day   :day   :day   :day ) .
+  :dee :week  ( undef  undef  undef  undef  undef  undef  undef ) .   # on leave
+  :eve :week  ( :night [ a :Shift ] :day undef undef :day :day ) .   # Tuesday's shift not yet decided
+  :fay :week  ( :day :day :night ) .                                 # three days: not a week</pre>
+  <p>A <code>:Worker</code> has a <code>:week</code>: an <code>ra:ObjectSequence</code> of <code>ra:length</code> 7 whose members are shifts. The slots count towards the seven; a week of seven slots, Dee's, is a week. Eve's Tuesday is a blank node: a shift is rostered, which one is not said. Fay is a <code>:Person</code> with a three-day record; add <code>:fay a :Worker</code> and the ontology is inconsistent.</p>
+  </section>
+  <section id="the-questions">
+  <h2>The questions</h2>
+  <p>Each is a defined class in <code>roster.ttl</code> and a DL query; the instances are HermiT's through the OWL-array expansion, and what Protégé's DL Query tab lists.</p>
+  <table class="simple">
+  <thead><tr><th>Question</th><th>Class expression</th><th>Instances</th></tr></thead>
+  <tbody>
+  <tr><td>At least two days off</td><td><code>:Worker and :week some (ra:holes some xsd:nonNegativeInteger[&gt;= 2])</code></td><td>ann dee eve</td></tr>
+  <tr><td>No day off</td><td><code>:Worker and :week some ra:DenseSequence</code></td><td>cy</td></tr>
+  <tr><td>On leave: seven positions, seven slots</td><td><code>:Worker and :week some (ra:length value 7 and ra:holes value 7)</code></td><td>dee</td></tr>
+  <tr><td>A night somewhere</td><td><code>:Worker and :week some (ra:member some :Night)</code></td><td>ann bob eve</td></tr>
+  <tr><td>Day shifts only</td><td><code>:Worker and :week some (ra:member only :Day and ra:member some :Day)</code></td><td>cy</td></tr>
+  <tr><td>Every position decided</td><td><code>:Worker and :week some (ra:member only {:day , :night})</code></td><td>ann bob cy dee</td></tr>
+  <tr><td>Starts with a night</td><td><code>:Worker and :week some (ra:first some :Night)</code></td><td>eve</td></tr>
+  <tr><td>Ends with a day</td><td><code>:Worker and :week some (ra:last some :Day)</code></td><td>ann bob cy eve</td></tr>
+  <tr><td>Monday off</td><td><code>:Worker and :week some (ra:first max 0 and not ra:EmptySequence)</code></td><td>bob dee</td></tr>
+  <tr><td>A day of 12 hours or more</td><td><code>:Worker and :hours some (ra:memberValue some xsd:integer[&gt;= 12])</code></td><td>ann bob</td></tr>
+  <tr><td>Short days only</td><td><code>:Worker and :hours some (ra:memberValue only xsd:integer[&lt;= 8])</code></td><td>cy dee</td></tr>
+  <tr><td>Hours every day</td><td><code>:Worker and :hours some (ra:DenseSequence and ra:memberValue only xsd:integer[&gt;= 1])</code></td><td>cy</td></tr>
+  <tr><td>An empty week</td><td><code>:Worker and :week some ra:EmptySequence</code></td><td>(none)</td></tr>
+  <tr><td>A three-day record</td><td><code>:Person and :week some (ra:length value 3)</code></td><td>fay</td></tr>
+  </tbody></table>
+  <p>Four of them are the point of the example:</p>
+  <ul><li><strong>Every position decided</strong> lists Dee, whose week is slots only, and not Eve, whose Tuesday is a blank node. A slot is closed: there is nothing there, and <code>ra:member only</code> has nothing to check. A blank node is open, and <code>only</code> is not decided of a sequence holding one.</li><li><strong>Monday off</strong> is <code>ra:first max 0</code>: at a slot, <code>ra:first</code> is undefined, and the expansion says so. Without that, a reasoner that knows "a non-empty sequence has a first" and "the members are day and night" would give Bob's week a first shift in {day, night}.</li><li><strong>Short days only</strong> lists Dee, who worked no hours at all: <code>only</code> over the values is vacuous at a slot, as it is of the empty sequence. "Hours every day" adds <code>ra:DenseSequence</code>.</li><li><strong>On leave</strong> is not <strong>an empty week</strong>: <code>( undef undef undef undef undef undef undef )</code> has length 7 and no members; <code>()</code> has length 0.</li></ul>
+  </section>
+  <section id="in-prot-g">
+  <h2>In Protégé</h2>
+  <p><a href="../../docs/protege-undef.html">protege-undef.md</a> is the walk-through: Protégé 5.6.9 with owlapi-array's bundle and the protege-owl-array plugin opens <code>roster.ttl</code> (94 axioms, 9 sequence terms, no triple left unparsed), <strong>HermiT 1.4.3 (OWL-array)</strong> starts in two seconds and finds the roster consistent, the Individuals tab shows Dee's inferred types ('Monday off', 'On leave', 'Rested worker', 'Short days only', Assigned), and the DL Query tab lists the instances of §3 for all 23 queries of <code>walkthrough.tsv</code>. <strong>ELK 0.6.0 (OWL-array)</strong> answers 2 of the 23 as expected: ELK has no datatypes, so <code>ra:length</code> and <code>ra:holes</code> are out of its reach, <code>only</code> and <code>max 0</code> are outside OWL 2 EL, and it skips Eve's week, which holds a blank node, so even <code>ra:member some :Night</code> misses her.</p>
+  </section>
+  <section id="run-it">
+  <h2>Run it</h2>
+  <pre class="example nohighlight">git clone -b rdf-undef https://github.com/rdf-array/protege-owl-array.git
+  git clone -b rdf-undef https://github.com/rdf-array/rdf-array.git
+  cd protege-owl-array
+  ./assemble.sh Protege-5.6.9-rdf-undef
+  JAVA_HOME=$(/usr/libexec/java_home -v 21) \
+    Protege-5.6.9-rdf-undef/run.sh ../rdf-array/examples/roster/roster.ttl</pre>
+  <p>Then Reasoner ▸ HermiT 1.4.3 (OWL-array) ▸ Start reasoner, and type a class expression of §3 into the DL Query tab. To change the roster, edit <code>roster.ttl</code> and reload: Protégé displays a sequence by its <code>_:seq_…</code> node ID, so the slots are visible in the file, not yet in the editor.</p>
+  </section>
+  <script>
+  // Turtle-array and SPARQL-array highlighting: a few token classes are enough for these examples.
+  (function () {
+    var token = /(<[^>\s]*>)|("""[\s\S]*?"""|"(?:[^"\\]|\\.)*")(@[A-Za-z0-9-]+|\^\^[^\s;,.()\]]+)?|(#[^\n]*)|(\?[A-Za-z_][\w]*)|(_:[A-Za-z0-9_-]+)|(\b(?:PREFIX|BASE|SELECT|CONSTRUCT|ASK|DESCRIBE|WHERE|DELETE|INSERT|DATA|FILTER|OPTIONAL|UNION|ORDER|BY|GROUP|LIMIT|OFFSET|BIND|VALUES|GRAPH|a)\b)|(\b-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b)|([A-Za-z][\w-]*:[\w#./-]*|[A-Za-z][\w-]*:)/g;
+    function paint(pre) {
+      var src = pre.textContent, out = '', last = 0, m;
+      token.lastIndex = 0;
+      while ((m = token.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        var cls = m[1] ? 'hljs-iri' : m[2] ? 'hljs-lit' : m[4] ? 'hljs-cmt' : m[5] ? 'hljs-var' : m[6] ? 'hljs-bnode' : m[7] ? 'hljs-kw' : m[8] ? 'hljs-num' : 'hljs-pname';
+        out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+        last = token.lastIndex;
+      }
+      out += esc(src.slice(last));
+      pre.innerHTML = out;
+    }
+    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    var jsonToken = /("(?:[^"\\]|\\.)*")(\s*:)?|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|\b(true|false|null)\b/g;
+    function paintJson(pre) {
+      var src = pre.textContent, out = '', last = 0, m;
+      jsonToken.lastIndex = 0;
+      while ((m = jsonToken.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        if (m[1]) { out += '<span class="' + (m[2] ? 'hljs-attr' : 'hljs-string') + '">' + esc(m[1]) + '</span>' + esc(m[2] || ''); }
+        else if (m[3]) { out += '<span class="hljs-number">' + esc(m[3]) + '</span>'; }
+        else { out += '<span class="hljs-literal">' + esc(m[4]) + '</span>'; }
+        last = jsonToken.lastIndex;
+      }
+      out += esc(src.slice(last));
+      pre.innerHTML = out;
+    }
+    function tidyHeader() {
+      // An unofficial draft has no published version; ReSpec prints the line anyway.
+      document.querySelectorAll('.head dt').forEach(function (dt) {
+        if (/^Latest published version/.test(dt.textContent)) { var dd = dt.nextElementSibling; dt.remove(); if (dd && dd.tagName === 'DD') dd.remove(); }
+      });
+    }
+    function run() { tidyHeader(); document.querySelectorAll('pre.turtle, pre.sparql').forEach(paint); document.querySelectorAll('pre.json').forEach(paintJson); }
+    if (document.respec && document.respec.ready) { document.respec.ready.then(run); } else { document.addEventListener('DOMContentLoaded', run); }
+  })();
+  </script>
+</body>
+</html>
