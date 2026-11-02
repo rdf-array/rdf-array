@@ -29,6 +29,10 @@ ra:SequenceFunctions a mf:Requirement ;
     rdfs:label "SequenceFunctions" ;
     rdfs:comment "SPARQL-array functions isSEQ, SEQLEN and SEQ, the index expr[i], the slice expr[m...n] and `?x IN ?seq`. Proposed syntax (docs/array-syntax.md)." .
 
+ra:UndefSlots a mf:Requirement ;
+    rdfs:label "UndefSlots" ;
+    rdfs:comment "The empty slot of a sequence, undef, in the syntaxes, in SPARQL patterns, templates and SEQ, and in results as {\"type\": \"undef\"} and <unbound/>. Proposed (docs/rdf-undef.md)." .
+
 ra:ListShapeExpression a mf:Requirement ;
     rdfs:label "ListShapeExpression" ;
     rdfs:comment "ShEx-array LIST shape expression: LIST ( regex ) over the members, LIST * x, LIST + x, LIST {m,n} x; ShExJ {\"type\": \"ListShape\"}, ShExR sx:ListShape. Proposed syntax (docs/array-syntax.md)." .
