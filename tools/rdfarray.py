@@ -6,7 +6,8 @@
     python3 rdfarray.py canon IN.nq                        print sorted, re-serialized quads
 
 Terms: IRIs <...>, blank nodes _:x, literals "..."(@lang(--dir)? | ^^<dt>)?, triple terms
-<<( s p o )>> (and the older << s p o >>), and sequences ( t1 t2 ... ), nested, () empty.
+<<( s p o )>> (and the older << s p o >>), and sequences ( t1 t2 ... ), nested, () empty; a member of a
+sequence may be the empty slot undef, any case (rdf-undef, docs/rdf-undef.md on that branch).
 
 Folding (see the w3c-test-suites skill): a *ladder cell* is a blank node with exactly one
 rdf:first and one rdf:rest (and at most an rdf:type rdf:List), in one graph, used as an object
@@ -28,6 +29,7 @@ XSD_STRING = 'http://www.w3.org/2001/XMLSchema#string'
 
 # ---- terms: tuples, hashable ----
 # ('iri', v) ('bnode', label) ('lit', lexical, datatype, lang, dir) ('triple', s, p, o) ('seq', (t...))
+# ('undef',), only as a member of a seq
 def iri(v): return ('iri', v)
 
 
@@ -39,6 +41,7 @@ def seq(elements): return ('seq', tuple(elements))
 
 NIL_T = iri(NIL)
 EMPTY = seq(())
+UNDEF = ('undef',)
 
 
 def escape(s):
@@ -63,6 +66,8 @@ def term_str(t):
         return f'<<( {term_str(t[1])} {term_str(t[2])} {term_str(t[3])} )>>'
     if kind == 'seq':
         return '(' + ' '.join(term_str(e) for e in t[1]) + ')' if t[1] else '()'
+    if kind == 'undef':
+        return 'undef'
     raise ValueError(t)
 
 
@@ -134,7 +139,12 @@ class Parser:
                 if s[self.i] == ')':
                     self.i += 1
                     return seq(elements)
-                elements.append(self.term())
+                m = re.compile(r'undef(?=[\s()#])', re.I).match(s, self.i)
+                if m:
+                    self.i = m.end()
+                    elements.append(UNDEF)
+                else:
+                    elements.append(self.term())
         if s[i] == '"':
             j = i + 1
             while s[j] != '"':

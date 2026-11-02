@@ -10,6 +10,7 @@ import org.apache.jena.sparql.resultset.ResultsFormat;
 /** Drive jena-array for test-suite rewriting.
  *  parse FILE [BASE]               -> N-Quads-array on stdout
  *  query QUERY DATA|- [NAMED...]   -> SPARQL JSON results (or N-Quads-array for CONSTRUCT/DESCRIBE)
+ *  query-format json|xml|csv|tsv QUERY DATA|- -> a SELECT's results in that format
  *  update UPDATE DATA|-            -> N-Quads-array of the dataset after the update
  *  shacl SHAPES DATA               -> the SHACL-array validation report as N-Triples-array */
 public class JenaArray {
@@ -36,6 +37,21 @@ public class JenaArray {
                     if (q.isSelectType()) ResultSetFormatter.outputAsJSON(System.out, qe.execSelect());
                     else if (q.isAskType()) ResultSetFormatter.outputAsJSON(System.out, qe.execAsk());
                     else RDFDataMgr.write(System.out, q.isConstructType() ? qe.execConstruct() : qe.execDescribe(), Lang.NTRIPLES);
+                }
+            }
+            case "query-format" -> {
+                Dataset ds = DatasetFactory.createTxnMem();
+                if (!a[3].equals("-")) RDFParser.source(a[3]).base(Path.of(a[3]).toUri().toString()).parse(ds.asDatasetGraph().getDefaultGraph());
+                Query q = QueryFactory.read(a[2], null, Syntax.syntaxARQ);
+                try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
+                    ResultSet rs = qe.execSelect();
+                    switch (a[1]) {
+                        case "json" -> ResultSetFormatter.outputAsJSON(System.out, rs);
+                        case "xml" -> ResultSetFormatter.outputAsXML(System.out, rs);
+                        case "csv" -> ResultSetFormatter.outputAsCSV(System.out, rs);
+                        case "tsv" -> ResultSetFormatter.outputAsTSV(System.out, rs);
+                        default -> throw new IllegalArgumentException(a[1]);
+                    }
                 }
             }
             case "update" -> {

@@ -15,6 +15,8 @@ def term(b):
         return ('lit', b['value'], dt, lang.lower(), b.get('its:dir', ''))
     if t == 'seq':
         return ra.seq(term(e) for e in b['value'])
+    if t == 'undef':  # the empty slot, as a member of a seq (rdf-undef)
+        return ra.UNDEF
     if t == 'triple':
         v = b['value']
         return ('triple', term(v['subject']), term(v['predicate']), term(v['object']))
