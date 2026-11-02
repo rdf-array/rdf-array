@@ -8,28 +8,29 @@ rdf:first in a signature: 0
 distinct sequence terms: 9, in 10 axioms
 
 == 2. How Protégé renders an axiom holding a sequence
-  Dee week _:seq_KCB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiAp
-  Dee hours _:seq_KCB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiAp
-  Ann hours _:seq_KCAiOCJeXjxodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSNpbnRlZ2VyPiB1bmRlZiAiMTIiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gdW5kZWYgdW5kZWYgIjgiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gIjgiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gKQ
-  :ann: Ann week _:seq_KCA8aHR0cHM6Ly9yZGYtYXJyYXkuZ2l0aHViLmlvL3JkZi1hcnJheS9leGFtcGxlcy9yb3N0ZXIvcm9zdGVyLnR0bCNkYXk-IHVuZGVmIDxodHRwczovL3JkZi1hcnJheS5naXRodWIuaW8vcmRmLWFycmF5L2V4YW1wbGVzL3Jvc3Rlci9yb3N0ZXIudHRsI25pZ2h0PiB1bmRlZiB1bmRlZiA8aHR0cHM6Ly9yZGYtYXJyYXkuZ2l0aHViLmlvL3JkZi1hcnJheS9leGFtcGxlcy9yb3N0ZXIvcm9zdGVyLnR0bCNkYXk-IDxodHRwczovL3JkZi1hcnJheS5naXRodWIuaW8vcmRmLWFycmF5L2V4YW1wbGVzL3Jvc3Rlci9yb3N0ZXIudHRsI2RheT4gKQ
+  Dee week ( undef undef undef undef undef undef undef )
+  Dee hours ( undef undef undef undef undef undef undef )
+  Ann hours ( 8 undef 12 undef undef 8 8 )
+  :ann: Ann week ( day undef night undef undef day day )
   :ann: Individual: Ann
-  :ann: Ann hours _:seq_KCAiOCJeXjxodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSNpbnRlZ2VyPiB1bmRlZiAiMTIiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gdW5kZWYgdW5kZWYgIjgiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gIjgiXl48aHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEjaW50ZWdlcj4gKQ
+  :ann: Ann hours ( 8 undef 12 undef undef 8 8 )
   :ann: Ann Type Worker
   :dee: Dee Type Worker
   :dee: Individual: Dee
-  :dee: Dee hours _:seq_KCB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiAp
-  :dee: Dee week _:seq_KCB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiB1bmRlZiAp
+  :dee: Dee hours ( undef undef undef undef undef undef undef )
+  :dee: Dee week ( undef undef undef undef undef undef undef )
   :eve: Individual: Eve
   :eve: Eve Type Worker
-  :eve: Eve week _:seq_KCA8aHR0cHM6Ly9yZGYtYXJyYXkuZ2l0aHViLmlvL3JkZi1hcnJheS9leGFtcGxlcy9yb3N0ZXIvcm9zdGVyLnR0bCNuaWdodD4gXzpnZW5pZDIxNDc0ODM3MjYgPGh0dHBzOi8vcmRmLWFycmF5LmdpdGh1Yi5pby9yZGYtYXJyYXkvZXhhbXBsZXMvcm9zdGVyL3Jvc3Rlci50dGwjZGF5PiB1bmRlZiB1bmRlZiA8aHR0cHM6Ly9yZGYtYXJyYXkuZ2l0aHViLmlvL3JkZi1hcnJheS9leGFtcGxlcy9yb3N0ZXIvcm9zdGVyLnR0bCNkYXk-IDxodHRwczovL3JkZi1hcnJheS5naXRodWIuaW8vcmRmLWFycmF5L2V4YW1wbGVzL3Jvc3Rlci9yb3N0ZXIudHRsI2RheT4gKQ
+  :eve: Eve week ( night _:genid2147483726 day undef undef day day )
 
 == 3. The reasoner
-  reasoner menu: HermiT 1.4.3.456  (org.semanticweb.hermit.HermiT.reasoner.factory)
+  reasoner menu: ELK 0.6.0  (org.semanticweb.elk.elk.reasoner.factory)
   reasoner menu: None  (org.protege.editor.owl.NoOpReasoner)
+  reasoner menu: HermiT 1.4.3.456  (org.semanticweb.hermit.HermiT.reasoner.factory)
   reasoner menu: HermiT 1.4.3 (OWL-array)  (org.rdfarray.protege.hermit-owl-array)
   reasoner menu: ELK 0.6.0 (OWL-array)  (org.rdfarray.protege.elk-owl-array)
-  reasoner menu: ELK 0.6.0  (org.semanticweb.elk.elk.reasoner.factory)
-current reasoner: HermiT (rdf-array sequences); status: INITIALIZED; 2026 ms
+current reasoner: HermiT (rdf-array sequences); status: INITIALIZED; 2019 ms
+dialog after starting the reasoner: org.protege.editor.core.update.PluginPanel[,0,0,600x600,invalid,layout=java.awt.BorderLayout,alignmentX=0.0,alignmentY=0.0,border=,flags=9,maximumSize=,minimumSize=,preferredSize=java.awt.Dimension[width=600,height=600]]
 consistent: true
   renderer: Render by prefixed annotation property
   inferred types of Ann: ['Ends with a day', 'Long days', 'Night worker', 'Rested worker', Assigned, Person, Worker, owl:Thing]
@@ -129,7 +130,7 @@ PASS 10-query-23  :Person and :week some (ra:length value 3)
 23 of 23 queries list the expected instances
 
 == 6. The same queries with ELK (OWL-array), closure off
-current reasoner: ELK Reasoner (rdf-array sequences); status: INITIALIZED; 2026 ms
+current reasoner: ELK Reasoner (rdf-array sequences); status: INITIALIZED; 2025 ms
 PASS 01 :Worker
 DIFF 02 :RestedWorker
       tab lists: (none)    expected: [:ann, :dee, :eve]

@@ -181,7 +181,7 @@ Each is a test in `UndefReasoningTestCase`, against HermiT.
   union: the lax reading of a non-list hid it.
 - **Found on the way**: owlapi-array's reasoner decorator expanded a sequence named only by a query
   once and then forgot it had not, so a second `isEntailed` naming the same foreign sequence answered
-  over an individual with no axioms. Fixed on `rdf-undef`; `rdf-sequences` has it too.
+  over an individual with no axioms. Fixed on both `rdf-sequences` and `rdf-undef`.
 
 ### How the SPARQL semantics keeps this open
 
@@ -202,19 +202,38 @@ gives. That is the case against it.
 
 ## 5. The rest of the stack
 
-The prototype covers Jena's RDF parsers and writers, SPARQL and its result formats, the OWL API and
-Protégé (§4). These are still to do, on their own `rdf-undef` branches:
+Implemented as of 2026-11-02, each on its own `rdf-undef` branch, with §1–§3 as Jena has them:
+
+| Area | Where | What it did |
+|---|---|---|
+| Shared tests, ShEx, SHACL, JSON-LD | shexTest-contrib, data-shapes-contrib, json-ld-api-contrib | `undef-*` tests on their `rdf-undef` branches, as the rows below say. The W3C suite forks change nothing, since a slot is opt-in or new syntax. |
+| Shared tests | rdf-tests-contrib | `undef-*`, requiring `ra:UndefSlots`: 27 syntax tests across Turtle, TriG, N-Triples and N-Quads (positive and negative), §3's table as 48 evaluation tests, 4 updates, 10 further SPARQL syntax tests, and results in JSON and XML. Generated from Jena; `bin/build.py` cross-checks them against N3.js and Comunica. |
+| Jena | jena-array | The reference (`TestUndefSlots`). The contrib results tests found that `ResultSetCompare` could not compare a slot; fixed. |
+| OWL | owlapi-array, protege-owl-array | §4. Protégé shows a sequence as `( day undef night … )`: the Manchester object renderer writes it and the Manchester parser reads it, in an individual's position and after `value`. A saved Manchester document keeps the reversible `_:seq_…` node ID. |
+| RDF/JS terms and syntax | types, rdf-data-factory, rdf-string, rdf-string-ttl, rdf-terms, N3.js, n3writer-wrapper, lezer-turtle | An element of `termType` `Undef`, refused in quad positions by the types and the factory. N3.js reads and writes it, and `Sequence.value` spells it `(1 undef 3)`. |
+| RDF/XML | rdfxml-streaming-parser | No spelling, and this is only a parser, so no code changed. owlapi-array's writer refuses a slot and rdflib-array's RDF/XML refuses sequences. |
+| Results | sparqljson-parse, sparqlxml-parse, rdf-test-suite | `{"type":"undef"}` and `<unbound/>`, read back and compared. |
+| SPARQL in JavaScript | traqula, comunica | A bind join cannot write a value into a sequence pattern, since a constant does not match a slot: Comunica leaves the variable in place and filters with `!BOUND(?b) || sameTerm(?b, value)`. Variables inside sequence patterns and the `UNNEST` variable are `canBeUndef`. |
+| Python | rdflib-array | Term, parsers, serializers, SPARQL, results. It has no fixed-variables analysis, so only the matching changed. |
+| Rust | oxigraph-array, rudof-array | oxrdf, oxttl, spargebra, sparopt, spareval, sparesults and the store's encoding. rudof takes the term from Oxigraph. |
+| ShEx | jena-shex, shex.js, lezer-shexc, pyshexc, ShExJSG, PyShEx, CFGraph, rudof, shexTest-contrib | No value constraint is met at a slot, `.` included, and a member expression writes `undef` to allow one: `LIST ( ( xsd:integer \| undef ) * )`, for any length. `LIST ( xsd:integer \| undef ) *` is a one-member list, since a cardinality after the list belongs to the triple constraint; `LIST * undef` is short for `LIST ( undef * )`. `undef` is not a shape expression, so `undef OR x` and `:p undef` are syntax errors. A sequence holding a slot still satisfies `.` as a whole value. ShExJ `{ "type": "Undef", "min": m, "max": n }`, beside `Member` in `listExpr`; ShExR `sx:Undef`. |
+| SHACL | jena-shacl, data-shapes-contrib, rudof | A slot conforms to no member shape, so `sh:memberShape` fails there, even for a shape with no constraints, and there is no new constraint. This is stricter than `ra:member only C` in OWL (§4), where `only` is vacuous at a hole. `sh:minListLength` and `sh:maxListLength` count slots. In `sh:uniqueMembers` a slot equals only a slot, so `( undef undef )` repeats a member. A slot in a list in a shapes graph (`sh:in`, `sh:or`, paths, `sh:ignoredProperties`) makes it ill-formed. rudof has no `sh:memberShape`, so it does only this last part. |
+| JSON-LD | jsonld-streaming-parser, jsonld-streaming-serializer, jsonld.js, rdflib, Oxigraph, json-ld-api-contrib | `null` as a member of a list is a slot under the processing option `undefSlots`, at any depth and in `@container: @list` arrays; `"p": null`, `"@list": null`, `{"@value": null}` and a `null` outside a list stay dropped. Without the option JSON-LD 1.1 stands, and a serializer refuses a slot with an error naming the sequence. jsonld.js has expand, compact, flatten and `arrayToRDF`; its `toRDF` makes ladders, which cannot hold a slot, so it refuses. |
+
+The implementations agree on every row of §3's table and on the contrib tests. What this turned up:
+
+- **`VALUES` holds no sequences**, with or without a slot, in Jena and Oxigraph, so §2's "data blocks" is reached only by `INSERT DATA` and `DELETE DATA`.
+- **CSV differs, as it did before slots.** Jena writes `?` for any sequence, and Comunica and Oxigraph write it out, so the suite has no slot case for CSV.
+- **JSON-LD implementations differ where neither is a slot.** An array directly in `@list`, `{"@list": [[1]]}`, nests in jsonld.js, the streaming parser and rdflib and flattens in Oxigraph; `{"@list": null}` gives an empty node in jsonld.js and rdflib and no triple in the streaming parser. Neither is in the suite.
+- **N3** does not read `undef` in Oxigraph, since this note names Turtle, TriG, N-Triples and N-Quads.
+
+These are still to do, on their own `rdf-undef` branches:
 
 | Area | Question |
 |---|---|
-| ShEx `LIST` | Does a slot satisfy a member? Suggested: no value constraint is met at a slot, and a member expression says `undef` to allow one, as in `LIST ( xsd:integer | undef ) *`. |
-| SHACL | Suggested: `sh:memberShape` skips slots, matching `ra:member`, and a separate constraint rules them out. |
-| JSON-LD | `null` in a list is the natural spelling, though JSON-LD 1.1 drops it, so this needs a flag or a new keyword. |
-| RDF/XML, RDF Thrift, Protobuf, TDB | Sequences need checking in each first; a slot is one more case once they carry sequences. |
+| RDF Thrift, Protobuf, TDB | Sequences need checking in each first; a slot is one more case once they carry sequences. |
 | Jena's model API | `Node.UNDEF` can reach callers of `getSeq()` and `GraphList`; these should say what they return at a slot. |
 | OWL `HasKey` | Not implemented without slots either; with them, one key per length and pattern of holes (§4). |
-| Protégé's display | A sequence shows as its `_:seq_…` node ID, slots inside it invisible; the Manchester renderer should write `( 1 undef 3 )`. |
-| Shared suites | `*-contrib` and the `*-array` suites gain the tests, once §6 is settled, from `TestUndefSlots`. |
 
 ## 6. Open decisions
 

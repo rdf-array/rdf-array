@@ -99,5 +99,5 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) \
 ```
 
 Then Reasoner ▸ HermiT 1.4.3 (OWL-array) ▸ Start reasoner, and type a class expression of §3 into the
-DL Query tab. To change the roster, edit `roster.ttl` and reload: Protégé displays a sequence by its
-`_:seq_…` node ID, so the slots are visible in the file, not yet in the editor.
+DL Query tab. Protégé displays a sequence as `( day undef night … )`. To change the roster, edit
+`roster.ttl` and reload.

@@ -84,10 +84,10 @@ distinct sequence terms in 10 axioms.
 "The Active ontology tab after opening `roster.ttl`.")](../examples/roster/protege/loaded.png)
 
 Dee before reasoning: her `week` and `hours` are one term each, the same term, which Protégé
-displays by its `_:seq_…` node ID (the slots are inside it, invisible here; the file has them).
+displays as `( undef undef undef undef undef undef undef )`.
 
 [![The Individuals tab for Dee: type Worker, and the property assertions week and hours, each a
-term whose name begins with _:seq_.](../examples/roster/protege/detail-dee.png
+sequence of seven undef.](../examples/roster/protege/detail-dee.png
 "Dee before reasoning: `week` and `hours` are sequence terms, and the same one.")](../examples/roster/protege/dee.png)
 
 ## Start the reasoner
@@ -152,8 +152,9 @@ that HermiT finds through the OWL API; the table is [§3 of the example](../exam
   reads it back with the same axioms; RDF/XML refuses, naming the sequence: `rdf:parseType="Collection"`
   holds node elements only, and a slot is none ([#18](https://github.com/rdf-array/rdf-array/issues/18)
   was the literal element).
-- **The slots are invisible in the editor.** A sequence displays by its node ID; the Manchester
-  renderer writing `( :day undef :night … )` is the fix, on both branches' lists.
+- **A sequence is written out in the editor, not yet in a Manchester file.** owlapi-array's object
+  renderer writes `( day undef night … )`, and its parser reads that back; a saved Manchester document
+  keeps the reversible `_:seq_…` node ID.
 - **The inner positions are invisible to the reasoner.** The expansion tells `( 1 undef )` from
   `( undef 1 )` by the ends and from `( 1 2 )` by the count of holes, but not `( 1 undef 2 3 )` from
   `( 1 2 undef 3 )`, as it did not tell `( 1 2 3 4 )` from `( 1 3 2 4 )` before: sound and incomplete
