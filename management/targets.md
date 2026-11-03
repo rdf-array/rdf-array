@@ -108,6 +108,9 @@ rdf-canonize (the algorithm's hashing steps, and its `rdf-canonize-native` twin)
 for the test infrastructure of every JavaScript fork and for signing rdf-array data (verifiable
 credentials are canonicalized before signing).
 
+**RDFC-1.0: done, 2026-11-03.** [rdfc-array.md](../docs/rdfc-array.md), in rdf-canonize-array and oxigraph-array, with tests in
+rdf-tests-contrib's `rdf/rdf-canon`. rdf-isomorphic, `rdf-canonize-native` and Python's rdf-canon remain.
+
 ## QLever: the scale showcase
 
 QLever is a C++ engine that builds a compressed index from Turtle or N-Triples and answers SPARQL
@@ -213,6 +216,6 @@ Oxigraph gives Rust.
    and implement it in jena-shacl,~~ done: [shacl-array.md](../docs/shacl-array.md) and jena-array's
    `jena-shacl` (2026-10-25). Then rudof's `shacl`, whose lists rudof-array already reads as
    sequences but which lacks SHACL 1.2's list constraints, and a data-shapes-array suite fork.
-4. Fork rdf-isomorphic and rdf-canonize, and switch the JavaScript forks' tests to them.
+4. ~~Fork rdf-canonize,~~ done: rdf-canonize-array (2026-11-03). Fork rdf-isomorphic, and switch the JavaScript forks' tests to them.
 5. Deploy a Fuseki-array endpoint and point Yasgui and SPARQLWrapper at it.
 6. Fork QLever when the model is stable enough to carry a C++ index design.

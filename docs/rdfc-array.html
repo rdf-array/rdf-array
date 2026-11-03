@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>RDFC-array: RDFC-1.0 over rdf-array</title>
+  <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
+  <script class="remove">
+    var respecConfig = {
+      specStatus: "unofficial",
+      shortName: "rdfc-array",
+      editors: [{ name: "Eric Prud'hommeaux" }],
+      edDraftURI: "https://rdf-array.github.io/rdf-array/docs/rdfc-array.html",
+      latestVersion: null,
+      overrideCopyright: "<p class='copyright'>Copyright &copy; 2026 the rdf-array project. This document is licensed under a <a href='https://creativecommons.org/licenses/by/4.0/'>Creative Commons Attribution 4.0 License</a>.</p>",
+      lint: { "no-unused-dfns": false },
+      localBiblio: {
+        "RML-CORE": { title: "RML-Core: Generic Mapping Language for RDF", href: "https://w3id.org/rml/core/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "RML-CC": { title: "RML-CC: RML Collections and Containers", href: "https://w3id.org/rml/cc/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "RML-LV": { title: "RML-LV: RML Logical Views", href: "https://w3id.org/rml/lv/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "RML-FNML": { title: "RML-FNML: RML Functions", href: "https://w3id.org/rml/fnml/spec", publisher: "W3C Knowledge Graph Construction Community Group" },
+        "YARRRML": { title: "YARRRML", href: "https://rml.io/yarrrml/spec/", publisher: "IDLab, Ghent University" }
+      }
+    };
+  </script>
+  <style>
+    table.simple { font-size: 0.9em; }
+    table.simple td, table.simple th { vertical-align: top; }
+    pre.example { font-size: 0.9em; line-height: 1.35; }
+    .hljs-iri { color: #0b5394; }
+    .hljs-pname { color: #38761d; }
+    .hljs-lit { color: #a61c00; }
+    .hljs-kw { color: #741b47; font-weight: bold; }
+    .hljs-var { color: #b45f06; }
+    .hljs-cmt { color: #777; font-style: italic; }
+    .hljs-bnode { color: #666; }
+    .hljs-num, .hljs-number { color: #a61c00; }
+    .hljs-attr { color: #0b5394; }
+    .hljs-string { color: #38761d; }
+    .hljs-literal { color: #741b47; }
+  </style>
+</head>
+<body>
+  <section id="abstract">
+    <p>RDFC-array is <a href="https://www.w3.org/TR/rdf-canon/">RDF Dataset Canonicalization</a> (RDFC-1.0) over a dataset whose subjects and objects may be sequences. A dataset with no sequence gives exactly what RDFC-1.0 gives, byte for byte: every change below applies only to a quad holding one, and W3C's rdf-canon suite passes unchanged.</p>
+  </section>
+  <section id="sotd">
+    <p>This is a working document of the <a href="https://github.com/rdf-array">rdf-array</a> project, generated from <a href="https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/rdfc-array.md">docs/rdfc-array.md</a> by <code>tools/md-to-respec.py</code> in the same repository. It is not a W3C document and has no standing anywhere.</p>
+  </section>
+  <section class="introductory" id="introduction">
+    <h2>Introduction</h2>
+    <p><em>Definition, 2026-11-03. Implemented in <a href="https://github.com/rdf-array/rdf-canonize-array">rdf-canonize-array</a> and in <a href="https://github.com/rdf-array/oxigraph-array">oxigraph-array</a>'s <code>oxrdf</code>, which agree on the tests of <a href="https://github.com/rdf-array/rdf-tests-contrib">rdf-tests-contrib</a>'s <code>rdf/rdf-canon</code>. <a href="rdf-array.html">rdf-array.md</a> describes the change from RDF to rdf-array.</em></p>
+  </section>
+  <section id="the-canonical-spelling">
+  <h2>The canonical spelling</h2>
+  <p>A sequence is written <code>(e1 e2 …)</code>: one space between elements, none inside the parentheses, and <code>()</code> when empty. Each element is written as a term of canonical N-Quads, and a nested sequence by this same rule.</p>
+  </section>
+  <section id="changes-to-the-algorithm">
+  <h2>Changes to the algorithm</h2>
+  <p>The step numbers are those of RDFC-1.0.</p>
+  <ol><li><strong>Blank node to quads map (§4.4.3 step 2).</strong> A blank node occurs in a quad if it is the subject, object or graph name, or an element of a subject or object sequence, at any depth.</li><li><strong>Hash First Degree Quads (§4.6.3 step 3).</strong> The blank nodes inside a sequence are replaced by <code>_:a</code> and <code>_:z</code> like any other.</li><li><strong>Hash N-Degree Quads (§4.8.3 step 3).</strong> A blank node inside a sequence, other than the reference blank node, is a related blank node once for each place it occurs. Its <em>position</em>, passed to Hash Related Blank Node, is <code>s</code> or <code>o</code> for the sequence's place in the quad, followed by <code>-</code> and the zero-based index at each level: <code>o-1-0</code> is the first element of the second element of an object sequence.</li><li><strong>Hash N-Degree Quads, before step 6.</strong> Append to <em>data to hash</em> each quad of the reference blank node that holds a sequence, written in canonical N-Quads with a line ending, using for each blank node its canonical identifier if it has one and otherwise its identifier from the issuer. These lines are sorted first. All these blank nodes have identifiers by this point, because each is the reference blank node or related to it.</li><li><strong>Serialized canonical form (§4.4.3 step 7, §5).</strong> Blank nodes inside sequences are replaced by their canonical identifiers.</li></ol>
+  </section>
+  <section id="why-step-4-is-needed">
+  <h2>Why step 4 is needed</h2>
+  <p>Hash Related Blank Node sees pairs: the reference blank node and one other. That describes an ordinary dataset, whose quads relate at most three blank nodes, each of them visible as a subject, object or graph name. A sequence ties together any number, and pairs do not say which ones share a sequence:</p>
+  <pre class="example nohighlight">&lt;s&gt; &lt;p&gt; (_:x _:y _:a) .
+  &lt;s&gt; &lt;p&gt; (_:x _:u _:b) .
+  &lt;s&gt; &lt;p&gt; (_:w _:y _:b) .
+  &lt;s&gt; &lt;p&gt; (_:w _:u _:a) .</pre>
+  <p>Every pair here occurs once at each pair of positions, and so it does if <code>_:a</code> and <code>_:b</code> trade places. Without step 4, two choices of identifiers can give the same hash and yet different datasets, so the result depends on the input's labels or order. In 200 random datasets in which every blank node occurs once at every position, 13 gave different results under shuffled labels with step 3 alone; with step 4, none of 600 did. That is a test and not a proof. The argument for step 4 is that a path now spells out every sequence that a blank node on it holds, so two equal hashes describe the same sequences under the same identifiers.</p>
+  <p>The index path in step 3 is not needed for that. It keeps one blank node's places in a sequence apart from one another and from its place as a plain object, which would otherwise share a related hash.</p>
+  </section>
+  <section id="not-settled">
+  <h2>Not settled</h2>
+  <ul><li><strong>Complexity.</strong> Step 4 adds work in proportion to the quads holding sequences, but ties remain as costly as RDFC-1.0's <a href="https://www.w3.org/TR/rdf-canon/#dataset-poisoning">dataset poisoning</a>, and a sequence makes many ties easy to write, as above. Implementations should keep their limits on deep iterations.</li><li><strong>A sequence in a triple term.</strong> <code>oxrdf</code> hashes blank nodes in one; the tests have none, since jena-array and N3.js-array reject them.</li><li><strong>Slots.</strong> This document covers the <code>rdf-sequences</code> branch, which has no way to write a slot.</li><li><strong>The name.</strong> Output from this algorithm is not RDFC-1.0 output when a sequence is present, and it has no identifier of its own for use in signatures.</li></ul>
+  </section>
+  <script>
+  // Turtle-array and SPARQL-array highlighting: a few token classes are enough for these examples.
+  (function () {
+    var token = /(<[^>\s]*>)|("""[\s\S]*?"""|"(?:[^"\\]|\\.)*")(@[A-Za-z0-9-]+|\^\^[^\s;,.()\]]+)?|(#[^\n]*)|(\?[A-Za-z_][\w]*)|(_:[A-Za-z0-9_-]+)|(\b(?:PREFIX|BASE|SELECT|CONSTRUCT|ASK|DESCRIBE|WHERE|DELETE|INSERT|DATA|FILTER|OPTIONAL|UNION|ORDER|BY|GROUP|LIMIT|OFFSET|BIND|VALUES|GRAPH|a)\b)|(\b-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b)|([A-Za-z][\w-]*:[\w#./-]*|[A-Za-z][\w-]*:)/g;
+    function paint(pre) {
+      var src = pre.textContent, out = '', last = 0, m;
+      token.lastIndex = 0;
+      while ((m = token.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        var cls = m[1] ? 'hljs-iri' : m[2] ? 'hljs-lit' : m[4] ? 'hljs-cmt' : m[5] ? 'hljs-var' : m[6] ? 'hljs-bnode' : m[7] ? 'hljs-kw' : m[8] ? 'hljs-num' : 'hljs-pname';
+        out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+        last = token.lastIndex;
+      }
+      out += esc(src.slice(last));
+      pre.innerHTML = out;
+    }
+    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    var jsonToken = /("(?:[^"\\]|\\.)*")(\s*:)?|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|\b(true|false|null)\b/g;
+    function paintJson(pre) {
+      var src = pre.textContent, out = '', last = 0, m;
+      jsonToken.lastIndex = 0;
+      while ((m = jsonToken.exec(src))) {
+        out += esc(src.slice(last, m.index));
+        if (m[1]) { out += '<span class="' + (m[2] ? 'hljs-attr' : 'hljs-string') + '">' + esc(m[1]) + '</span>' + esc(m[2] || ''); }
+        else if (m[3]) { out += '<span class="hljs-number">' + esc(m[3]) + '</span>'; }
+        else { out += '<span class="hljs-literal">' + esc(m[4]) + '</span>'; }
+        last = jsonToken.lastIndex;
+      }
+      out += esc(src.slice(last));
+      pre.innerHTML = out;
+    }
+    function tidyHeader() {
+      // An unofficial draft has no published version; ReSpec prints the line anyway.
+      document.querySelectorAll('.head dt').forEach(function (dt) {
+        if (/^Latest published version/.test(dt.textContent)) { var dd = dt.nextElementSibling; dt.remove(); if (dd && dd.tagName === 'DD') dd.remove(); }
+      });
+    }
+    function run() { tidyHeader(); document.querySelectorAll('pre.turtle, pre.sparql').forEach(paint); document.querySelectorAll('pre.json').forEach(paintJson); }
+    if (document.respec && document.respec.ready) { document.respec.ready.then(run); } else { document.addEventListener('DOMContentLoaded', run); }
+  })();
+  </script>
+</body>
+</html>
