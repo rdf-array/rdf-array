@@ -60,6 +60,11 @@ from its place as a plain object, which would otherwise share a related hash.
   Implementations should keep their limits on deep iterations.
 - **A sequence in a triple term.** `oxrdf` hashes blank nodes in one; the tests have none, since jena-array and N3.js-array
   reject them.
-- **Slots.** This document covers the `rdf-sequences` branch, which has no way to write a slot.
 - **The name.** Output from this algorithm is not RDFC-1.0 output when a sequence is present, and it has no identifier of its own
   for use in signatures.
+
+## 5. Slots
+
+On the `rdf-undef` branch ([rdf-undef.md](rdf-undef.html)) a sequence may hold empty slots. The algorithm needs nothing further:
+a slot holds no blank node, and it is written `undef`, in lowercase, like any other element. It counts as an element in an index
+path, so the `_:x` of `(undef _:x)` is at `o-1`.

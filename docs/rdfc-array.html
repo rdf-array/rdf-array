@@ -71,7 +71,11 @@
   </section>
   <section id="not-settled">
   <h2>Not settled</h2>
-  <ul><li><strong>Complexity.</strong> Step 4 adds work in proportion to the quads holding sequences, but ties remain as costly as RDFC-1.0's <a href="https://www.w3.org/TR/rdf-canon/#dataset-poisoning">dataset poisoning</a>, and a sequence makes many ties easy to write, as above. Implementations should keep their limits on deep iterations.</li><li><strong>A sequence in a triple term.</strong> <code>oxrdf</code> hashes blank nodes in one; the tests have none, since jena-array and N3.js-array reject them.</li><li><strong>Slots.</strong> This document covers the <code>rdf-sequences</code> branch, which has no way to write a slot.</li><li><strong>The name.</strong> Output from this algorithm is not RDFC-1.0 output when a sequence is present, and it has no identifier of its own for use in signatures.</li></ul>
+  <ul><li><strong>Complexity.</strong> Step 4 adds work in proportion to the quads holding sequences, but ties remain as costly as RDFC-1.0's <a href="https://www.w3.org/TR/rdf-canon/#dataset-poisoning">dataset poisoning</a>, and a sequence makes many ties easy to write, as above. Implementations should keep their limits on deep iterations.</li><li><strong>A sequence in a triple term.</strong> <code>oxrdf</code> hashes blank nodes in one; the tests have none, since jena-array and N3.js-array reject them.</li><li><strong>The name.</strong> Output from this algorithm is not RDFC-1.0 output when a sequence is present, and it has no identifier of its own for use in signatures.</li></ul>
+  </section>
+  <section id="slots">
+  <h2>Slots</h2>
+  <p>On the <code>rdf-undef</code> branch (<a href="rdf-undef.html">rdf-undef.md</a>) a sequence may hold empty slots. The algorithm needs nothing further: a slot holds no blank node, and it is written <code>undef</code>, in lowercase, like any other element. It counts as an element in an index path, so the <code>_:x</code> of <code>(undef _:x)</code> is at <code>o-1</code>.</p>
   </section>
   <script>
   // Turtle-array and SPARQL-array highlighting: a few token classes are enough for these examples.
