@@ -45,10 +45,6 @@ ra:JsonLdArrayToRdfTest a rdfs:Class ;
     rdfs:label "JsonLdArrayToRdfTest" ;
     rdfs:comment "A JSON-LD-array test: plain JSON (input) and a mapping document (ra:mapping) to N-Quads-array (expect) or an error code (expectErrorCode)." .
 
-ra:undefSlots a rdf:Property ;
-    rdfs:label "undefSlots" ;
-    rdfs:comment "A JSON-LD processing option, set on a test's options: true makes a null that is a member of a list an empty slot (docs/rdf-undef.md §5)." .
-
 ra:mapping a rdf:Property ;
     rdfs:label "mapping" ;
     rdfs:comment "The JSON-LD-array mapping document of a ra:JsonLdArrayToRdfTest." .

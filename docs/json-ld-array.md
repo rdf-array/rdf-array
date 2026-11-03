@@ -148,7 +148,7 @@ Every JSON value kind has one rdf-array reading; the mapping only refines it.
 | string | a plain literal; or an identifier of a node (an IRI, or a blank node); or a datatyped or language-tagged literal | `datatype`, `language`, `direction`, `valueType`, `template`, `termType`, `role` |
 | number | `xsd:integer` when it has no fraction or exponent, otherwise `xsd:decimal` | `datatype` (for instance `xsd:double`) |
 | `true` / `false` | `xsd:boolean` | — |
-| `null` | nothing: no triple, and no element in a sequence | — |
+| `null` | nothing: no triple; as a member of an array, an empty slot of the sequence ([rdf-undef](rdf-undef.md)) | — |
 
 The one principle behind arrays and dictionaries: **JSON arrays are ordered, so they become
 sequences; JSON objects are unordered (RFC 8259), so an object used as a dictionary becomes repeated
@@ -421,7 +421,7 @@ stands for the blank node of the enclosing object.
 | `{ "members": [ { "name": "A" }, { "name": "B" } ] }` | `"members": { "iri": "ex:members", "propertyMap": { "name": "schema:name" } }` | `[] ex:members ( [ schema:name "A" ] [ schema:name "B" ] ) .` |
 | `{ "codes": ["A1", "B2"] }` | `"codes": { "iri": "ex:code", "valueType": "identifier" }` | `[] ex:code ( <https://example.org/people/A1> <https://example.org/people/B2> ) .` |
 | `{ "names": ["Dog", "Hund"] }` | `"names": { "iri": "rdfs:label", "language": "en" }` | `[] rdfs:label ( "Dog"@en "Hund"@en ) .` (one language per property; a dictionary gives one per value, §5.4) |
-| `{ "mixed": ["a", 1, null, { "x": 1 }] }` | `"mixed": { "iri": "ex:mixed", "propertyMap": { "x": "ex:x" } }` | `[] ex:mixed ( "a" 1 [ ex:x 1 ] ) .` (the `null` leaves no element; see §8) |
+| `{ "mixed": ["a", 1, null, { "x": 1 }] }` | `"mixed": { "iri": "ex:mixed", "propertyMap": { "x": "ex:x" } }` | `[] ex:mixed ( "a" 1 undef [ ex:x 1 ] ) .` (the `null` keeps its position as an empty slot) |
 
 ### 5.4 Dictionaries are repeated properties
 
@@ -497,8 +497,6 @@ matters belongs in an array of objects with the key as a field.
 
 ## 8. Decisions to confirm
 
-- **`null` inside an array** leaves no element, which shifts the positions after it. The
-  alternative is an explicit placeholder term; rdf-array has none today.
 - **Fractional numbers default to `xsd:decimal`**, not JSON-LD's `xsd:double`; `datatype` gives
   the double back.
 - **An inverse property and the type role spread an array** instead of making a sequence the
@@ -574,7 +572,7 @@ constant-valued, reference-valued (a field of the record) or template-valued.
 | Transforming values | none | none | RML-FNML: functions described with the Function Ontology, and conditions through functions in implementations |
 | Quoted triples | JSON-LD-star, not standardized | none | RML-star `rml:StarMap` |
 | Unmapped data | dropped, or everything becomes a property under `@vocab` | `unmappedKeys` and `unmappedTypes`: a scope and an `otherwise` | only referenced data is read: positive selection, so there is nothing to drop |
-| Missing values and `null` | dropped; `null` also undefines terms and resets contexts | dropped | a reference with no value produces no triple |
+| Missing values and `null` | dropped; `null` also undefines terms and resets contexts | dropped, except as a member of an array, which is an empty slot | a reference with no value produces no triple |
 | Direction | both ways: expansion, compaction, framing | JSON to RDF; the inverse is defined for tree-shaped graphs | one way, source to RDF; `rr:inverseExpression` only hints at the reverse for tables |
 | Status | W3C Recommendation (2020) | this sketch | R2RML a W3C Recommendation (2012); the RML modules W3C Community Group reports (2023–2025); processors such as RMLMapper, Morph-KGC and SDM-RDFizer |
 
