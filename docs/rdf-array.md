@@ -132,7 +132,10 @@ stock jsonld-streaming-parser, so they stay ladders.
 
 **RDF/XML.** `rdf:parseType="Collection"` is one sequence, `()` when empty, and `rdf:ID` reification
 or `rdf:annotation` applies to that one triple; `rdf:li` is no longer numbered into `rdf:_1`, `rdf:_2`,
-…. RDFLib's RDF/XML, TriX and HexTuples writers refuse sequence terms rather than invent a spelling.
+…. rdfxml-streaming-parser-array does all of this. jena-array makes the sequence in all its readers and
+writes one holding only IRIs and blank nodes back as a Collection, refusing anything else, but still numbers
+`rdf:li`. rdflib-array's parser still reads a Collection as a ladder and numbers `rdf:li`, and its RDF/XML,
+TriX and HexTuples writers refuse sequence terms rather than invent a spelling.
 
 **SHACL.** [SHACL-array](shacl-array.html): a SHACL list (`sh:path ( … )`, `sh:in`, `sh:or`, …) is
 a sequence term and a ladder is not a list; SHACL 1.2's `sh:memberShape`, `sh:minListLength`,
