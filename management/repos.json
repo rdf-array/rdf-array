@@ -524,13 +524,29 @@
       "language": "JavaScript",
       "stack": true,
       "upstream": "digitalbazaar/jsonld.js",
-      "description": "JSON-LD-array: `jsonld.arrayToRDF`, writers for N-Quads-array and Turtle-array, and the [playground](https://rdf-array.github.io/jsonld.js-array/).",
+      "description": "JSON-LD-array: `jsonld.arrayToRDF`, writers for N-Quads-array and Turtle-array, and the [playground](https://rdf-array.github.io/jsonld.js-array/); `toRDF`, `fromRDF` and `canonize` with sequences.",
       "deps": [
         {
           "repo": "json-ld-api-contrib",
           "scope": "test"
+        },
+        {
+          "repo": "rdf-canonize-array"
+        },
+        {
+          "repo": "json-ld-api-array",
+          "scope": "test"
         }
       ]
+    },
+    {
+      "name": "rdf-canonize-array",
+      "short": "rdf-canonize",
+      "anchor": "rdf-canonize-array",
+      "kind": "implementation",
+      "language": "JavaScript",
+      "upstream": "digitalbazaar/rdf-canonize",
+      "description": "RDFC-1.0 over sequences, [rdfc-array.md](../docs/rdfc-array.html), and N-Quads-array."
     },
     {
       "name": "PyShEx-array",
@@ -708,7 +724,7 @@
     {
       "anchor": "rdf-canonize",
       "done": false,
-      "text": "**rdf-canonize and rdf-isomorphic** (JavaScript; Python rdf-canon) — canonicalization and isomorphism with blank nodes inside sequences; the JavaScript forks' tests need it. Impact 2–3, utility 4. [Assessment](targets.md#canonicalization-and-isomorphism)."
+      "text": "**rdf-isomorphic** (JavaScript; Python rdf-canon) — isomorphism and canonicalization with blank nodes inside sequences; the JavaScript forks' tests need it. rdf-canonize is done: [rdf-canonize-array](#rdf-canonize-array). Impact 2–3, utility 4. [Assessment](targets.md#canonicalization-and-isomorphism)."
     },
     {
       "anchor": "fuseki-endpoint",

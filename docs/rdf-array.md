@@ -40,7 +40,7 @@ triple term became one in RDF 1.2.
   triple terms and are compared element by element, a shorter prefix first.
 - **Blank nodes inside sequences** are ordinary blank nodes: `( [ :p 1 ] )` is a sequence holding a
   blank node that also has a triple. Graph isomorphism has to canonicalize blank nodes inside
-  sequences too, which stock tools do not yet (see [Open questions](#open-questions)).
+  sequences too ([rdfc-array.md](rdfc-array.html)), which stock tools do not yet (see [Open questions](#open-questions)).
 
 ### The sequence in code
 
@@ -126,7 +126,7 @@ lexically scoped bases and templates replace the flat `@context`. Implemented in
 **JSON-LD as it is.** For the RDF/JS stack, the jsonld-streaming-parser fork reads a JSON-LD `@list`
 as one sequence (nested lists as nested sequences) and the jsonld-streaming-serializer fork writes a
 sequence as `@list`. jsonld.js's `toRDF` and `fromRDF` make and read one sequence term for a `@list`, and a
-ladder is ordinary triples to them. Its `canonize` refuses a sequence, since RDFC-1.0 has no sequence term.
+ladder is ordinary triples to them. Its `canonize` follows [rdfc-array.md](rdfc-array.html).
 Components.js, the dependency injection comunica is built with, reads its configuration lists through a
 stock jsonld-streaming-parser, so they stay ladders.
 
@@ -139,7 +139,10 @@ a sequence term and a ladder is not a list; SHACL 1.2's `sh:memberShape`, `sh:mi
 `sh:maxListLength` and `sh:uniqueMembers` constrain sequence values.
 
 **Not touched.** RDFa (`inlist` still builds a
-ladder), the canonicalization algorithm RDFC-1.0 (no sequence term), N3 formulas (fine in RDFLib).
+ladder), N3 formulas (fine in RDFLib).
+
+**Canonicalization.** [RDFC-array](rdfc-array.html) is RDFC-1.0 with blank nodes inside sequences taking part, and
+gives RDFC-1.0's output for a dataset with no sequence.
 
 ### Converting between RDF and rdf-array
 
@@ -190,9 +193,8 @@ graph with no sequences is an RDF graph.
 
 - **A placeholder element.** JSON `null` inside an array leaves no element, which shifts the
   positions after it; rdf-array has no term to hold a place.
-- **Blank nodes inside sequences.** `rdf-isomorphic` and the canonicalization algorithms do not look
-  inside sequences, so two graphs that differ only in blank node labels inside sequences are not
-  recognised as isomorphic; tests compare such cases by hand.
+- **Blank nodes inside sequences.** `rdf-isomorphic` does not look inside sequences, so two graphs that differ
+  only in blank node labels inside sequences are not recognised as isomorphic; tests that use it compare such cases by hand.
 - **Sequences as subjects** are allowed; JSON-LD-array cannot write them (no `@id` for a value), and
   nothing yet needs them.
 - **Containers.** `rdf:Seq`, `rdf:Bag` and `rdf:Alt` keep their vocabulary but lose the only syntax
@@ -213,8 +215,8 @@ graph with no sequences is an RDF graph.
   not all walk them yet ([#3](https://github.com/rdf-array/rdf-array/issues/3); see [repos.html](https://rdf-array.github.io/rdf-array/management/repos.html#test-suites) for the repositories and contrib-duplicates.md for the
   overlap). The suite forks are newer than the suites the implementations pin, so a port must tell
   upstream drift from rdf-array failures ([#11](https://github.com/rdf-array/rdf-array/issues/11)).
-  SHACL's suite waits for a data-shapes-array fork (shacl-array.md §4), and RDF canonicalization's
-  for a canonicalization of sequences.
+  SHACL's suite waits for a data-shapes-array fork (shacl-array.md §4). RDF canonicalization's tests of
+  sequences are in rdf-tests-contrib.
 - **A sequence inside a triple term.** RDF 1.2 forbids a collection in a triple term because it generates
   triples; a sequence generates none, so rdf-array could allow `<< :s :p ( 1 ) >>`, but jena-array and
   N3.js-array reject it today, and rdf-tests-array keeps the RDF 1.2 negative test (`trig12-syntax-bad-06`)
