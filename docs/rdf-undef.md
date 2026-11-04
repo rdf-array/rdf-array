@@ -26,8 +26,8 @@ A slot is a position with no value. Three consequences carry through everything 
   and I am not saying what". `undef` says there is nothing there, so `( 1 2 3 )` does not entail
   `( 1 undef 3 )`, nor the reverse. This follows from [owl-array.md](owl-array.html) §3.1, "a sequence
   is closed".
-- **It counts.** `( 1 undef 3 )` has length 3. Two sequences are the same term when their members and
-  their slots line up: `( 1 undef )` is `( 1 undef )`, and is different from `( 1 )`, `( undef 1 )` and
+- **It counts.** `( 1 undef 3 )` has length 3. Two sequences are equal when their members and
+  their slots line up: `( 1 undef )` equals `( 1 undef )`, and differs from `( 1 )`, `( undef 1 )` and
   `( 1 2 )`.
 
 ## 2. Syntax

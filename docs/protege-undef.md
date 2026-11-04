@@ -83,7 +83,7 @@ distinct sequence terms in 10 axioms.
 [![Protégé's Active ontology tab for roster.ttl.](../examples/roster/protege/loaded.png
 "The Active ontology tab after opening `roster.ttl`.")](../examples/roster/protege/loaded.png)
 
-Dee before reasoning: her `week` and `hours` are one term each, the same term, which Protégé
+Dee before reasoning: her `week` and `hours` are equal sequences, so one individual, which Protégé
 displays as `( undef undef undef undef undef undef undef )`.
 
 [![The Individuals tab for Dee: type Worker, and the property assertions week and hours, each a
