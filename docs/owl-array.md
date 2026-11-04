@@ -117,8 +117,9 @@ values or sequences. A sequence term `( t1 … tn )` denotes the tuple of its el
 
 - **Identity is by elements.** Two sequence terms denote the same individual exactly when their
   elements denote the same things, pairwise: `( ex:a )` and `( ex:b )` are the same individual in
-  every interpretation in which `ex:a owl:sameAs ex:b`, and `( 1 2 )` is the same term in every
-  document, as `"1"^^xsd:integer` is.
+  every interpretation in which `ex:a owl:sameAs ex:b`, and `( 1 2 )` denotes the same tuple in every
+  document, as `"1"^^xsd:integer` denotes one value. Two occurrences in an RDF graph
+  ([rdf-array.md](rdf-array.html)) are two terms there and one individual here.
 - **Sequences are a sort of their own.** No IRI, blank node or literal denotes a tuple, so a
   sequence is never `owl:sameAs` an IRI-named individual, as a literal is not, and `ra:Sequence` is
   disjoint from every class of ordinary individuals.
@@ -132,6 +133,8 @@ individual of a class assertion, an element of another sequence, a nominal in `o
 A sequence holding an anonymous individual anywhere inside is itself anonymous, and goes only where
 OWL 2 DL lets an anonymous individual go: not into `owl:hasValue`, `owl:oneOf`, `owl:sameAs`,
 `owl:differentFrom` or a negative property assertion.
+In RDF a sequence may only be an object, so an axiom that would need one as a subject has no RDF form
+and reaches an ontology only through the Functional-style, OWL/XML or Manchester syntax.
 A sequence is never a class, a property, a datatype or an ontology IRI. The RDF-based semantics
 (OWL 2 Full) is not addressed here.
 
@@ -311,7 +314,7 @@ elements `e1 … en`:
   `ra:member max 0` when there are none, and the same for `ra:memberValue` with a `DataOneOf`.
   Closure is what makes `ra:member only C` decidable on `s` and what no ladder could supply; it
   is omitted for an EL reasoner, which cannot express it and cannot ask the questions that need it.
-- Nested sequences are expanded recursively; equal terms get the same individual, which gives
+- Nested sequences are expanded recursively; equal sequences get the same individual, which gives
   identity by elements for ground sequences. Identity under `owl:sameAs` of elements (§3.1) is a key
   on positions; an expansion may add `HasKey` axioms per length for it, which OWL 2 restricts to
   named individuals, exactly the sequences that are named here.
@@ -361,7 +364,8 @@ sequence terms on the way out.
   `STRING ARRAY {1,2}`): a constraint on members and bounds on length.
 - **Identity by elements, no IRI.** An earlier draft named each sequence with a reversible URN and
   an `rdfs:label`. That makes `( ex:a )` and `( ex:b )` different individuals when `ex:a owl:sameAs
-  ex:b`, and no other rdf-array implementation gives a sequence an identity beyond its elements.
+  ex:b`. RDF graphs keep occurrences apart, but what a sequence denotes here still depends only on its
+  elements.
   The canonical IRI survives only inside the expansion (§6).
 - **No companion ontology.** The same draft materialised the `ra:` assertions into an ontology
   imported beside the source. The length of `( 1 2 3 )` is a fact about the term, as the value of
