@@ -3,10 +3,11 @@
 *Definition, 2026-11-03. Implemented in [rdf-canonize-array](https://github.com/rdf-array/rdf-canonize-array) and in
 [oxigraph-array](https://github.com/rdf-array/oxigraph-array)'s `oxrdf`, which agree on the tests of
 [rdf-tests-contrib](https://github.com/rdf-array/rdf-tests-contrib)'s `rdf/rdf-canon`. [rdf-array.md](rdf-array.html) describes
-the change from RDF to rdf-array.*
+the change from RDF to rdf-array. Neither implementation yet follows the data model adopted that day: a subject sequence is still
+accepted, and equal quads are still one (item 6 below).*
 
-RDFC-array is [RDF Dataset Canonicalization](https://www.w3.org/TR/rdf-canon/) (RDFC-1.0) over a dataset whose subjects and
-objects may be sequences. A dataset with no sequence gives exactly what RDFC-1.0 gives, byte for byte: every change below applies
+RDFC-array is [RDF Dataset Canonicalization](https://www.w3.org/TR/rdf-canon/) (RDFC-1.0) over a dataset whose objects may be
+sequences, and in which a quad holding a sequence may occur more than once. A dataset with no sequence gives exactly what RDFC-1.0 gives, byte for byte: every change below applies
 only to a quad holding one, and W3C's rdf-canon suite passes unchanged.
 
 ## 1. The canonical spelling
@@ -19,17 +20,19 @@ is written as a term of canonical N-Quads, and a nested sequence by this same ru
 The step numbers are those of RDFC-1.0.
 
 1. **Blank node to quads map (§4.4.3 step 2).** A blank node occurs in a quad if it is the subject, object or graph name, or an
-   element of a subject or object sequence, at any depth.
+   element of an object sequence, at any depth.
 2. **Hash First Degree Quads (§4.6.3 step 3).** The blank nodes inside a sequence are replaced by `_:a` and `_:z` like any other.
 3. **Hash N-Degree Quads (§4.8.3 step 3).** A blank node inside a sequence, other than the reference blank node, is a related
-   blank node once for each place it occurs. Its *position*, passed to Hash Related Blank Node, is `s` or `o` for the sequence's
-   place in the quad, followed by `-` and the zero-based index at each level: `o-1-0` is the first element of the second element
+   blank node once for each place it occurs. Its *position*, passed to Hash Related Blank Node, is `o`,
+   followed by `-` and the zero-based index at each level: `o-1-0` is the first element of the second element
    of an object sequence.
 4. **Hash N-Degree Quads, before step 6.** Append to *data to hash* each quad of the reference blank node that holds a sequence,
    written in canonical N-Quads with a line ending, using for each blank node its canonical identifier if it has one and otherwise
    its identifier from the issuer. These lines are sorted first. All these blank nodes have identifiers by this point, because each
    is the reference blank node or related to it.
 5. **Serialized canonical form (§4.4.3 step 7, §5).** Blank nodes inside sequences are replaced by their canonical identifiers.
+6. **Repeated quads.** Each occurrence of a quad holding a sequence stays a quad of its own in every list above and a line of its
+   own in the canonical form. The two occurrences are interchangeable, so sorting needs nothing more. This item is not yet tested.
 
 ## 3. Why step 4 is needed
 

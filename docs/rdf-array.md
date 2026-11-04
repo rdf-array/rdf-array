@@ -26,12 +26,24 @@ triple term became one in RDF 1.2.
 
 ### The data model
 
+*Adopted 2026-11-03. Until then equal sequences were one term and a sequence could be a subject. The
+implementations still follow that rule (see [Open questions](#open-questions)), and the table of terms
+below describes them as they are.*
+
 - **Terms.** IRIs, blank nodes, literals, triple terms (RDF 1.2) and sequences. A sequence is a
-  finite, ordered, possibly empty list of terms of any kind, sequences included. It is a value, as a
-  literal is: two sequences are equal when their elements are equal, pairwise; it has no identity of
-  its own, no triples are *about* it, and no blank node stands for it.
-- **Positions.** A sequence may be the subject or the object of a triple, and an element of a
-  sequence. It may not be a predicate or a graph name.
+  finite, ordered, possibly empty list of terms of any kind, sequences included.
+- **Occurrences.** Each sequence written is its own, as each `( )` in an RDF 1.1 Turtle document is:
+  `:N1 :p (1 2) . :N2 :p (1 2) .` holds two lists, and so does `:s :p (1 2), (1 2) .`. A sequence has
+  no label and no blank node stands for it, so it occurs in exactly one triple and no other triple can
+  mention it. A nested sequence is part of the sequence that holds it.
+- **Equality.** Two sequences are equal when their elements are equal, pairwise. Equal sequences are
+  still two. Equality is what a constant in a pattern, `=` and `DELETE DATA` use.
+- **Graphs.** A graph is a set of triples, except that a triple holding a sequence may occur more than
+  once. Since each sequence occurs in one triple, two occurrences differ only in being two, and an
+  implementation may keep a count rather than an identifier.
+- **Positions.** A sequence may be the object of a triple and an element of a sequence. It may not be
+  a subject, a predicate or a graph name: with no label, a subject could have only one
+  predicate and object, and nothing could reach it again.
 - **`rdf:first`, `rdf:rest`, `rdf:nil`.** They keep no special meaning: they are ordinary IRIs, and a
   triple using them is an ordinary triple. `()` is the empty sequence, not `rdf:nil`. The container
   vocabulary (`rdf:Seq`, `rdf:Bag`, `rdf:Alt`, `rdf:_n`, `rdfs:member`) is likewise plain IRIs; no
@@ -66,10 +78,16 @@ quad component name or an element index.
 
 ### Concrete syntaxes
 
-**Turtle-array, TriG-array, N-Triples-array, N-Quads-array.** `( e1 e2 … )` is a term wherever a
-subject or an object may stand, nested freely; `()` is the empty sequence. N-Triples and N-Quads use
-the same spelling on one line. A Turtle document written for RDF 1.1 therefore means something new
-under rdf-array: its collections are sequences, not ladders.
+**Turtle-array, TriG-array, N-Triples-array, N-Quads-array.** `( e1 e2 … )` is a term wherever an
+object may stand, nested freely; `()` is the empty sequence, and a sequence as a subject is a syntax
+error. N-Triples and N-Quads use the same spelling on one line. A Turtle document written for RDF 1.1
+therefore means something new under rdf-array: its collections are sequences, not ladders.
+
+Each `( … )` read is a new sequence, in every one of these syntaxes. Reading a Turtle document twice
+doubles its sequences, as it doubles its `( )` and `[ ]` in RDF 1.1. N-Triples and N-Quads lose
+something RDF 1.1 has: a repeated line there restates a triple, because the blank node of a list
+has a label, while a repeated line holding a sequence is another sequence. Concatenating a file with
+itself therefore changes the graph, and `sort -u` is not safe on such a file.
 
 **SPARQL-array.** A collection in a triple pattern, a CONSTRUCT template or INSERT/DELETE DATA is one
 sequence term. A variable inside a pattern's sequence is bound from the corresponding element of a
@@ -87,6 +105,22 @@ UNNEST(?seq AS ?e AT ?i)                         # every member, ?i bound to its
 BIND(?rows[2][3] AS ?cell) BIND(?pts[2...] AS ?rest)   # index and slice, 1-based, the slice closed
 FILTER(isSEQ(?x) && SEQLEN(?x) = 3 && SEQ(3, 4) IN ?pts) # functions and membership
 ```
+
+Occurrences reach SPARQL-array in these ways:
+
+- **Joins.** A variable bound to a sequence from the data stands for that occurrence, so
+  `?x :p ?l . ?y :p ?l` matches only where both patterns match one triple, and does not join `:N1` and
+  `:N2` above. `sameTerm` likewise.
+- **Comparison.** A constant, including one from `VALUES` or `BIND`, matches by equality, and so do
+  `=`, `IN`, `DISTINCT`, `GROUP BY` and `ORDER BY`: a result has no way to show which occurrence a row
+  holds.
+- **Writing.** Each triple written with a sequence adds an occurrence, wherever the sequence came from,
+  since it cannot be in two triples. `INSERT { ?s :p ?l } WHERE { ?s :p ?l }` doubles what it matches,
+  which it would not do for a blank node; `CONSTRUCT { ?s :q ?l ; :r ?l }` makes two; `ADD` adds.
+  `DELETE DATA` and `DELETE` remove every occurrence equal to the one named.
+- **Subjects.** A sequence in a pattern's subject matches no data, and in a `CONSTRUCT` template or
+  `INSERT` it is an error. Property functions keep the spelling for their arguments, as in
+  `(?s ?score) text:query ('text')`, which is not a pattern over data.
 
 In expressions a sequence is a term of its own kind: `isIRI`, `isBlank`, `isLiteral` and `isTriple`
 are false for it, `=` and `!=` compare whole sequences, `<` orders them as above, `STR()` spells
@@ -150,7 +184,8 @@ gives RDFC-1.0's output for a dataset with no sequence.
 ### Converting between RDF and rdf-array
 
 Nothing converts automatically. Parsing an RDF 1.1 document with an rdf-array parser gives sequences
-where it had collections and leaves any explicit `rdf:first`/`rdf:rest` triples as they are; parsing
+where it had collections, refuses a collection as a subject, and leaves any explicit
+`rdf:first`/`rdf:rest` triples as they are; parsing
 an rdf-array document with an RDF 1.1 parser fails on `( … )` in the places RDF 1.1 does not allow it,
 or silently makes a ladder. Folding ladders into sequences is beyond a single SPARQL-array update
 (the fold recurses); CFGraph-array flattens both for ShEx validation, and a dedicated converter is
@@ -159,8 +194,8 @@ repeated properties back needs an aggregate.
 
 ## What does not change
 
-Triples, graphs, datasets and their semantics; IRIs, blank nodes and literals; SPARQL's algebra apart
-from the term kind and its gap patterns; ShEx apart from the list shape expression; JSON-LD
+Triples and their semantics; graphs and datasets, apart from the repeated triples above; IRIs, blank
+nodes and literals; SPARQL's algebra apart from the term kind, its occurrences and its gap patterns; ShEx apart from the list shape expression; JSON-LD
 1.1 itself (JSON-LD-array is a different mapping language, not a change to JSON-LD). An rdf-array
 graph with no sequences is an RDF graph.
 
@@ -198,8 +233,15 @@ graph with no sequences is an RDF graph.
   positions after it; rdf-array has no term to hold a place.
 - **Blank nodes inside sequences.** `rdf-isomorphic` does not look inside sequences, so two graphs that differ
   only in blank node labels inside sequences are not recognised as isomorphic; tests that use it compare such cases by hand.
-- **Sequences as subjects** are allowed; JSON-LD-array cannot write them (no `@id` for a value), and
-  nothing yet needs them.
+- **Implementations and the data model.** No fork follows the data model above yet: they keep equal
+  sequences as one term, and the RDF/JS and Oxigraph types still allow a sequence as a subject.
+  Positive syntax tests with a collection as a subject need rewriting in rdf-tests-array.
+- **Lists that several triples share.** With no label and no ladder, two triples cannot hold one list.
+  The one deliberate use we found gives a list an IRI and reuses it, such as DASH's
+  `dash:HTMLOrStringOrLangString` under `sh:or`; rdf-array has no spelling for that yet.
+- **Comparison in SPARQL-array.** `DISTINCT` and `GROUP BY` by equality is a choice made so that results
+  stay meaningful: RDF 1.1 would keep two blank nodes apart there. Implementing occurrence joins
+  costs every engine a change; if that proves too much, joins by equality are the fallback.
 - **Containers.** `rdf:Seq`, `rdf:Bag` and `rdf:Alt` keep their vocabulary but lose the only syntax
   that produced them (`rdf:li`); whether a sequence should ever be read as a bag or an alternative is
   open.

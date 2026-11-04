@@ -96,7 +96,7 @@ only the reasoner, an individual for `s` and ordinary assertions:
 s ra:member e<sub>1</sub> , … , e<sub>n</sub> .   s ra:first e<sub>1</sub> .   s ra:last e<sub>n</sub> .
 s <span class="k">a</span> [ ra:member <span class="k">only</span> { e<sub>1</sub> … e<sub>n</sub> } ]     <span class="c"># the closure, when the elements are named</span></code></pre>
 
-Nested sequences expand recursively, and equal terms get the same individual. The expansion is
+Nested sequences expand recursively, and equal sequences get the same individual. The expansion is
 linear in the number of elements, its output is OWL 2 DL, and HermiT runs it unchanged. A result
 that mentions an expansion individual is mapped back to its term on the way out. The ontology you
 edit and save never sees any of this.
