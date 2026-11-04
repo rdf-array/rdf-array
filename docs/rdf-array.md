@@ -113,7 +113,7 @@ Occurrences reach SPARQL-array in these ways:
   `:N2` above. `sameTerm` likewise.
 - **Comparison.** A constant, including one from `VALUES` or `BIND`, matches by equality, and so do
   `=`, `IN`, `DISTINCT`, `GROUP BY` and `ORDER BY`: a result has no way to show which occurrence a row
-  holds.
+  holds. `DISTINCT` and `GROUP BY` have a problem here (see [Open questions](#open-questions)).
 - **Writing.** Each triple written with a sequence adds an occurrence, wherever the sequence came from,
   since it cannot be in two triples. `INSERT { ?s :p ?l } WHERE { ?s :p ?l }` doubles what it matches,
   which it would not do for a blank node; `CONSTRUCT { ?s :q ?l ; :r ?l }` makes two; `ADD` adds.
@@ -239,9 +239,32 @@ graph with no sequences is an RDF graph.
 - **Lists that several triples share.** With no label and no ladder, two triples cannot hold one list.
   The one deliberate use we found gives a list an IRI and reuses it, such as DASH's
   `dash:HTMLOrStringOrLangString` under `sh:or`; rdf-array has no spelling for that yet.
-- **Comparison in SPARQL-array.** `DISTINCT` and `GROUP BY` by equality is a choice made so that results
-  stay meaningful: RDF 1.1 would keep two blank nodes apart there. Implementing occurrence joins
-  costs every engine a change; if that proves too much, joins by equality are the fallback.
+- **Comparison in SPARQL-array.** `DISTINCT` and `GROUP BY` by equality do not fit joins by occurrence,
+  because a row they keep stands for several occurrences and a later join can reach only one. Over
+  `:N1 :p (1 2) . :N2 :p (1 2) .`:
+
+  ```sparql
+  # A: the lists
+  SELECT DISTINCT ?l WHERE { ?x :p ?l }
+  # B: who holds a list that someone holds
+  SELECT ?y WHERE { { SELECT DISTINCT ?l WHERE { ?x :p ?l } } ?y :p ?l }
+  # C: the same, with a count per list
+  SELECT ?y ?c WHERE { { SELECT ?l (COUNT(*) AS ?c) WHERE { ?x :p ?l } GROUP BY ?l } ?y :p ?l }
+  ```
+
+  | Query | RDF 1.1 (run on Jena 4.8.0) | The rule above (by reasoning, no engine has it) |
+  |---|---|---|
+  | A | two rows, `_:b0` and `_:b1` | one row, `(1 2)` |
+  | B | `:N1`, `:N2` | `:N1` or `:N2`, whichever occurrence `DISTINCT` kept |
+  | C | `:N1 1`, `:N2 1` | `:N1 2` or `:N2 2`: a count of two, and one holder |
+
+  B loses a solution, and which one depends on the engine. There are two ways out. By occurrence
+  everywhere, `=` and constants alone comparing elements, gives RDF 1.1's answers to all three, but A
+  returns two rows that look the same, and grouping by contents needs `GROUP BY (STR(?l))`. Or a
+  variable leaving `DISTINCT` or `GROUP BY` holds a value rather than an occurrence, and joins by
+  equality: B gives RDF 1.1's answer, A keeps its one row, and C gives `:N1 2`, `:N2 2`.
+- **The cost of occurrence joins.** They cost every engine a change; if that proves too much, joins by
+  equality are the fallback.
 - **Containers.** `rdf:Seq`, `rdf:Bag` and `rdf:Alt` keep their vocabulary but lose the only syntax
   that produced them (`rdf:li`); whether a sequence should ever be read as a bag or an alternative is
   open.
