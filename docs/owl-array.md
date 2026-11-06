@@ -3,7 +3,9 @@
 *Definition, 2026-10-26; implemented in
 [owlapi-array](https://github.com/rdf-array/owlapi-array) (OWL API 4.5.29, the 4.5 line that
 Protégé 5.6 loads), 2026-10-26; a worked example over FHIR RDF, [examples/fhir](../examples/fhir/index.html),
-2026-10-27. This document is [owl-array.md](https://github.com/rdf-array/rdf-array) in the
+2026-10-27; revised 2026-11-06: a sequence is an individual per occurrence, not identified by its
+elements, and `ra:tupleOf` names the sequences with given elements ([§10](#identity-the-alternatives)
+compares the alternatives and reports the experiments behind the choice). This document is [owl-array.md](https://github.com/rdf-array/rdf-array) in the
 organisation's meta-repository, rendered at <https://rdf-array.github.io/rdf-array/docs/owl-array.html>;
 [rdf-array.md](rdf-array.html) describes the change from RDF to rdf-array, and
 [shacl-array.md](shacl-array.html) settles the same questions for SHACL. The `.claude/skills/owl-array`
@@ -22,6 +24,8 @@ things and adds one small vocabulary:
    ( ex:ada ex:alan )` holds one term. OWL-array reads that term as an individual of the class
    `ra:Sequence` whose members, length, first and last element are given by properties with a
    meaning the semantics fixes: `ra:member`, `ra:memberValue`, `ra:length`, `ra:first`, `ra:last`.
+   Two sequences with the same elements are not thereby one individual; the class
+   `ra:tupleOf ( … )` picks out the sequences with given elements.
    Nothing about the term is asserted in triples, nothing is reserved vocabulary, and a class
    expression can constrain the members of a list-valued property while staying in OWL 2 DL (§3).
 
@@ -89,6 +93,7 @@ Everywhere the RDF mapping of OWL 2 reads a list, OWL-array reads a sequence ter
 | `owl:disjointUnionOf` | `ex:Animal owl:disjointUnionOf ( ex:Cat ex:Dog )` |
 | `owl:withRestrictions` | `[ owl:onDatatype xsd:integer ; owl:withRestrictions ( [ xsd:minInclusive 0 ] ) ]` |
 | `owl:onProperties` (n-ary data ranges, not in OWL 2 DL) | `[ owl:onProperties ( ex:x ex:y ) ]` |
+| `ra:tupleOf` (§3.2, new in OWL-array) | `[ ra:tupleOf ( 255 xsd:integer ex:Zero ) ]` |
 | SWRL `swrl:body`, `swrl:head`, `swrl:arguments` | `[ a swrl:Imp ; swrl:body ( … ) ; swrl:head ( … ) ]` |
 
 Written in Turtle-array these are sequences already, so an OWL ontology written in Turtle reads
@@ -112,28 +117,41 @@ Manchester syntaxes have no RDF lists and are unchanged by this part.
 ### 3.1 Semantics
 
 The direct semantics changes in one place. The object domain of an interpretation contains, beside
-the ordinary individuals, the *sequences*: finite tuples whose elements are individuals, data
-values or sequences. A sequence term `( t1 … tn )` denotes the tuple of its elements' denotations,
-`( t1^I … tn^I )`; `()` denotes the empty tuple. Consequently:
+the ordinary individuals, *sequences*: individuals each of which has a length n and an element at
+each position 1 … n, an element being an individual, a data value or a sequence. Each occurrence of
+a sequence term `( t1 … tn )` in an ontology denotes some sequence of length n whose i-th element is
+`ti^I`; an occurrence of `()` denotes some sequence of length 0. Consequently:
 
-- **Identity is by elements.** Two sequence terms denote the same individual exactly when their
-  elements denote the same things, pairwise: `( ex:a )` and `( ex:b )` are the same individual in
-  every interpretation in which `ex:a owl:sameAs ex:b`, and `( 1 2 )` denotes the same tuple in every
-  document, as `"1"^^xsd:integer` denotes one value. Two occurrences in an RDF graph
-  ([rdf-array.md](rdf-array.html)) are two terms there and one individual here.
+- **An occurrence is an anonymous individual whose structure is fixed.** Two occurrences of
+  `( 1 2 )`, in one document or in two, may denote one sequence or two, and nothing in OWL-array
+  says which, just as nothing says whether two blank nodes with the same description denote one
+  thing. This is the rdf-array data model, in which each written `( … )` is a term of its own
+  ([rdf-array.md](rdf-array.html)), and it agrees with RDF simple entailment, under which
+  `:s :p (1 2), (1 2)` and `:s :p (1 2)` entail each other.
+- **Elements tell sequences apart.** Sequences of different lengths, or with different elements at
+  some position, are different: occurrences of `( 1 2 )` and `( 1 3 )` denote different individuals
+  in every interpretation, and occurrences of `( ex:a )` and `( ex:b )` do whenever
+  `ex:a owl:differentFrom ex:b`.
+- **Elements do not make sequences the same.** Equal elements are necessary for two occurrences to
+  denote one sequence, not sufficient. An ontology that wants identity by elements states it with a
+  key ([§10.3](#trade-offs)); [§10](#identity-the-alternatives) gives the design this replaces and
+  the entailments each gives.
 - **Sequences are a sort of their own.** No IRI, blank node or literal denotes a tuple, so a
   sequence is never `owl:sameAs` an IRI-named individual, as a literal is not, and `ra:Sequence` is
   disjoint from every class of ordinary individuals.
 - **A sequence is closed.** Its members are exactly its elements, in order; there is nothing more
   to learn about them from other triples.
 
-Where a sequence may stand in an ontology: wherever the structural specification allows an
-*individual*, with one restriction. It may be the subject or object of a property assertion, the
-individual of a class assertion, an element of another sequence, a nominal in `owl:hasValue` and
-`owl:oneOf`, a party to `owl:sameAs` and `owl:differentFrom`, and an annotation value or subject.
-A sequence holding an anonymous individual anywhere inside is itself anonymous, and goes only where
-OWL 2 DL lets an anonymous individual go: not into `owl:hasValue`, `owl:oneOf`, `owl:sameAs`,
-`owl:differentFrom` or a negative property assertion.
+Where a sequence may stand in an ontology: wherever OWL 2 DL lets an anonymous individual stand. It
+may be the object of a property assertion, the individual of a class assertion, an element of
+another sequence, and an annotation value. OWL 2's
+[restrictions on anonymous individuals](https://www.w3.org/TR/owl2-syntax/#The_Restrictions_on_the_Axiom_Closure)
+keep it out of `owl:hasValue`, `owl:oneOf`, `owl:sameAs`, `owl:differentFrom` and negative property
+assertions, where an individual that no other axiom can name would say nothing useful. A class
+expression about a particular sequence uses `ra:tupleOf` instead: `ex:rgb some ra:tupleOf ( 255 0 0 )`
+where an earlier draft wrote `ex:rgb value ( 255 0 0 )`. The link between a sequence and its
+elements is not an `ObjectPropertyAssertion`, so it does not count toward the forest condition on
+anonymous individuals in those restrictions.
 In RDF a sequence may only be an object, so an axiom that would need one as a subject has no RDF form
 and reaches an ontology only through the Functional-style, OWL/XML or Manchester syntax.
 A sequence is never a class, a property, a datatype or an ontology IRI. The RDF-based semantics
@@ -155,6 +173,14 @@ sequence in the world, as an axiom about `owl:topObjectProperty` would.
 | `ra:length` | functional data property | `s ra:length n`, `n` the number of elements of `s`, an `xsd:nonNegativeInteger` |
 | `ra:first`, `ra:last` | functional object properties | the first and the last element of `s`, when it is an individual or a sequence |
 | `ra:firstValue`, `ra:lastValue` | functional data properties | the first and the last element of `s`, when it is a literal |
+| `ra:tupleOf ( c1 … cn )` | class expression | the sequences `s` of length n whose i-th element is in `ci`, where `ci` is a class expression, a data range, an individual (that individual) or a literal (that value) |
+
+`ra:tupleOf` is the one new constructor. Its positions are exact, since a sequence is closed:
+`ra:tupleOf ( 255 0 0 )` holds `( 255 0 0 )` and not `( 255 0 0 7 )`. In RDF, an IRI element of its
+list is a class when the imports closure declares it `owl:Class`, a datatype when it declares it
+`rdfs:Datatype`, and an individual otherwise, the way the RDF mapping of OWL 2 already uses
+declarations to tell entities apart. A literal element is that value, and a blank node element is
+a class expression or data range given by its own triples.
 
 `ra:first ⊑ ra:member`, `ra:last ⊑ ra:member`, `ra:firstValue ⊑ ra:memberValue` and
 `ra:lastValue ⊑ ra:memberValue` hold by construction; so does `∃ra:member.⊤ ⊑ ra:Sequence` and the
@@ -193,7 +219,11 @@ Class: ex:Ring
 Class: ex:Swatch
   SubClassOf: ex:rgb only (ra:length value 3 and ra:memberValue only xsd:integer[>= 0, <= 255])
 Class: ex:RedThing
-  EquivalentTo: ex:rgb value ( 255 0 0 )                               # a sequence as a nominal
+  EquivalentTo: ex:rgb some ra:tupleOf ( 255 0 0 )                     # the sequences ( 255 0 0 )
+Class: ex:Point
+  EquivalentTo: ra:tupleOf ( xsd:decimal xsd:decimal )                 # a pair of decimals
+Class: ex:AdaFirst
+  EquivalentTo: bibo:authorList some ra:tupleOf ( { ex:ada } foaf:Agent foaf:Agent )
 ObjectProperty: dc:creator
   SubPropertyChain: bibo:authorList o ra:member                        # flattens the list by axiom
 ObjectProperty: ex:firstAuthor
@@ -228,11 +258,14 @@ From the ontology above, a reasoner that implements OWL-array (§6) concludes:
 - `ex:p a ex:BigPaper`, since `( ex:ada ex:alan ex:grace ) ra:length 3`;
 - `ex:p dc:creator ex:ada`, `ex:p ex:firstAuthor ex:ada`;
 - `( ex:ada ex:alan ex:grace ) a ra:Sequence`, `ra:ObjectSequence`, and `not ra:EmptySequence`;
-- if `ex:ada owl:sameAs ex:adaL`, then `ex:p bibo:authorList ( ex:adaL ex:alan ex:grace )`;
+- `ex:p a ex:AdaFirst`, and, if `ex:ada owl:sameAs ex:adaL`, `ex:p a (bibo:authorList some
+  ra:tupleOf ( { ex:adaL } ex:alan ex:grace ))`;
 - `ex:ring a ex:Ring` with three points is inconsistent, and `ex:red ex:rgb ( 255 0 )` with
   `ex:red a ex:Swatch` is inconsistent;
-- `ex:x ex:rgb ( 255 0 0 )` entails `ex:x a ex:RedThing`; `( 255 0 0 ) owl:differentFrom ( 0 0 255 )`
-  holds in every interpretation.
+- `ex:x ex:rgb ( 255 0 0 )` entails `ex:x a ex:RedThing`, whichever document each comes from;
+- `ex:x ex:rgb ( 255 0 0 ) . ex:y ex:rgb ( 0 0 255 )` entails that the two sequences are different
+  individuals; `ex:x ex:rgb ( 255 0 0 ) . ex:y ex:rgb ( 255 0 0 )` entails neither that they are
+  the same nor that they are different.
 
 Nothing follows about the members of a list from the list alone: `( ex:ada ex:alan )` says that
 `ex:ada` is a member of it and nothing more, as a triple says nothing more than itself.
@@ -255,7 +288,10 @@ Two consequences of OWL 2's semantics are worth knowing before writing cardinali
 OWL 2 EL has no `only`, so an EL ontology constrains members through a property chain and a range:
 `bibo:authorList o ra:member SubPropertyOf: ex:author`, `ex:author Range: foaf:Agent`. OWL 2 RL
 keeps `only` over members in superclass position, which is where the examples above use it, and
-has no datatype facets, so length bounds are outside RL. The vocabulary ontology uses functional
+has no datatype facets, so length bounds are outside RL. `ra:tupleOf` expands to an intersection
+of `some` and `value` restrictions (§6), which EL allows anywhere and RL allows on the left of
+`SubClassOf`; telling two sequences apart by their elements needs the expansion's functional
+position properties, which EL has only for data. The vocabulary ontology uses functional
 object properties, complements and unions, which EL and QL lack; an EL or QL ontology relies on the
 built-in meaning without importing it.
 
@@ -267,7 +303,11 @@ built-in meaning without importing it.
 | RDF/XML | `<ex:p rdf:parseType="Collection">…</ex:p>` | one term, `()` when empty; a literal element needs a nested description, so RDF/XML cannot write every sequence |
 | Functional-style syntax | `Sequence( ex:a "x"^^xsd:string Sequence( "1"^^xsd:integer "2"^^xsd:integer ) )`, `Sequence( )` | a new production under `Individual` |
 | OWL/XML | `<Sequence> <NamedIndividual IRI="…"/> <Literal>…</Literal> <Sequence/> </Sequence>` | likewise |
-| Manchester syntax | `( ex:a "x" ( 1 2 ) )`, `( )` | in individual positions only: `Facts:`, `value`, `{ … }`, `SameAs:`, `DifferentFrom:`, `Individual:` |
+| Manchester syntax | `( ex:a "x" ( 1 2 ) )`, `( )` | in the positions of an anonymous individual: `Facts:`, `Individual:` |
+
+`ra:tupleOf` is spelled `[ ra:tupleOf ( … ) ]` in RDF and, as proposed, `ra:tupleOf ( … )` in
+Manchester syntax and `ObjectTupleOf( … )` in the Functional-style syntax and OWL/XML; no
+implementation reads it yet.
 
 Until a syntax's grammar is taught the spelling, an implementation may round-trip a sequence as an
 anonymous individual whose node ID encodes the sequence reversibly, so that the same document read
@@ -282,32 +322,39 @@ syntaxes in its first cut, and labels such a node ID `_:seq…`. A sequence neve
   as individuals, with every limit of §1: it is left out on purpose. `ra:first` and `ra:last` cover
   the positions ontologies ask for; the remaining ones are reached, for now, by SPARQL-array's
   position patterns rather than by class expressions.
-- **No positional class constructor.** A tuple type, `ra:tupleOf ( C1 … Cn )`, meaning "exactly n
-  members, the i-th in Ci", and a regular content model over members are the natural next layer,
-  as they are for SHACL-array and ShEx-array. The name `ra:tupleOf` is reserved and not defined.
+- **No content model.** `ra:tupleOf` fixes the length; a regular content model over members
+  (`( Person+ Org? )`) is the natural next layer, as it is for SHACL-array and ShEx-array.
+- **No positional properties in the vocabulary.** The expansion (§6) has a property per position;
+  they stay out of `ra:`, for the reasons of [§10.3](#trade-offs).
 - **No datatype reading.** A literal-only sequence is still an individual with `ra:memberValue`s,
   not a value of a sequence datatype. OWL 2 DL keeps individuals and data values apart, and a
   datatype could never say "every author is a Person"; one reading is simpler than two.
 - **No counting by position** through `ra:member` (§3.5), and no uniqueness constraint: SHACL 1.2's
   `sh:uniqueMembers` has no OWL-array counterpart, since OWL cannot say that two positions differ.
-- **No identity for sequences beyond their elements.** A sequence has no IRI and no label; an
-  editor displays it by its spelling.
+- **No identity by elements**, unless an ontology states it (§3.1, [§10](#identity-the-alternatives)).
+  A sequence has no IRI and no label; an editor displays it by its spelling.
 
 ## 6. Reasoning with a reasoner that does not know sequences
 
 The semantics of §3 is normative; how a reasoner meets it is not. The first implementations give
 an existing OWL 2 DL reasoner (HermiT, JFact, ELK for EL) the meaning of the built-ins by
 *expansion*: a decorator around the reasoner rewrites the ontology it sees, and nothing is added to
-the ontology the user edits or saves. For each sequence term `s` in the imports closure, with
-elements `e1 … en`:
+the ontology the user edits or saves. For each occurrence `s` of a sequence term in the imports
+closure, with elements `e1 … en`:
 
-- `s` becomes an individual: a named one, with a canonical IRI derived from the term's spelling,
-  when `s` holds no anonymous individual, so that it can stand in `owl:hasValue` and `owl:oneOf`;
-  an anonymous one otherwise. The IRI is an artefact of the expansion and never leaves it. Whether
-  the anonymous individuals themselves should be named inside the expansion, so that every sequence
-  is closed, is [rdf-array#20](https://github.com/rdf-array/rdf-array/issues/20); FHIR RDF, in which
-  every element is a blank node, is the case that decides it.
+- `s` becomes a fresh named individual. Naming an anonymous individual (Skolemising it) keeps every
+  entailment that does not mention the new name, and the decorator maps results back to the
+  occurrence, so no name leaves the expansion. Since the name does not depend on the elements, an
+  occurrence holding a blank node is named like any other. Whether the blank nodes inside should be
+  named the same way, so that `ra:member` can be closed with a `ObjectOneOf` of them, is
+  [rdf-array#20](https://github.com/rdf-array/rdf-array/issues/20); FHIR RDF, in which every element
+  is a blank node, is the case that decides it.
 - `ClassAssertion( ra:Sequence s )` and `DataPropertyAssertion( ra:length s n )`.
+- **Positions:** `ObjectPropertyAssertion( o_i s ei )` for an individual or sequence element and
+  `DataPropertyAssertion( d_i s vi )` for a literal, where `o_i` and `d_i` are functional properties
+  with domain `ra:Sequence`, private to the expansion; and
+  `ClassAssertion( ObjectMaxCardinality( 0 o_n+1 ) s )` with its data counterpart, so that nothing
+  follows position n.
 - `ObjectPropertyAssertion( ra:member s ei )` for each individual element and
   `DataPropertyAssertion( ra:memberValue s vi )` for each literal element, with `ra:first`,
   `ra:last`, `ra:firstValue` and `ra:lastValue` for the ends.
@@ -315,13 +362,22 @@ elements `e1 … en`:
   `ra:member max 0` when there are none, and the same for `ra:memberValue` with a `DataOneOf`.
   Closure is what makes `ra:member only C` decidable on `s` and what no ladder could supply; it
   is omitted for an EL reasoner, which cannot express it and cannot ask the questions that need it.
-- Nested sequences are expanded recursively; equal sequences get the same individual, which gives
-  identity by elements for ground sequences. Identity under `owl:sameAs` of elements (§3.1) is a key
-  on positions; an expansion may add `HasKey` axioms per length for it, which OWL 2 restricts to
-  named individuals, exactly the sequences that are named here.
+- Nested sequences are expanded recursively, each occurrence to its own individual.
+- **`ra:tupleOf ( c1 … cn )`** becomes `ra:Sequence and ra:length value n` intersected, for each i,
+  with `o_i value a` (an individual `a`), `o_i some C` (a class expression, or a nested
+  `ra:tupleOf`), `d_i value v` (a literal) or `d_i some D` (a data range). This is the *structural*
+  expansion.
+- **Hybrid expansion of ground tuples.** A reasoner pays heavily for structural `ra:tupleOf`
+  classes ([§10.4](#results)). For each `ra:tupleOf` whose elements are all individuals and literals,
+  the expansion therefore makes a named class `T`, adds `T SubClassOf` its structural expansion, puts
+  `T` where the `ra:tupleOf` was, and asserts `ClassAssertion( T s )` for each occurrence `s` whose
+  elements are those individuals and values, comparing literals by value. This is sound. It is
+  complete when the elements are literals, whose identity the expansion can decide. With individual
+  elements it misses an occurrence whose elements are only entailed to be the tuple's (through
+  `owl:sameAs` or a functional property); a query written with the structural form still finds it.
 
 The expansion is linear in the number of elements, complete for the sequences spelled in the
-ontology, and sound for the rest: of a sequence that a class expression merely asserts to exist, a
+ontology (with the hybrid's exception above), and sound for the rest: of a sequence that a class expression merely asserts to exist, a
 reasoner knows what the vocabulary ontology's axioms say. The vocabulary ontology is added to the
 closure the reasoner sees. Reasoner results that mention expansion individuals are mapped back to
 sequence terms on the way out.
@@ -339,6 +395,10 @@ sequence terms on the way out.
 - **The FHIR example**, [examples/fhir](../examples/fhir/index.html): the SWAT4LS 2016 FHIR reasoning
   process over today's FHIR RDF, 24 DL queries with their expected answers and one inconsistency, run
   through owlapi-array and HermiT by its `FhirReasoning.java`; to become a test in the fork.
+- **The identity experiments** of [§10.4](#results), in
+  [examples/owl-identity](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity): the RedThing case under OWL 2 with the OWL API,
+  HermiT and Jena, and the per-occurrence expansion with `ra:tupleOf` checked case by case and timed;
+  to become tests in owlapi-array when it implements this revision.
 - **owl-tests-contrib**, if a second implementation follows: the same cases in a manifest, with a
   requirement term `ra:OwlArray` added to the test vocabulary with it.
 
@@ -348,6 +408,10 @@ sequence terms on the way out.
 |---|---|---|---|---|
 | [owlapi-array](https://github.com/rdf-array/owlapi-array) (OWL API 4.5.29) | Turtle and RDF/XML parsers and renderers; RDF/XML refuses a sequence holding a literal ([#18](https://github.com/rdf-array/rdf-array/issues/18)); the Rio formats still use ladders ([#19](https://github.com/rdf-array/rdf-array/issues/19)); Functional-style, OWL/XML and Manchester carry a sequence as a `_:seq_…` node ID | an `OWLSequence` individual, equal by elements | the expansion of §6 as `SequenceAwareReasonerFactory`, tested with HermiT 1.4.5; no closure when a sequence holds an anonymous individual ([#20](https://github.com/rdf-array/rdf-array/issues/20)) | the term, parsers, renderers and decorator done 2026-10-26; the FHIR example a test, blank nodes inside sequences written inside them, 2026-10-27: 4703 tests, 0 failures, 316 flagged; see its `doc/rdf-array.md` |
 | Protégé 5.6.9 against owlapi-array | its `bundles/owlapi-osgidistribution.jar` replaced by owlapi-array's, same symbolic name and version; no editor change | displayed by node ID, `_:seq_…`, until the Manchester renderer learns `( … )`; never a DL Query answer ([#21](https://github.com/rdf-array/rdf-array/issues/21)) | "HermiT 1.4.3 (OWL-array)" and "ELK 0.6.0 (OWL-array)" in the reasoner menu, from [protege-owl-array](https://github.com/rdf-array/protege-owl-array); ELK skips the blank nodes that hold FHIR data | done 2026-10-27: [examples/fhir](../examples/fhir/index.html) §4, the 24 DL queries answered in the DL Query tab as through the OWL API |
+
+Both implement the reading this revision drops (design A of [§10](#identity-the-alternatives)): one
+individual per distinct ground sequence, and `owl:hasValue` with a sequence. Neither yet has
+`ra:tupleOf` or one individual per occurrence.
 
 ## 9. Decisions and precedent
 
@@ -363,11 +427,15 @@ sequence terms on the way out.
   `sh:minListLength`, ShEx-array's `((S))[m, n]`, JSON Schema's `items` plus `minItems`, and the
   array types of property-graph schemas (Neo4j's `LIST<INTEGER NOT NULL>` constraints, PG-Schema's
   `STRING ARRAY {1,2}`): a constraint on members and bounds on length.
-- **Identity by elements, no IRI.** An earlier draft named each sequence with a reversible URN and
-  an `rdfs:label`. That makes `( ex:a )` and `( ex:b )` different individuals when `ex:a owl:sameAs
-  ex:b`. RDF graphs keep occurrences apart, but what a sequence denotes here still depends only on its
-  elements.
-  The canonical IRI survives only inside the expansion (§6).
+- **No IRI, and no identity by elements.** The first draft named each sequence with a reversible
+  URN and an `rdfs:label`, which made `( ex:a )` and `( ex:b )` different individuals even when
+  `ex:a owl:sameAs ex:b`. The second (2026-10-26 to 2026-11-05) made a sequence denote the tuple of
+  its elements, so that equal sequences were one individual everywhere. The rdf-array data model
+  then made each written `( … )` a term of its own (2026-11-03), and that reading made OWL entail
+  more than the data model: `:N1 :p (1 2) . :N2 :p (1 2)` entailed that N1 and N2 have a common
+  `:p` value. This revision gives up identity by elements, keeps every OWL 2 inference, and gets
+  `RedThing` back with `ra:tupleOf`. [§10](#identity-the-alternatives) has the alternatives and the
+  evidence.
 - **No companion ontology.** The same draft materialised the `ra:` assertions into an ontology
   imported beside the source. The length of `( 1 2 3 )` is a fact about the term, as the value of
   `"3"^^xsd:integer` is; it is computed where it is needed, not stored.
@@ -380,12 +448,166 @@ sequence terms on the way out.
   bears on OWL-array is Baader and Sattler's on
   [aggregates](https://iccl.inf.tu-dresden.de/web/LATPub267) (a built-in `ra:length` on a closed
   term avoids the undecidability of counting over open chains), Lutz, Areces, Horrocks and
-  Sattler's on [keys](https://jair.org/index.php/jair/article/view/10412) (identity by elements is a
-  key on positions, decidable over named individuals), and temporal description logics over
+  Sattler's on [keys](https://jair.org/index.php/jair/article/view/10412) (identity by elements,
+  where an ontology wants it, is a key on positions, decidable over named individuals), and temporal description logics over
   [finite traces](https://bia.unibz.it/esploro/outputs/conferenceProceeding/Temporal-description-logics-over-finite-traces/991005772379101241)
   for the content-model layer to come. Property graphs have arrays only of primitive values and
   constrain them by element type and count; none lets an array hold a node, which is the case
   that matters here.
+
+## 10. Identity: the alternatives
+
+When do two sequences denote one individual? The answer decides what follows from data that two
+documents wrote separately. It also decides whether OWL-array entails more than the rdf-array data
+model it sits on, and what a reasoner pays. This section sets out the designs considered, the
+entailments on which they differ, and the experiments behind §3.1's choice.
+
+### 10.1 The designs
+
+- **O. OWL 2 as it is.** A list in the data is an RDF 1.1 list: a blank node with `rdf:first` and
+  `rdf:rest` triples. The baseline: what an ontology gets today.
+- **A. Identity by elements** (OWL-array from 2026-10-26 to 2026-11-05). A sequence term denotes the
+  tuple of its elements' denotations, so equal sequences are one individual in every document, as a
+  literal denotes one value. A sequence may be a nominal: `ex:rgb value ( 255 0 0 )`. The expansion
+  gives each distinct ground sequence one named individual.
+- **B. One individual per occurrence** (this document, §3.1). Each occurrence denotes some sequence
+  with its elements; equal elements do not make two the same. `ra:tupleOf` replaces the nominal.
+  The expansion is structural or hybrid (§6).
+- **B+K. B with a key.** An ontology that wants identity by elements adds a key on length and
+  positions, `HasKey( ra:Sequence ( o_1 … ) ( ra:length d_1 … ) )` in the expansion's terms. OWL 2
+  keys bind only named individuals with named values, so sequences holding blank nodes stay apart.
+- **D. A datatype.** A sequence of literals is a data value of a sequence datatype, equal by value
+  for free. It cannot hold an individual, so "every author is a Person" is out of reach; §9 rejects it.
+- **E. Positional properties in the vocabulary.** B, with the expansion's position properties made
+  public (`ra:o_1`, `ra:d_1`, …, after RDF's `rdf:_1`, `rdf:_2`, …), so that an ontology writes tuple
+  classes and keys itself instead of `ra:tupleOf`. Its entailments are those of B, or of B+K with a key.
+
+### 10.2 Differential entailments
+
+Each row is a premise set and a conclusion; each cell says whether the design entails it. In
+column O the sequence is an RDF 1.1 list. In column B the premise's `ex:rgb value ( 255 0 0 )` is
+written `ex:rgb some ra:tupleOf ( 255 0 0 )`. The test numbers in brackets are §10.4's.
+
+| # | Premises | Conclusion | O | A | B | B+K | D |
+|---|---|---|---|---|---|---|---|
+| 1 | `RedThing ≡ ex:rgb value ( 255 0 0 )` in one document; `ex:x ex:rgb ( 255 0 0 )` in another | `ex:x a RedThing` | no [R1–R3] | yes | yes [T1] | yes | yes |
+| 2 | `:N1 :p (1 2) . :N2 :p (1 2)` | the two sequences are one individual (N1 and N2 have a common `:p` value) | no | yes | no [T3] | yes [T4] | yes |
+| 3 | `:code` inverse functional (for D, `HasKey( owl:Thing () ( :code ) )`); `:a :code (1 2) . :b :code (1 2)` | `:a owl:sameAs :b` | no | yes | no [T4] | yes [T4] | yes |
+| 4 | `:p :authorList ( :ada :alan :grace ) . :ada owl:sameAs :adaL` | `:p a (:authorList some ra:tupleOf ( {:adaL} :alan :grace ))` (in A, `:p :authorList ( :adaL :alan :grace )`) | no | yes | yes [T2], and with the hybrid expansion only through a structural query [T8] | yes | n/a |
+| 5 | `:s :p (1 2) . :t :p (1 3)` | the two sequences are different | no | yes | yes [T3] | yes | yes |
+| 6 | `Swatch ⊑ ex:rgb only (ra:length value 3)`; `:red a Swatch ; ex:rgb (255 0)` | inconsistent | no | yes | yes [T6] | yes | yes |
+| 7 | `:s :p (1 2), (1 2)` | `:s a (:p min 2 owl:Thing)` | no | no | no | no | no |
+| 8 | `:s :p (1 2)` | `:s :p (1 2), (1 2)` (read as two occurrences) | yes | yes | yes | yes | yes |
+
+Rows 2 and 3 are where the designs part. A, B+K and D say that equal sequences are one thing. O and B
+say that they may be, and RDF says the same of two blank nodes with one description. Rows 7 and 8
+hold in every design: no design counts occurrences, which matches RDF simple entailment and makes a
+repeated occurrence redundant, not meaningful. Row 1 is the case that seemed to need A. It does not
+hold in OWL 2 today (§10.4.1), and B gets it back with `ra:tupleOf`.
+
+What A entails beyond B is all of one kind: conclusions that equate sequences, or the things that
+hold them, because their elements are equal. Under A, OWL-array entails `:N1 :p _:x . :N2 :p _:x`
+from row 2's premises, which rdf-array's own data model, read as RDF, does not. SPARQL-array has the
+same tension where `DISTINCT` and `GROUP BY` meet joins by occurrence
+([rdf-array.md](rdf-array.html#distinct-and-group-by-under-joins-by-occurrence)).
+
+### 10.3 Trade-offs
+
+| Design | For | Against |
+|---|---|---|
+| O | nothing new | no list in the data is OWL 2 DL; no class expression can look into one; row 1 fails |
+| A | a sequence works like a literal: a nominal, in `owl:sameAs`, in `owl:oneOf`; row 1 with the familiar `value` | entails more than the data model it reads (rows 2, 3); a sequence holding a blank node is anonymous and gets no identity anyway ([#20](https://github.com/rdf-array/rdf-array/issues/20)); identity through `owl:sameAs` of elements needs a key per length, never implemented |
+| B | entails nothing the data model does not; treats a sequence as OWL 2 treats an anonymous individual; every occurrence can be named in the expansion whatever it holds; `ra:tupleOf` takes classes as well as values (`ra:tupleOf ( {ex:ada} foaf:Agent )`) | no sequence in `owl:hasValue`, `owl:oneOf`, `owl:sameAs`; one new class constructor for every syntax; structural `ra:tupleOf` is slow in HermiT and needs the hybrid expansion, which is incomplete under `owl:sameAs` of individual elements |
+| B+K | identity where an ontology asks for it, with an OWL 2 construct | the key needs a spelling that names positions (E, or a new built-in); keys bind named individuals and values only; cost at scale not measured |
+| D | identity and facets for free | no individual members; OWL 2 DL keeps data values and individuals apart |
+| E | no new constructor, since `ra:tupleOf` becomes a macro; keys are written directly | an unbounded vocabulary split into object and data positions; invites ontologies to rebuild the ladder out of positions |
+
+The recommendation, and §3.1, is B with the hybrid expansion. B+K stays open to any ontology that
+asks for identity, once the key has a spelling (§10.5).
+
+### 10.4 Results
+
+All runs used the OWL API 4.5.29 and HermiT 1.4.3 as bundled in Protégé 5.6.9, and Apache Jena 4.8.0,
+on Java 21. The sources are in [examples/owl-identity](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity).
+
+#### 10.4.1 OWL 2 today: the RedThing case (`Red.java`, `RedJ.java`)
+
+`ex:RedThing owl:equivalentClass [ owl:onProperty ex:rgb ; owl:hasValue ( 255 0 0 ) ]` and
+`ex:x ex:rgb ( 255 0 0 )`, read as Turtle 1.1, with a named individual `ex:red` in place of the
+list as a control:
+
+| # | Reading | `ex:x a ex:RedThing` |
+|---|---|---|
+| R1 | OWL API + HermiT, list, the two triples in two documents | not entailed |
+| R2 | OWL API + HermiT, list, one document | not entailed |
+| R3 | Jena OWL rules and OWL Micro rules, list, one graph | not entailed |
+| R4 | all three, `ex:red` in place of the list | entailed |
+
+The list's head is a blank node, so the restriction names an anonymous individual, which OWL 2 DL
+forbids in `ObjectHasValue`
+([OWL 2 Syntax §11.2](https://www.w3.org/TR/owl2-syntax/#The_Restrictions_on_the_Axiom_Closure)). The
+OWL API takes it anyway: it drops the `rdf:first`/`rdf:rest` triples, reports no unparsed triples,
+and its OWL 2 DL profile checker passes the ontology, a gap in the checker. Read that way, the two
+lists are two anonymous individuals, even in one document, and nothing makes them one. The
+RDF-Based Semantics has no extensionality for lists either, so OWL 2 Full does not equate them, and
+Jena's rules agree. The named individual works because both axioms name the same thing. A literal
+works for the same reason: it denotes its value in every interpretation, which is what design A gave
+sequences.
+
+#### 10.4.2 Design B checked case by case (`Tuple.java`)
+
+The structural expansion of §6, with every result as wanted:
+
+| # | Premises | Question | Result |
+|---|---|---|---|
+| T1 | `RedThing ≡ ex:rgb some ra:tupleOf ( 255 0 0 )`; `x rgb (255 0 0)`, `y rgb (0 0 255)`, `z rgb (255 0)` | x, y, z a RedThing? | x yes; y, z no |
+| T1 | `rgbF` functional, `RedF ≡ rgbF some ra:tupleOf ( 255 0 0 )`; `w rgbF (0 0 255)` | `w a not RedF`? | yes |
+| T1 | the occurrences of (255 0 0), (0 0 255) and (255 0) | different from each other? | yes, by element and by length |
+| T2 | `paper authorList (ada alan grace)`, `ada sameAs adaL` | `paper a authorList some ra:tupleOf ({adaL} alan grace)`? | yes; with `alan` and `ada` swapped, no |
+| T3 | `N1 p (1 2) . N2 p (1 2) . N3 p (1 3)` | the two (1 2) the same? different? | neither |
+| T3 | | (1 2) and (1 3) different? | yes |
+| T3 | | `N2 a (p value` N1's sequence`)`? | no |
+| T4 | `code` inverse functional; `a code (1 2) . b code (1 2)` | `a sameAs b`? | no; with `HasKey( ra:Sequence () ( ra:length d_1 d_2 ) )`, yes |
+| T5 | `FromOrigin ≡ pts some ra:tupleOf ( ra:tupleOf ( 0 0 ) ( ra:Sequence and ra:length value 2 ) )` | `seg pts ((0 0) (1 0))`, `seg2 pts ((1 1) (1 0))` in FromOrigin? | seg yes, seg2 no |
+| T6 | `Swatch ⊑ rgb only (ra:length value 3)`; `red a Swatch ; rgb (255 0)` | inconsistent? | yes |
+| T8 | hybrid: `ByAdaL ≡ authorList some T`, `T ⊑ ra:tupleOf ({adaL} alan grace)`; the occurrence of (ada alan grace) asserted into its own tuple class; `ada sameAs adaL` | `paper a ByAdaL`? | no: the hybrid's incompleteness |
+| T8 | | `paper a authorList some ra:tupleOf ({adaL} alan grace)` (structural)? | yes |
+
+#### 10.4.3 Reasoning cost
+
+K classes `Ci ≡ ex:rgb some ra:tupleOf ( i i+1 i+2 )` and n individuals each with one `ex:rgb`
+sequence drawn from those K. The measure is the time to retrieve the instances of all K classes
+after a consistency check. "Structural, shared" gives one individual to all equal sequences, which
+is design A's identity with B's classes. "Nominal" is a stand-in for design A's expansion, a named
+individual per distinct sequence with `Ci ≡ ex:rgb value ci`, without the `ra:` assertions.
+
+| Expansion | Design | Elements | K | n | Time |
+|---|---|---|---|---|---|
+| structural | B | literals | 11 | 5 | 12.8 s |
+| structural | B | literals | 5 | 200 | 55 s |
+| structural | B | literals | 20 | 20 | over 120 s, stopped |
+| structural | B | individuals | 5 | 200 | 20.9 s |
+| structural, shared | A's identity, B's classes | literals | 5 | 200 | 21 s |
+| nominal | stand-in for A | named individuals | 20 | 5000 | 0.22 s (consistency 0.09 s) |
+| hybrid | B | literals | 20 | 1000 | 0.06 s |
+| hybrid | B | literals | 20 | 5000 | 0.14 s (consistency 0.44 s) |
+
+Sharing an individual between equal sequences does not rescue the structural expansion, so its cost
+comes from the `ra:tupleOf` classes, not from having one individual per occurrence. The hybrid
+expansion makes B as fast as the nominal stand-in for A. Neither the key of B+K nor reasoners other
+than HermiT were timed.
+
+### 10.5 Open
+
+- **How an ontology asks for identity.** Design E's public positions, or one built-in assertion
+  that the expansion turns into the key (`ra:Sequence a ra:KeyedByElements`, say). Either way the
+  key covers only sequences whose elements are named.
+- **Completeness of the hybrid expansion** with individual elements: whether to fall back to the
+  structural form for a tuple whose elements take part in `owl:sameAs`, functional properties or
+  keys, and what that costs.
+- **Other reasoners** (ELK, JFact, Pellet, Konclude), and the cost of B+K's key at scale.
+- **OWL 2 Full.** The RDF-Based Semantics is not addressed (§3.1). Design B needs no
+  extensionality condition there, where design A would have needed one.
 
 [OWL 2 Direct Semantics]: https://www.w3.org/TR/owl2-direct-semantics/
 [OWL 2 Mapping to RDF Graphs]: https://www.w3.org/TR/owl2-mapping-to-rdf/
