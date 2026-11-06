@@ -51,7 +51,8 @@ Protégé](protege-array.html) is a demo of it in Protégé.
 ## 1. Why
 
 OWL 2 DL reserves `rdf:List`, `rdf:first`, `rdf:rest` and `rdf:nil` for its own syntax. An ontology
-document whose data holds an RDF list leaves `rdf:first` triples unconsumed and is not OWL 2 DL,
+document whose data holds an RDF list leaves `rdf:first` triples [unconsumed](https://www.w3.org/TR/owl2-mapping-to-rdf/#Parsing_of_Axioms) and is not OWL 2 DL
+(the mapping removes each triple a pattern matches, and the graph MUST be empty at the end),
 so BIBO's `bibo:authorList` and SKOS's `skos:memberList` push their users into OWL Full, and no DL
 class expression can look into a list at all. The workaround, since
 [Drummond et al. 2006](https://research.manchester.ac.uk/en/publications/putting-owl-in-order-patterns-for-sequences-in-owl/),
@@ -94,7 +95,7 @@ Written in Turtle-array these are sequences already, so an OWL ontology written 
 unchanged. As in SHACL-array, three consequences follow:
 
 - **A ladder is not a list.** An ontology document that spells a list as `rdf:first`/`rdf:rest`
-  triples (N-Triples written by an RDF 1.1 tool, say) leaves those triples unconsumed, exactly as a
+  triples (N-Triples written by an RDF 1.1 tool, say) leaves those triples [unconsumed](https://www.w3.org/TR/owl2-mapping-to-rdf/#Parsing_of_Axioms), exactly as a
   list in the data did before: the document is not OWL 2 DL and a parser reports the triples.
   Convert it first.
 - **`()` is the empty list; `rdf:nil` is not.** A SWRL rule with no body writes `swrl:body ()`.
