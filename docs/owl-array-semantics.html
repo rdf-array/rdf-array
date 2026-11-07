@@ -48,16 +48,17 @@
   </section>
   <section class="introductory" id="introduction">
     <h2>Introduction</h2>
-    <style>
-  .delta { border-left: 4px solid #b4530a; background: rgba(180, 83, 10, 0.07); padding: 0.4em 1em 0.6em; margin: 1em 0; }
-  .delta::before { content: attr(data-kind) " change"; display: block; font: 600 0.75em/1.6 sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: #b4530a; }
-  .delta p { margin: 0.4em 0; }
-  .delta table { margin: 0.5em 0; }
-  .ent { font-family: monospace; font-size: 0.92em; }
-</style>
+
   </section>
   <section id="introduction-https-www-w3-org-tr-owl2-direct-semantics-introduction-the-running-example">
   <h2><a href="https://www.w3.org/TR/owl2-direct-semantics/#Introduction">Introduction</a>: the running example</h2>
+  <style>
+    .delta { border-left: 4px solid #b4530a; background: rgba(180, 83, 10, 0.07); padding: 0.4em 1em 0.6em; margin: 1em 0; }
+    .delta::before { content: attr(data-kind) " change"; display: block; font: 600 0.75em/1.6 sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: #b4530a; }
+    .delta p { margin: 0.4em 0; }
+    .delta table { margin: 0.5em 0; }
+    .ent { font-family: monospace; font-size: 0.92em; }
+  </style>
   <p>Five axioms. Three come from the Structural Specification's examples, and two are new. One new axiom holds a list, Peter's children from eldest to youngest. The other connects the list to <code>a:fatherOf</code>, the property of the §9.6.2 example:</p>
   <pre class="example nohighlight">SameIndividual( a:Meg a:Megan )                                   # Structural Spec. §9.6.1
   DifferentIndividuals( a:Peter a:Meg a:Chris a:Stewie )            # §9.6.2
