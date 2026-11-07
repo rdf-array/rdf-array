@@ -56,8 +56,8 @@
   .ent { font-family: monospace; font-size: 0.92em; }
 </style>
   </section>
-  <section id="the-running-example">
-  <h2>The running example</h2>
+  <section id="introduction-https-www-w3-org-tr-owl2-direct-semantics-introduction-the-running-example">
+  <h2><a href="https://www.w3.org/TR/owl2-direct-semantics/#Introduction">Introduction</a>: the running example</h2>
   <p>Five axioms. Three come from the Structural Specification's examples, and two are new. One new axiom holds a list, Peter's children from eldest to youngest. The other connects the list to <code>a:fatherOf</code>, the property of the §9.6.2 example:</p>
   <pre class="example nohighlight">SameIndividual( a:Meg a:Megan )                                   # Structural Spec. §9.6.1
   DifferentIndividuals( a:Peter a:Meg a:Chris a:Stewie )            # §9.6.2
@@ -69,8 +69,8 @@
   <ul><li>A <em>sequence term</em> <code>( t1 … tn )</code>, <code>n ≥ 0</code>, is an <code>Individual</code>, and each <code>ti</code> is an individual (named, anonymous or another sequence term) or a literal.</li><li><code>ObjectTupleOf( u1 … un )</code> is a class expression, and each <code>ui</code> is a class expression, a data range, a named individual or a literal.</li><li>Seven built-in entities have fixed meanings, as <code>owl:Thing</code> has: <code>ra:Sequence</code>, <code>ra:member</code>, <code>ra:first</code>, <code>ra:last</code>, <code>ra:memberValue</code>, <code>ra:length</code>, <code>ra:firstValue</code> and <code>ra:lastValue</code>.</li></ul>
   <p>The entailments below were checked with HermiT 1.4.3 through the expansion of owl-array.md §6 (<code>Family.java</code> in <a href="https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity">examples/owl-identity</a>). That expansion gives evidence, not a proof. The claims follow from the definitions.</p>
   </section>
-  <section id="direct-model-theoretic-semantics-https-www-w3-org-tr-owl2-direct-semantics-direct-model-theoretic-semantics-for-owl-2">
-  <h2><a href="https://www.w3.org/TR/owl2-direct-semantics/#Direct_Model-Theoretic_Semantics_for_OWL_2">Direct Model-Theoretic Semantics</a></h2>
+  <section id="direct-model-theoretic-semantics-for-owl-2-https-www-w3-org-tr-owl2-direct-semantics-direct-model-theoretic-semantics-for-owl-2">
+  <h2><a href="https://www.w3.org/TR/owl2-direct-semantics/#Direct_Model-Theoretic_Semantics_for_OWL_2">Direct Model-Theoretic Semantics for OWL 2</a></h2>
     <section id="vocabulary-https-www-w3-org-tr-owl2-direct-semantics-vocabulary">
     <h3><a href="https://www.w3.org/TR/owl2-direct-semantics/#Vocabulary">Vocabulary</a></h3>
     <div class="delta" data-kind="Model">
@@ -105,6 +105,14 @@
     </tbody></table>
     <p>§9.6.2 concludes that Peter has at least three children, <code>ObjectMinCardinality( 3 a:fatherOf )</code>. That still holds in every model of <em>O<sub>G</sub></em>. But the chain makes <code>a:fatherOf</code> non-simple, so §2.5's restriction excludes that question, and HermiT does not derive it.</p>
     </div>
+      <section id="object-property-expressions-https-www-w3-org-tr-owl2-direct-semantics-object-property-expressions">
+      <h4><a href="https://www.w3.org/TR/owl2-direct-semantics/#Object_Property_Expressions">Object Property Expressions</a></h4>
+      <p>Unchanged.</p>
+      </section>
+      <section id="data-ranges-https-www-w3-org-tr-owl2-direct-semantics-data-ranges">
+      <h4><a href="https://www.w3.org/TR/owl2-direct-semantics/#Data_Ranges">Data Ranges</a></h4>
+      <p>Unchanged.</p>
+      </section>
       <section id="class-expressions-https-www-w3-org-tr-owl2-direct-semantics-class-expressions-table-4">
       <h4><a href="https://www.w3.org/TR/owl2-direct-semantics/#Class_Expressions">Class Expressions</a>, Table 4</h4>
       <div class="delta" data-kind="Model">
@@ -131,6 +139,22 @@
     <section id="satisfaction-in-an-interpretation-https-www-w3-org-tr-owl2-direct-semantics-satisfaction-in-an-interpretation">
     <h3><a href="https://www.w3.org/TR/owl2-direct-semantics/#Satisfaction_in_an_Interpretation">Satisfaction in an Interpretation</a></h3>
     <p>Tables 5 to 10 are unchanged. A sequence term enters an axiom as an individual, and an axiom holding one is satisfied when its condition holds of the term's interpretation from §2.2.</p>
+      <section id="class-expression-axioms-https-www-w3-org-tr-owl2-direct-semantics-class-expression-axioms">
+      <h4><a href="https://www.w3.org/TR/owl2-direct-semantics/#Class_Expression_Axioms">Class Expression Axioms</a></h4>
+      <p>Unchanged.</p>
+      </section>
+      <section id="object-property-expression-axioms-https-www-w3-org-tr-owl2-direct-semantics-object-property-expression-axioms">
+      <h4><a href="https://www.w3.org/TR/owl2-direct-semantics/#Object_Property_Expression_Axioms">Object Property Expression Axioms</a></h4>
+      <p>Unchanged. A property chain through <code>ra:member</code> or <code>ra:first</code> is an ordinary chain; its entailments are in the box after §2.2.</p>
+      </section>
+      <section id="data-property-expression-axioms-https-www-w3-org-tr-owl2-direct-semantics-data-property-expression-axioms">
+      <h4><a href="https://www.w3.org/TR/owl2-direct-semantics/#Data_Property_Expression_Axioms">Data Property Expression Axioms</a></h4>
+      <p>Unchanged.</p>
+      </section>
+      <section id="datatype-definitions-https-www-w3-org-tr-owl2-direct-semantics-datatype-definitions">
+      <h4><a href="https://www.w3.org/TR/owl2-direct-semantics/#Datatype_Definitions">Datatype Definitions</a></h4>
+      <p>Unchanged.</p>
+      </section>
       <section id="keys-https-www-w3-org-tr-owl2-direct-semantics-keys">
       <h4><a href="https://www.w3.org/TR/owl2-direct-semantics/#Keys">Keys</a></h4>
       <div class="delta" data-kind="Entailment">
@@ -177,9 +201,9 @@
     <p>Unchanged. Instance checking and the atoms of a Boolean conjunctive query name only named individuals, so a question about a sequence is asked through the property that holds it, as in the tables above. §2.5's restriction to simple properties in cardinalities applies as before; a chain through <code>ra:member</code> makes its super-property non-simple (§2.2 above).</p>
     </section>
   </section>
-  <section id="unchanged">
-  <h2>Unchanged</h2>
-  <p>The datatype map apart from <code>xsd:nonNegativeInteger</code>, Tables 1, 3 and 5 to 10, the definitions of §2.4 and §2.5, and the <a href="https://www.w3.org/TR/owl2-direct-semantics/#Independence_of_the_Direct_Semantics_from_the_Datatype_Map_in_OWL_2_DL_.28Informative.29">independence of the datatype map</a> are unchanged. The RDF-Based Semantics is not addressed. Under it, design B needs no extensionality condition for sequences. Design A would have needed one.</p>
+  <section id="independence-of-the-direct-semantics-from-the-datatype-map-https-www-w3-org-tr-owl2-direct-semantics-independence-of-the-direct-semantics-from-the-datatype-map-in-owl-2-dl-28informative-29">
+  <h2><a href="https://www.w3.org/TR/owl2-direct-semantics/#Independence_of_the_Direct_Semantics_from_the_Datatype_Map_in_OWL_2_DL_.28Informative.29">Independence of the Direct Semantics from the Datatype Map</a></h2>
+  <p>Unchanged. Overall, the datatype map changes only by requiring <code>xsd:nonNegativeInteger</code>; Tables 1, 3 and 5 to 10 and the definitions of §2.4 and §2.5 are unchanged. The RDF-Based Semantics is not addressed. Under it, design B needs no extensionality condition for sequences. Design A would have needed one.</p>
   </section>
   <script>
   // Turtle-array and SPARQL-array highlighting: a few token classes are enough for these examples.

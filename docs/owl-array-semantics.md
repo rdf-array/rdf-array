@@ -16,7 +16,7 @@ alternatives it was chosen from are in [owl-array.md](owl-array.html) §3 and §
   .ent { font-family: monospace; font-size: 0.92em; }
 </style>
 
-## 1. The running example
+## 1. [Introduction](https://www.w3.org/TR/owl2-direct-semantics/#Introduction): the running example
 
 Five axioms. Three come from the Structural Specification's examples, and two are new. One new
 axiom holds a list, Peter's children from eldest to youngest. The other connects the list to
@@ -47,7 +47,7 @@ The entailments below were checked with HermiT 1.4.3 through the expansion of ow
 (`Family.java` in [examples/owl-identity](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity)).
 That expansion gives evidence, not a proof. The claims follow from the definitions.
 
-## 2. [Direct Model-Theoretic Semantics](https://www.w3.org/TR/owl2-direct-semantics/#Direct_Model-Theoretic_Semantics_for_OWL_2)
+## 2. [Direct Model-Theoretic Semantics for OWL 2](https://www.w3.org/TR/owl2-direct-semantics/#Direct_Model-Theoretic_Semantics_for_OWL_2)
 
 ### 2.1 [Vocabulary](https://www.w3.org/TR/owl2-direct-semantics/#Vocabulary)
 
@@ -86,6 +86,14 @@ The built-ins give the first entailments over the list.
 <p>§9.6.2 concludes that Peter has at least three children, <code>ObjectMinCardinality( 3 a:fatherOf )</code>. That still holds in every model of <em>O<sub>G</sub></em>. But the chain makes <code>a:fatherOf</code> non-simple, so §2.5's restriction excludes that question, and HermiT does not derive it.</p>
 </div>
 
+#### 2.2.1 [Object Property Expressions](https://www.w3.org/TR/owl2-direct-semantics/#Object_Property_Expressions)
+
+Unchanged.
+
+#### 2.2.2 [Data Ranges](https://www.w3.org/TR/owl2-direct-semantics/#Data_Ranges)
+
+Unchanged.
+
 #### 2.2.3 [Class Expressions](https://www.w3.org/TR/owl2-direct-semantics/#Class_Expressions), Table 4
 
 <div class="delta" data-kind="Model">
@@ -113,6 +121,23 @@ The built-ins give the first entailments over the list.
 
 Tables 5 to 10 are unchanged. A sequence term enters an axiom as an individual, and an axiom
 holding one is satisfied when its condition holds of the term's interpretation from §2.2.
+
+#### 2.3.1 [Class Expression Axioms](https://www.w3.org/TR/owl2-direct-semantics/#Class_Expression_Axioms)
+
+Unchanged.
+
+#### 2.3.2 [Object Property Expression Axioms](https://www.w3.org/TR/owl2-direct-semantics/#Object_Property_Expression_Axioms)
+
+Unchanged. A property chain through `ra:member` or `ra:first` is an ordinary chain; its entailments
+are in the box after §2.2.
+
+#### 2.3.3 [Data Property Expression Axioms](https://www.w3.org/TR/owl2-direct-semantics/#Data_Property_Expression_Axioms)
+
+Unchanged.
+
+#### 2.3.4 [Datatype Definitions](https://www.w3.org/TR/owl2-direct-semantics/#Datatype_Definitions)
+
+Unchanged.
 
 #### 2.3.5 [Keys](https://www.w3.org/TR/owl2-direct-semantics/#Keys)
 
@@ -161,11 +186,10 @@ individuals, so a question about a sequence is asked through the property that h
 tables above. §2.5's restriction to simple properties in cardinalities applies as before; a chain
 through `ra:member` makes its super-property non-simple (§2.2 above).
 
-## 3. Unchanged
+## 3. [Independence of the Direct Semantics from the Datatype Map](https://www.w3.org/TR/owl2-direct-semantics/#Independence_of_the_Direct_Semantics_from_the_Datatype_Map_in_OWL_2_DL_.28Informative.29)
 
-The datatype map apart from `xsd:nonNegativeInteger`, Tables 1, 3 and 5 to 10, the definitions of
-§2.4 and §2.5, and the [independence of the datatype map](https://www.w3.org/TR/owl2-direct-semantics/#Independence_of_the_Direct_Semantics_from_the_Datatype_Map_in_OWL_2_DL_.28Informative.29)
-are unchanged. The RDF-Based Semantics is not addressed. Under it, design B needs no extensionality
+Unchanged. Overall, the datatype map changes only by requiring `xsd:nonNegativeInteger`; Tables 1, 3
+and 5 to 10 and the definitions of §2.4 and §2.5 are unchanged. The RDF-Based Semantics is not addressed. Under it, design B needs no extensionality
 condition for sequences. Design A would have needed one.
 
 [OWL 2 Direct Semantics]: https://www.w3.org/TR/owl2-direct-semantics/
