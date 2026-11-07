@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OWL 2 Direct Semantics, OWL-array redline</title>
+<!--
+  A redline of the OWL 2 Direct Semantics for OWL-array. This file holds only the changes: the
+  page fetches the W3C Recommendation from w3.org when it is opened (w3.org allows the request)
+  and applies each change to it in the reader's browser, marking new text as <ins> and removed text
+  as <del>. The same changes, without the original around them, are owl-array-semantics.html.
+-->
+<style>
+  ins.ra, div.ra-ins, tr.ra-ins td, li.ra-ins { background: #e6ffec; text-decoration: none; }
+  ins.ra { border-bottom: 2px solid #2da44e; padding: 0 1px; }
+  del.ra { background: #ffebe9; color: #82071e; text-decoration: line-through; }
+  div.ra-ins { border-left: 4px solid #2da44e; padding: 0.3em 1em 0.5em; margin: 1em 0; }
+  div.ra-ins.example { background: #f3faf5; }
+  div.ra-ins::before { content: "OWL-array: new text"; display: block; font: 600 0.72em/1.6 sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: #1a7f37; }
+  div.ra-ins.example::before { content: "OWL-array: example (informative, new)"; }
+  tr.ra-ins td { border-color: #2da44e; }
+  li.ra-ins { list-style-position: outside; }
+  #ra-banner { position: sticky; top: 0; z-index: 10; background: #fffbea; border-bottom: 1px solid #d4a72c; padding: 0.5em 1em; font: 14px/1.45 system-ui, sans-serif; color: #3b2f00; }
+  #ra-banner p { margin: 0.2em 0; }
+  #ra-banner a { color: #0b5394; }
+  #ra-banner details summary { cursor: pointer; font-weight: 600; }
+  #ra-banner ol { margin: 0.3em 0 0.2em 1.4em; padding: 0; columns: 2; font-size: 13px; }
+  #ra-banner .key ins, #ra-banner .key del { padding: 0 3px; }
+  .ra-ent { font-family: monospace; font-size: 0.9em; }
+  div.ra-ins table { border-collapse: collapse; margin: 0.4em 0; }
+  div.ra-ins td, div.ra-ins th { border: 1px solid #9fd5ad; padding: 0.25em 0.5em; vertical-align: top; text-align: left; }
+  #ra-status { font: 16px/1.5 system-ui, sans-serif; padding: 2em; max-width: 44em; }
+</style>
+</head>
+<body>
+<div id="ra-banner">
+  <p><strong>OWL-array redline</strong> of the <a href="https://www.w3.org/TR/owl2-direct-semantics/">OWL 2 Direct Semantics (Second Edition)</a>.
+    <span class="key"><ins class="ra">Green</ins> is new text and <del class="ra">red struck</del> text is removed.</span>
+    Only changes to the interpretations or to what is entailed are marked. The examples extend the OWL 2 Structural Specification's
+    Griffin family with one ordered list.</p>
+  <p>The page fetches the Recommendation from w3.org and applies OWL-array's changes in your browser, so the W3C text is the
+    published one. The design is <a href="owl-array.html">owl-array.md</a> §3 and §10, the same changes without the original are
+    <a href="owl-array-semantics.html">owl-array-semantics</a>, and the entailments were checked with HermiT
+    (<a href="https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity">examples/owl-identity</a>, Family.java).</p>
+  <details><summary>Changes (<span id="ra-count">0</span>)</summary><ol id="ra-list"></ol></details>
+</div>
+<div id="ra-status">Loading the OWL 2 Direct Semantics from w3.org…</div>
+<div id="ra-doc"></div>
+<script>
+(function () {
+  var SRC = 'https://www.w3.org/TR/owl2-direct-semantics/';
+  var doc, count = 0;
+  var list = document.getElementById('ra-list');
+
+  function norm(s) { return s.replace(/\s+/g, ' ').trim(); }
+  function frag(html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content; }
+  function mark(el, label) {
+    count++; el.id = 'ra-' + count;
+    var li = document.createElement('li'); li.innerHTML = '<a href="#ra-' + count + '">' + label + '</a>'; list.appendChild(li);
+    return el;
+  }
+  // The elements of a section: the siblings after its anchor, up to the next section anchor.
+  function section(id) {
+    var a = doc.querySelector('a[id="' + id + '"]'), out = [];
+    for (var el = a.nextElementSibling.nextElementSibling; el; el = el.nextElementSibling) {
+      if (el.tagName === 'A' && el.id && el.nextElementSibling && /^H[2-4]$/.test(el.nextElementSibling.tagName)) break;
+      out.push(el);
+    }
+    return out;
+  }
+  function find(id, selector, text) {
+    var els = section(id);
+    for (var i = 0; i < els.length; i++) {
+      // The innermost match: a nested list item rather than the item that holds its list.
+      var cands = [els[i]].concat([].slice.call(els[i].querySelectorAll(selector))), hit = null;
+      for (var j = 0; j < cands.length; j++)
+        if (cands[j].matches(selector) && (!text || norm(cands[j].textContent).indexOf(text) >= 0)) hit = cands[j];
+      if (hit) return hit;
+    }
+    throw new Error('not found in ' + id + ': ' + selector + ' "' + text + '"');
+  }
+  function lastOf(id, selector) { var els = section(id).filter(function (e) { return e.matches(selector); }); return els[els.length - 1]; }
+  // In the text of el, after the first occurrence of `text`, put the new HTML; with `delPart`, a
+  // suffix of `text`, that suffix is marked removed and the new HTML takes its place.
+  function edit(el, text, insHtml, label, delPart) {
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), node;
+    while ((node = walker.nextNode())) {
+      var k = node.data.replace(/ /g, ' ').indexOf(text);
+      if (k < 0) continue;
+      var after = node.splitText(k + text.length);
+      var parent = node.parentNode;
+      if (delPart) {
+        var old = node.splitText(k + text.length - delPart.length);
+        var del = document.createElement('del'); del.className = 'ra'; parent.replaceChild(del, old); del.appendChild(old);
+      }
+      var ins = document.createElement('ins'); ins.className = 'ra'; ins.innerHTML = insHtml;
+      parent.insertBefore(ins, after);
+      return mark(ins, label);
+    }
+    throw new Error('text not found: ' + text);
+  }
+  function block(ref, where, html, label, example) {
+    var d = document.createElement('div'); d.className = 'ra-ins' + (example ? ' example' : ''); d.innerHTML = html;
+    ref.parentNode.insertBefore(d, where === 'before' ? ref : ref.nextSibling);
+    return mark(d, label);
+  }
+  function li(ref, html, label) {
+    var l = document.createElement('li'); l.className = 'ra-ins'; l.innerHTML = '<ins class="ra">' + html + '</ins>';
+    ref.parentNode.insertBefore(l, ref.nextSibling);
+    return mark(l, label);
+  }
+  var I = function (s) { return '<i>' + s + '</i>'; };
+  var SEQ = I('SEQ'), LEN = I('len'), EL = I('el');
+
+  function apply() {
+    // 1 Introduction: the running example.
+    block(lastOf('Introduction', 'p'), 'after',
+      '<p>OWL-array changes the semantics in one place: an ontology may hold <i>sequence terms</i> ( t<sub>1</sub> … t<sub>n</sub> ), each ' +
+      'element an individual (named, anonymous or another sequence term) or a literal, and a class expression ' +
+      '<span class="name">ObjectTupleOf( u<sub>1</sub> … u<sub>n</sub> )</span> describes the sequences with given elements. ' +
+      'The examples in this document use the ontology <i>O<sub>G</sub></i>: three axioms from the examples of the OWL 2 Specification and two new ones.</p>' +
+      '<pre>SameIndividual( a:Meg a:Megan )                                   <i>(OWL 2 Specification, §9.6.1)</i>\n' +
+      'DifferentIndividuals( a:Peter a:Meg a:Chris a:Stewie )            <i>(§9.6.2)</i>\n' +
+      'ClassAssertion( a:Boy a:Stewie )                                  <i>(§9.1.3)</i>\n' +
+      'ObjectPropertyAssertion( a:children a:Peter ( a:Meg a:Chris a:Stewie ) )        <i>Peter\'s children, eldest first</i>\n' +
+      'SubObjectPropertyOf( ObjectPropertyChain( a:children ra:member ) a:fatherOf )</pre>' +
+      '<p>In Turtle-array the fourth axiom is <span class="name">a:Peter a:children ( a:Meg a:Chris a:Stewie ) .</span>; read as RDF 1.1, its list is ' +
+      'an rdf:first/rdf:rest structure that OWL 2 DL does not admit in data.</p>', 'Introduction: sequence terms and the running example', true);
+
+    // 2.1 Vocabulary.
+    edit(find('Vocabulary', 'li', 'is a set of individuals'), '(named and anonymous)',
+      ' and sequence terms; <b>each occurrence of a sequence term is an anonymous individual of its own</b>', '2.1 V<sub>I</sub>: sequence terms, one individual per occurrence');
+    edit(find('Vocabulary', 'li', 'is a set of classes'), 'owl:Nothing', ', and the class <i>ra:Sequence</i>', '2.1 V<sub>C</sub>: ra:Sequence');
+    edit(find('Vocabulary', 'li', 'is a set of object properties'), 'owl:bottomObjectProperty', ', and <i>ra:member</i>, <i>ra:first</i> and <i>ra:last</i>', '2.1 V<sub>OP</sub>: ra:member, ra:first, ra:last');
+    edit(find('Vocabulary', 'li', 'is a set of data properties'), 'owl:bottomDataProperty', ', and <i>ra:memberValue</i>, <i>ra:length</i>, <i>ra:firstValue</i> and <i>ra:lastValue</i>', '2.1 V<sub>DP</sub>: ra:memberValue, ra:length, …');
+    li(find('Vocabulary', 'li', 'denotes an individual (named or anonymous)'),
+      '<span class="name">s</span> denotes a sequence term ( t<sub>1</sub> … t<sub>n</sub> ), n ≥ 0, where each t<sub>i</sub> is an individual or a literal;',
+      '2.1 convention s');
+    li(find('Vocabulary', 'li', 'denotes a literal'),
+      '<span class="name">u</span> denotes a tuple item: a class expression, a data range, a named individual or a literal;', '2.1 convention u');
+    block(find('Vocabulary', 'p', 'is not required to contain all datatypes'), 'after',
+      '<p>The datatype map contains <i>xsd:nonNegativeInteger</i>, the range of <i>ra:length</i>.</p>', '2.1 datatype map: xsd:nonNegativeInteger');
+
+    // 2.2 Interpretations.
+    var p22 = find('Interpretations', 'p', 'is a 10-tuple');
+    var named = [].slice.call(p22.querySelectorAll('i')).filter(function (i) { return i.textContent === 'NAMED'; })[0];
+    var ins = document.createElement('ins'); ins.className = 'ra'; ins.innerHTML = ' , ' + SEQ + ' , ' + LEN + ' , ' + EL;
+    named.parentNode.insertBefore(ins, named.nextSibling); mark(ins, '2.2 interpretation: SEQ, len, el');
+    edit(p22, '10-tuple', '13-tuple', '2.2 a 13-tuple', '10-tuple');
+    var cl = find('Interpretations', 'li', '(owl:Nothing)');
+    edit(cl, '∅.', ' and', '2.2 ⋅C: one more condition', '.');
+    li(cl, I('(ra:Sequence)<sup>C</sup>') + ' = ' + SEQ + '.', '2.2 (ra:Sequence)C = SEQ');
+    var op = find('Interpretations', 'li', '(owl:bottomObjectProperty)');
+    edit(op, '∅.', ' and', '2.2 ⋅OP: more conditions', '.');
+    li(op, I('(ra:member)<sup>OP</sup>') + ' = { ( <i>x</i> , ' + EL + '(<i>x</i>, <i>i</i>) ) | <i>x</i> ∈ ' + SEQ + ' , 1 ≤ <i>i</i> ≤ ' + LEN + '(<i>x</i>) , ' + EL + '(<i>x</i>, <i>i</i>) ∈ <i>Δ<sub>I</sub></i> }, and ' +
+      I('(ra:first)<sup>OP</sup>') + ' and ' + I('(ra:last)<sup>OP</sup>') + ' are the same with <i>i</i> = 1 and <i>i</i> = ' + LEN + '(<i>x</i>).', '2.2 ra:member, ra:first, ra:last');
+    var dp = find('Interpretations', 'li', '(owl:bottomDataProperty)');
+    edit(dp, '∅.', ' and', '2.2 ⋅DP: more conditions', '.');
+    li(dp, I('(ra:memberValue)<sup>DP</sup>') + ', ' + I('(ra:firstValue)<sup>DP</sup>') + ' and ' + I('(ra:lastValue)<sup>DP</sup>') +
+      ' are as for <i>ra:member</i>, <i>ra:first</i> and <i>ra:last</i> with <i>Δ<sub>D</sub></i> in place of <i>Δ<sub>I</sub></i>, and ' +
+      I('(ra:length)<sup>DP</sup>') + ' = { ( <i>x</i> , ' + LEN + '(<i>x</i>) ) | <i>x</i> ∈ ' + SEQ + ' }.', '2.2 ra:memberValue, ra:length, …');
+    var ind = find('Interpretations', 'li', 'individual interpretation function');
+    var indIns = document.createElement('ins'); indIns.className = 'ra';
+    indIns.innerHTML = ' such that, for each sequence term <i>s</i> = ( t<sub>1</sub> … t<sub>n</sub> ) ∈ <i>V<sub>I</sub></i>, <i>(s)<sup>I</sup></i> ∈ ' + SEQ +
+      ', ' + LEN + '(<i>(s)<sup>I</sup></i>) = n, and ' + EL + '(<i>(s)<sup>I</sup></i>, i) is <i>(t<sub>i</sub>)<sup>I</sup></i> when t<sub>i</sub> is an individual and <i>(t<sub>i</sub>)<sup>LT</sup></i> when it is a literal; ' +
+      'and <i>(a)<sup>I</sup></i> ∉ ' + SEQ + ' for each individual <i>a</i>, named or anonymous, that is not a sequence term.';
+    // The item ends "… ∈ ΔI." : strike that last period and put the new conditions in its place.
+    var walker = document.createTreeWalker(ind, NodeFilter.SHOW_TEXT), tn, dot = null;
+    while ((tn = walker.nextNode())) if (/^\s*\./.test(tn.data)) dot = tn;
+    if (dot) {
+      var at = dot.data.indexOf('.'), rest = dot.splitText(at).splitText(1);
+      var d = document.createElement('del'); d.className = 'ra'; rest.parentNode.replaceChild(d, rest.previousSibling); d.textContent = '.';
+      rest.parentNode.insertBefore(indIns, rest);
+    } else ind.appendChild(indIns); mark(indIns, '2.2 ⋅I: what a sequence term denotes');
+    li(find('Interpretations', 'li', 'NAMED is a subset of'),
+      SEQ + ' is a subset of <i>Δ<sub>I</sub></i> called the set of <i>sequences</i>; ' + LEN + ' is a function from ' + SEQ +
+      ' to the non-negative integers; and ' + EL + ' assigns to each <i>x</i> ∈ ' + SEQ + ' and 1 ≤ <i>i</i> ≤ ' + LEN + '(<i>x</i>) an element ' +
+      EL + '(<i>x</i>, <i>i</i>) ∈ <i>Δ<sub>I</sub></i> ∪ <i>Δ<sub>D</sub></i>. Two sequences with the same ' + LEN + ' and ' + EL +
+      ' need not be equal; two that differ in length or at some position are different.', '2.2 SEQ, len, el');
+    block(find('Interpretations', 'p', 'The following sections define the extensions'), 'before',
+      '<p>In every model of <i>O<sub>G</sub></i>, Peter\'s <i>a:children</i> value is a sequence <i>x</i> with ' + LEN + '(<i>x</i>) = 3 and ' + EL +
+      '(<i>x</i>, 1) = <i>(a:Meg)<sup>I</sup></i> = <i>(a:Megan)<sup>I</sup></i>. The built-ins give these:</p><table>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊨</td><td class="ra-ent">ObjectPropertyAssertion( a:fatherOf a:Peter a:Megan )</td><td>the chain through <i>ra:member</i>: the three <i>a:fatherOf</i> assertions of §9.6.2\'s example follow from one list</td></tr>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectSomeValuesFrom( ra:last a:Boy ) ) a:Peter )</td><td>the youngest child is a boy</td></tr>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children DataHasValue( ra:length "3"^^xsd:integer ) ) a:Peter )</td><td></td></tr>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊭</td><td class="ra-ent">ClassAssertion( ObjectMinCardinality( 2 a:children ) a:Peter )</td><td>the list is one value</td></tr></table>' +
+      '<p>§9.6.2\'s conclusion <span class="name">ObjectMinCardinality( 3 a:fatherOf )</span> holds in every model of <i>O<sub>G</sub></i>, but the chain makes <i>a:fatherOf</i> non-simple, so §2.5\'s restriction excludes the question.</p>',
+      '2.2 example: the built-ins', true);
+
+    // 2.2.3 Class Expressions: Table 4.
+    var last4 = find('Class_Expressions', 'tr', 'DataExactCardinality( n DPE DR )');
+    var tr = document.createElement('tr'); tr.className = 'ra-ins';
+    tr.innerHTML = '<td class="name"><ins class="ra">ObjectTupleOf( u<sub>1</sub> ... u<sub>n</sub> )</ins></td><td><ins class="ra">{ <i>x</i> ∈ ' + SEQ + ' | ' + LEN +
+      '(<i>x</i>) = n and, for each 1 ≤ i ≤ n, ' + EL + '(<i>x</i>, i) ∈ <i>(u<sub>i</sub>)<sup>C</sup></i> if u<sub>i</sub> is a class expression, ∈ <i>(u<sub>i</sub>)<sup>DT</sup></i> if a data range, = <i>(u<sub>i</sub>)<sup>I</sup></i> if a named individual, = <i>(u<sub>i</sub>)<sup>LT</sup></i> if a literal }</ins></td>';
+    last4.parentNode.insertBefore(tr, last4.nextSibling); mark(tr, '2.2.3 Table 4: ObjectTupleOf');
+    block(lastOf('Class_Expressions', 'div'), 'after',
+      '<p>An individual in <span class="name">ObjectTupleOf</span> must be named, as one in <span class="name">ObjectHasValue</span> must; a sequence term never appears in a class expression.</p><table>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Megan a:Chris a:Stewie ) ) a:Peter )</td><td>one list entails another, through §9.6.1\'s SameIndividual</td></tr>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( owl:Thing owl:Thing a:Boy ) ) a:Peter )</td><td>a class at a position</td></tr>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊭</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Chris a:Megan a:Stewie ) ) a:Peter )</td><td>order matters</td></tr>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊭</td><td class="ra-ent">ClassAssertion( ObjectComplementOf( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Chris a:Megan a:Stewie ) ) ) a:Peter )</td><td>Peter may have another list</td></tr>' +
+      '<tr><td><i>O<sub>G</sub></i> ∪ { FunctionalObjectProperty( a:children ) } ⊨</td><td class="ra-ent">the same</td><td>the one list has Meg first, and Meg ≠ Chris</td></tr></table>' +
+      '<p>At the end of §9.6.2, a functional <i>a:fatherOf</i> makes that example inconsistent; a functional <i>a:children</i> is consistent, because one sequence holds all three children.</p>',
+      '2.2.3 example: ObjectTupleOf', true);
+
+    // 2.3.5 Keys.
+    block(lastOf('Keys', 'div'), 'after',
+      '<p>A sequence is never the interpretation of a named individual, so in some model no sequence is in <i>NAMED</i>: a key never entails that two sequences are equal, ' +
+      'and never identifies two individuals through a sequence-valued key property. Identity by elements, if an ontology wants it, needs a construct of its own.</p>',
+      '2.3.5 keys do not reach sequences');
+
+    // 2.3.6 Assertions.
+    block(lastOf('Assertions', 'div'), 'after',
+      '<p>A sequence term is an anonymous individual, so the restrictions of Section 11.2 of the OWL 2 Specification keep it out of SameIndividual, DifferentIndividuals, ' +
+      'the negative property assertions, ObjectOneOf and ObjectHasValue. The link between a sequence and its elements is not an ObjectPropertyAssertion and adds no edge to that section\'s forest condition.</p>',
+      '2.3.6 where a sequence term may stand');
+
+    // 2.3.7 Ontologies.
+    var p237 = find('Ontologies', 'p', 'standardized apart');
+    edit(p237, 'with anonymous individuals', ' and sequence terms', '2.3.7 sequence terms standardized apart');
+    block(p237, 'after',
+      '<p>Every occurrence of a sequence term in the axiom closure is a distinct anonymous individual, including two occurrences in one axiom and occurrences in different imported ontologies; ' +
+      'a structurally equal axiom stated twice is still one axiom.</p>', '2.3.7 occurrences');
+    block(section('Ontologies').filter(function (e) { return e.classList && e.classList.contains('ra-ins'); }).pop(), 'after',
+      '<p>Add Lois with the same children, and compare a data value from §9.5 (Keys):</p><table>' +
+      '<tr><td><i>O<sub>G</sub></i> ∪ { ObjectPropertyAssertion( a:children a:Lois ( a:Meg a:Chris a:Stewie ) ) } ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Megan a:Chris a:Stewie ) ) a:Lois )</td></tr>' +
+      '<tr><td>the same ⊭</td><td class="ra-ent">∃ x : a:children(a:Peter, x) ∧ a:children(a:Lois, x)</td></tr>' +
+      '<tr><td>{ DataPropertyAssertion( a:hasSSN a:Peter "123-45-6789" ), DataPropertyAssertion( a:hasSSN a:Peter_Griffin "123-45-6789" ) } ⊨</td><td class="ra-ent">∃ y : a:hasSSN(a:Peter, y) ∧ a:hasSSN(a:Peter_Griffin, y)</td></tr></table>' +
+      '<p>A literal denotes one value in every interpretation; a sequence is like a blank node with a fixed description, neither entailed to be the same as another with the same elements nor entailed to be different. ' +
+      'This agrees with RDF simple entailment over the same data.</p>', '2.3.7 example: no identity by elements', true);
+
+    // 2.4 Models.
+    var p24 = find('Models', 'p', 'by modifying the interpretation of anonymous individuals');
+    edit(p24, 'interpretation of anonymous individuals', ' and sequence terms', '2.4 models reinterpret sequence terms');
+    block(p24, 'after',
+      '<p>So a sequence term in an entailed ontology <i>O<sub>1</sub></i> is read existentially, and one list entails another directly:</p><table>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊨</td><td class="ra-ent">ObjectPropertyAssertion( a:children a:Peter ( a:Megan a:Chris a:Stewie ) )</td><td>Peter\'s list witnesses the new term</td></tr>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊨</td><td class="ra-ent">ObjectPropertyAssertion( a:children a:Peter ( a:Meg a:Chris a:Stewie ) ), ObjectPropertyAssertion( a:children a:Peter ( a:Megan a:Chris a:Stewie ) )</td><td>two occurrences, one witness: occurrences are not counted</td></tr>' +
+      '<tr><td><i>O<sub>G</sub></i> ⊭</td><td class="ra-ent">ObjectPropertyAssertion( a:children a:Peter ( a:Chris a:Meg a:Stewie ) )</td><td>no witness in some model</td></tr></table>',
+      '2.4 example: list entails list', true);
+  }
+
+  fetch(SRC).then(function (r) {
+    if (!r.ok) throw new Error('w3.org answered ' + r.status);
+    var base = r.url;
+    return r.text().then(function (text) {
+      var src = new DOMParser().parseFromString(text, 'text/html');
+      [].forEach.call(src.querySelectorAll('[href], [src]'), function (e) {
+        ['href', 'src'].forEach(function (a) {
+          var v = e.getAttribute(a);
+          if (v && v.charAt(0) !== '#') e.setAttribute(a, new URL(v, base).href);
+        });
+      });
+      [].forEach.call(src.head.querySelectorAll('link[rel~="stylesheet"], style'), function (e) {
+        document.head.insertBefore(document.importNode(e, true), document.head.firstChild);
+      });
+      [].forEach.call(src.body.querySelectorAll('script'), function (s) { s.remove(); });
+      var target = document.getElementById('ra-doc');
+      while (src.body.firstChild) target.appendChild(document.importNode(src.body.firstChild, true));
+      doc = target;
+      apply();
+      document.getElementById('ra-count').textContent = count;
+      document.getElementById('ra-status').remove();
+      if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
+    });
+  }).catch(function (e) {
+    document.getElementById('ra-status').innerHTML = 'Could not build the redline (' + String(e.message || e).replace(/</g, '&lt;') +
+      '). The same changes, without the original text around them, are in <a href="owl-array-semantics.html">owl-array-semantics.html</a>.';
+  });
+})();
+</script>
+</body>
+</html>
