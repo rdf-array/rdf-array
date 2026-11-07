@@ -8,7 +8,13 @@ section that is not mentioned is unchanged. The examples extend the running Grif
 of the [OWL 2 Structural Specification] with one ordered list. *2026-11-06; the design and the
 alternatives it was chosen from are in [owl-array.md](owl-array.html) §3 and §10.*
 
-## 1. [Introduction](https://www.w3.org/TR/owl2-direct-semantics/#Introduction): the running example
+Each box marks a change to the model or to what is entailed. A box labelled *Model change* alters the interpretations, and one labelled *Entailment change* shows what follows that did not in OWL 2. The entailments below were checked with HermiT 1.4.3 through the expansion of owl-array.md §6
+(`Family.java` in [examples/owl-identity](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity)).
+That expansion gives evidence, not a proof. The claims follow from the definitions.
+
+## 1. Introduction: the running example
+
+*OWL 2: [§1 Introduction](https://www.w3.org/TR/owl2-direct-semantics/#Introduction).*
 
 <style>
   .delta { border-left: 4px solid #b4530a; background: rgba(180, 83, 10, 0.07); padding: 0.4em 1em 0.6em; margin: 1em 0; }
@@ -43,20 +49,22 @@ The syntax this assumes, from owl-array.md §4:
 - Seven built-in entities have fixed meanings, as `owl:Thing` has: `ra:Sequence`, `ra:member`, `ra:first`, `ra:last`,
   `ra:memberValue`, `ra:length`, `ra:firstValue` and `ra:lastValue`.
 
-The entailments below were checked with HermiT 1.4.3 through the expansion of owl-array.md §6
-(`Family.java` in [examples/owl-identity](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity)).
-That expansion gives evidence, not a proof. The claims follow from the definitions.
+## 2. Direct Model-Theoretic Semantics for OWL 2
 
-## 2. [Direct Model-Theoretic Semantics for OWL 2](https://www.w3.org/TR/owl2-direct-semantics/#Direct_Model-Theoretic_Semantics_for_OWL_2)
+*OWL 2: [§2 Direct Model-Theoretic Semantics for OWL 2](https://www.w3.org/TR/owl2-direct-semantics/#Direct_Model-Theoretic_Semantics_for_OWL_2).*
 
-### 2.1 [Vocabulary](https://www.w3.org/TR/owl2-direct-semantics/#Vocabulary)
+### 2.1 Vocabulary
+
+*OWL 2: [§2.1 Vocabulary](https://www.w3.org/TR/owl2-direct-semantics/#Vocabulary).*
 
 <div class="delta" data-kind="Model">
 <p><em>V<sub>I</sub></em> also contains every sequence term, and <strong>each occurrence of a sequence term is an anonymous individual of its own</strong>. Two occurrences of <code>( a:Meg a:Chris a:Stewie )</code> are two members of <em>V<sub>I</sub></em>, as <code>_:x</code> and <code>_:y</code> are. <em>V<sub>C</sub></em> contains <code>ra:Sequence</code>; <em>V<sub>OP</sub></em> contains <code>ra:member</code>, <code>ra:first</code> and <code>ra:last</code>; <em>V<sub>DP</sub></em> contains <code>ra:memberValue</code>, <code>ra:length</code>, <code>ra:firstValue</code> and <code>ra:lastValue</code>. The datatype map contains <code>xsd:nonNegativeInteger</code>.</p>
 <p>Most of what follows comes from this one decision. Because a sequence term is anonymous, §2.3.7 standardizes its occurrences apart and §2.4 lets a model reinterpret them. Nothing makes two of them equal because their elements are.</p>
 </div>
 
-### 2.2 [Interpretations](https://www.w3.org/TR/owl2-direct-semantics/#Interpretations)
+### 2.2 Interpretations
+
+*OWL 2: [§2.2 Interpretations](https://www.w3.org/TR/owl2-direct-semantics/#Interpretations).*
 
 <div class="delta" data-kind="Model">
 <p>An interpretation also has a set <em>SEQ</em> ⊆ Δ<sub>I</sub> of <em>sequences</em>, a function <em>len</em> from <em>SEQ</em> to the non-negative integers, and a function <em>el</em> that gives, for each <em>x</em> ∈ <em>SEQ</em> and 1 ≤ <em>i</em> ≤ <em>len</em>(<em>x</em>), an element <em>el</em>(<em>x</em>, <em>i</em>) ∈ Δ<sub>I</sub> ∪ Δ<sub>D</sub>. These conditions hold:</p>
@@ -86,15 +94,21 @@ The built-ins give the first entailments over the list.
 <p>§9.6.2 concludes that Peter has at least three children, <code>ObjectMinCardinality( 3 a:fatherOf )</code>. That still holds in every model of <em>O<sub>G</sub></em>. But the chain makes <code>a:fatherOf</code> non-simple, so §2.5's restriction excludes that question, and HermiT does not derive it.</p>
 </div>
 
-#### 2.2.1 [Object Property Expressions](https://www.w3.org/TR/owl2-direct-semantics/#Object_Property_Expressions)
+#### 2.2.1 Object Property Expressions
+
+*OWL 2: [§2.2.1 Object Property Expressions](https://www.w3.org/TR/owl2-direct-semantics/#Object_Property_Expressions).*
 
 Unchanged.
 
-#### 2.2.2 [Data Ranges](https://www.w3.org/TR/owl2-direct-semantics/#Data_Ranges)
+#### 2.2.2 Data Ranges
+
+*OWL 2: [§2.2.2 Data Ranges](https://www.w3.org/TR/owl2-direct-semantics/#Data_Ranges).*
 
 Unchanged.
 
-#### 2.2.3 [Class Expressions](https://www.w3.org/TR/owl2-direct-semantics/#Class_Expressions), Table 4
+#### 2.2.3 Class Expressions, Table 4
+
+*OWL 2: [§2.2.3 Class Expressions](https://www.w3.org/TR/owl2-direct-semantics/#Class_Expressions).*
 
 <div class="delta" data-kind="Model">
 <table class="simple">
@@ -117,41 +131,57 @@ Unchanged.
 <p>Compare the end of Structural Spec. §9.6.2. There, <code>FunctionalObjectProperty( a:fatherOf )</code> makes the example inconsistent, because Meg, Chris and Stewie would have to be one individual. A functional <code>a:children</code> is consistent, because one sequence holds all three.</p>
 </div>
 
-### 2.3 [Satisfaction in an Interpretation](https://www.w3.org/TR/owl2-direct-semantics/#Satisfaction_in_an_Interpretation)
+### 2.3 Satisfaction in an Interpretation
+
+*OWL 2: [§2.3 Satisfaction in an Interpretation](https://www.w3.org/TR/owl2-direct-semantics/#Satisfaction_in_an_Interpretation).*
 
 Tables 5 to 10 are unchanged. A sequence term enters an axiom as an individual, and an axiom
 holding one is satisfied when its condition holds of the term's interpretation from §2.2.
 
-#### 2.3.1 [Class Expression Axioms](https://www.w3.org/TR/owl2-direct-semantics/#Class_Expression_Axioms)
+#### 2.3.1 Class Expression Axioms
+
+*OWL 2: [§2.3.1 Class Expression Axioms](https://www.w3.org/TR/owl2-direct-semantics/#Class_Expression_Axioms).*
 
 Unchanged.
 
-#### 2.3.2 [Object Property Expression Axioms](https://www.w3.org/TR/owl2-direct-semantics/#Object_Property_Expression_Axioms)
+#### 2.3.2 Object Property Expression Axioms
+
+*OWL 2: [§2.3.2 Object Property Expression Axioms](https://www.w3.org/TR/owl2-direct-semantics/#Object_Property_Expression_Axioms).*
 
 Unchanged. A property chain through `ra:member` or `ra:first` is an ordinary chain; its entailments
 are in the box after §2.2.
 
-#### 2.3.3 [Data Property Expression Axioms](https://www.w3.org/TR/owl2-direct-semantics/#Data_Property_Expression_Axioms)
+#### 2.3.3 Data Property Expression Axioms
+
+*OWL 2: [§2.3.3 Data Property Expression Axioms](https://www.w3.org/TR/owl2-direct-semantics/#Data_Property_Expression_Axioms).*
 
 Unchanged.
 
-#### 2.3.4 [Datatype Definitions](https://www.w3.org/TR/owl2-direct-semantics/#Datatype_Definitions)
+#### 2.3.4 Datatype Definitions
+
+*OWL 2: [§2.3.4 Datatype Definitions](https://www.w3.org/TR/owl2-direct-semantics/#Datatype_Definitions).*
 
 Unchanged.
 
-#### 2.3.5 [Keys](https://www.w3.org/TR/owl2-direct-semantics/#Keys)
+#### 2.3.5 Keys
+
+*OWL 2: [§2.3.5 Keys](https://www.w3.org/TR/owl2-direct-semantics/#Keys).*
 
 <div class="delta" data-kind="Entailment">
 <p>Table 9 is unchanged, but it no longer reaches sequences. A sequence is never the interpretation of a named individual, so in some model none is in NAMED. A key therefore never entails that two sequences are equal, and never identifies two individuals through a sequence-valued key property. To get identity by elements, an ontology needs a construct of its own. owl-array.md §10.5 leaves that construct open.</p>
 </div>
 
-#### 2.3.6 [Assertions](https://www.w3.org/TR/owl2-direct-semantics/#Assertions)
+#### 2.3.6 Assertions
+
+*OWL 2: [§2.3.6 Assertions](https://www.w3.org/TR/owl2-direct-semantics/#Assertions).*
 
 <div class="delta" data-kind="Model">
 <p>Table 10 is unchanged. Because a sequence term is an anonymous individual, Structural Spec. §11.2 keeps it out of <code>SameIndividual</code>, <code>DifferentIndividuals</code> and the negative property assertions, and out of <code>ObjectOneOf</code> and <code>ObjectHasValue</code>. The link between a sequence and its elements is not an <code>ObjectPropertyAssertion</code>, so it adds no edge to §11.2's forest condition.</p>
 </div>
 
-#### 2.3.7 [Ontologies](https://www.w3.org/TR/owl2-direct-semantics/#Ontologies)
+#### 2.3.7 Ontologies
+
+*OWL 2: [§2.3.7 Ontologies](https://www.w3.org/TR/owl2-direct-semantics/#Ontologies).*
 
 <div class="delta" data-kind="Model">
 <p>The axiom closure is satisfied with anonymous individuals <strong>and sequence terms</strong> standardized apart. Every occurrence of a sequence term in the closure is a distinct anonymous individual. That includes two occurrences in one axiom and occurrences in different imported ontologies. A structurally equal axiom stated twice is still one axiom, so it adds no second occurrence.</p>
@@ -166,7 +196,9 @@ Unchanged.
 <p>Here OWL-array departs from treating a sequence like a literal, the design owl-array.md §10 calls A. A sequence is like a blank node with a fixed description. Two of them are not entailed to be one thing, and not entailed to be two. This agrees with RDF simple entailment over the same data, and with OWL 2, which entails nothing about two RDF 1.1 lists here because they are anonymous individuals (owl-array.md §10.4.1).</p>
 </div>
 
-### 2.4 [Models](https://www.w3.org/TR/owl2-direct-semantics/#Models)
+### 2.4 Models
+
+*OWL 2: [§2.4 Models](https://www.w3.org/TR/owl2-direct-semantics/#Models).*
 
 <div class="delta" data-kind="Entailment">
 <p>The definition is unchanged. But the interpretation <em>J</em> it asks for may now reinterpret sequence terms, as it reinterprets anonymous individuals. So a sequence term in an entailed ontology <em>O<sub>1</sub></em> is read existentially, and one list entails another directly:</p>
@@ -179,14 +211,18 @@ Unchanged.
 </tbody></table>
 </div>
 
-### 2.5 [Inference Problems](https://www.w3.org/TR/owl2-direct-semantics/#Inference_Problems)
+### 2.5 Inference Problems
+
+*OWL 2: [§2.5 Inference Problems](https://www.w3.org/TR/owl2-direct-semantics/#Inference_Problems).*
 
 Unchanged. Instance checking and the atoms of a Boolean conjunctive query name only named
 individuals, so a question about a sequence is asked through the property that holds it, as in the
 tables above. §2.5's restriction to simple properties in cardinalities applies as before; a chain
 through `ra:member` makes its super-property non-simple (§2.2 above).
 
-## 3. [Independence of the Direct Semantics from the Datatype Map](https://www.w3.org/TR/owl2-direct-semantics/#Independence_of_the_Direct_Semantics_from_the_Datatype_Map_in_OWL_2_DL_.28Informative.29)
+## 3. Independence of the Direct Semantics from the Datatype Map
+
+*OWL 2: [§3 Independence of the Direct Semantics from the Datatype Map](https://www.w3.org/TR/owl2-direct-semantics/#Independence_of_the_Direct_Semantics_from_the_Datatype_Map_in_OWL_2_DL_.28Informative.29).*
 
 Unchanged. Overall, the datatype map changes only by requiring `xsd:nonNegativeInteger`; Tables 1, 3
 and 5 to 10 and the definitions of §2.4 and §2.5 are unchanged. The RDF-Based Semantics is not addressed. Under it, design B needs no extensionality
