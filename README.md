@@ -14,6 +14,8 @@ meta-repository: the documents below, the list of the forks and every repository
 | [json-ld-array.md](docs/json-ld-array.md) | [json-ld-array.html](https://rdf-array.github.io/rdf-array/docs/json-ld-array.html) | the JSON-LD-array specification: conventional JSON to rdf-array through a mapping document, with the output, the errors and the reference implementation |
 | [shacl-array.md](docs/shacl-array.md) | [shacl-array.html](https://rdf-array.github.io/rdf-array/docs/shacl-array.html) | SHACL-array: a SHACL list is a sequence term, and SHACL 1.2's list constraints apply to sequence values; implemented in jena-array |
 | [owl-array.md](docs/owl-array.md) | [owl-array.html](https://rdf-array.github.io/rdf-array/docs/owl-array.html) | OWL-array: OWL's own lists are sequences, and a sequence in the data is an individual whose members, length, first and last element the built-in `ra:member`, `ra:length`, `ra:first` and `ra:last` give, so class expressions can constrain list members in OWL 2 DL; implemented in owlapi-array |
+| [owl-direct-semantics-array.html](docs/owl-direct-semantics-array.html) | [owl-direct-semantics-array.html](https://rdf-array.github.io/rdf-array/docs/owl-direct-semantics-array.html) | OWL-array's model theory as a redline of the OWL 2 Direct Semantics: the changes marked as insertions and deletions in the Recommendation's own text, which the page fetches from w3.org when opened |
+| [rdfc-array.md](docs/rdfc-array.md) | [rdfc-array.html](https://rdf-array.github.io/rdf-array/docs/rdfc-array.html) | RDFC-array: RDFC-1.0 canonicalization over sequences |
 | [array-syntax.md](docs/array-syntax.md) | [array-syntax.html](https://rdf-array.github.io/rdf-array/docs/array-syntax.html) | a design note: the syntax proposed to replace `((x))[i]` in SPARQL-array (`UNNEST`, `...`, `expr[i]`, `IN ?seq`) and `((x))[m, n]` in ShEx-array (`LIST`), checked for LALR(1) conflicts and run on nested data; `tools/array-syntax/` reproduces it |
 | [protege-array.md](docs/protege-array.md) | [protege-array.html](https://rdf-array.github.io/rdf-array/docs/protege-array.html) | OWL-array in Protégé, a demo: the FHIR example in Protégé 5.6.9, step by step with screenshots: every list parsed as one term, and HermiT classifying observations and patients by what is inside them |
 | [examples/fhir/README.md](examples/fhir/README.md) | [examples/fhir/](https://rdf-array.github.io/rdf-array/examples/fhir/) | FHIR RDF reasoning with OWL-array: the SWAT4LS 2016 process over today's FHIR RDF (lists everywhere), run through owlapi-array and HermiT and in Protégé; the FHIR ontology's list axioms shown wrong over rdf-array |
@@ -25,6 +27,20 @@ rendering (ReSpec, unofficial draft, or with `template: page` in the front matte
 by `docs/page.css`, as `protege-array.md` is); HTML in the Markdown passes through. The Pages workflow
 refuses a push whose HTML is older than its Markdown, and redirects the pages' addresses from
 before they moved to `docs/` and `management/`.
+
+### Branches
+
+The site publishes two branches, each from its own tip: `rdf-sequences`, the main line above, at the
+root, and `rdf-undef` under [rdf-undef/](https://rdf-array.github.io/rdf-array/rdf-undef/docs/html-index.html),
+the site's [front page](https://rdf-array.github.io/rdf-array/) listing both. `rdf-undef` branches from
+`rdf-sequences` and lets a position of a sequence be empty, `( 1 undef 3 )`; its documents are on that branch only:
+
+| Document | Rendered | What it is |
+|---|---|---|
+| [rdf-undef.md](https://github.com/rdf-array/rdf-array/blob/rdf-undef/docs/rdf-undef.md) | [rdf-undef.html](https://rdf-array.github.io/rdf-array/rdf-undef/docs/rdf-undef.html) | empty slots in sequences: a slot is not a term and not an unknown value, and it counts; what it means in each syntax, in SPARQL, in OWL and in the rest of the stack, and the decisions still open |
+| [owl-direct-semantics-undef.html](https://github.com/rdf-array/rdf-array/blob/rdf-undef/docs/owl-direct-semantics-undef.html) | [owl-direct-semantics-undef.html](https://rdf-array.github.io/rdf-array/rdf-undef/docs/owl-direct-semantics-undef.html) | the redline of the OWL 2 Direct Semantics for empty slots, over OWL-array's changes: `ra:holes`, `ra:DenseSequence`, `undef` in `ObjectTupleOf`, and a slot that is not an unknown in either direction of entailment |
+| [protege-undef.md](https://github.com/rdf-array/rdf-array/blob/rdf-undef/docs/protege-undef.md) | [protege-undef.html](https://rdf-array.github.io/rdf-array/rdf-undef/docs/protege-undef.html) | Protégé reasons about days off: the roster example, a week's shifts with days off as slots, step by step with screenshots |
+| [examples/roster/README.md](https://github.com/rdf-array/rdf-array/blob/rdf-undef/examples/roster/README.md) | [examples/roster/](https://rdf-array.github.io/rdf-array/rdf-undef/examples/roster/) | the roster: the data, the ontology and the DL queries the walk-through runs |
 
 `management/` holds the documents about the work rather than its products: the organisation's
 manifest and the assessments and lists that steer what is done next.
