@@ -1,124 +1,120 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OWL 2 Direct Semantics, OWL-array redline</title>
-<!--
-  A redline of the OWL 2 Direct Semantics for OWL-array. This file holds only the changes: the
-  page fetches the W3C Recommendation from w3.org when it is opened (w3.org allows the request)
-  and applies each change to it in the reader's browser, marking new text as <ins> and removed text
-  as <del>. The same changes, without the original around them, are owl-array-semantics.html.
--->
-<style>
-  ins.ra, div.ra-ins, tr.ra-ins td, li.ra-ins { background: #e6ffec; text-decoration: none; }
-  ins.ra { border-bottom: 2px solid #2da44e; padding: 0 1px; }
-  del.ra { background: #ffebe9; color: #82071e; text-decoration: line-through; }
-  div.ra-ins { border-left: 4px solid #2da44e; padding: 0.3em 1em 0.5em; margin: 1em 0; }
-  div.ra-ins.example { background: #f3faf5; }
-  div.ra-ins::before { content: "OWL-array: new text"; display: block; font: 600 0.72em/1.6 sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: #1a7f37; }
-  div.ra-ins.example::before { content: "OWL-array: example (informative, new)"; }
-  tr.ra-ins td { border-color: #2da44e; }
-  li.ra-ins { list-style-position: outside; }
-  #ra-banner { background: #fffbea; border-bottom: 1px solid #d4a72c; padding: 0.5em 1em; font: 14px/1.45 system-ui, sans-serif; color: #3b2f00; }
-  #ra-banner p { margin: 0.2em 0; }
-  #ra-banner a { color: #0b5394; }
-  #ra-banner details summary { cursor: pointer; font-weight: 600; }
-  #ra-banner ol { margin: 0.3em 0 0.2em 1.4em; padding: 0; columns: 2; font-size: 13px; }
-  #ra-banner .key ins, #ra-banner .key del { padding: 0 3px; }
-  .ra-ent { font-family: monospace; font-size: 0.9em; }
-  div.ra-ins table { border-collapse: collapse; margin: 0.4em 0; }
-  div.ra-ins td, div.ra-ins th { border: 1px solid #9fd5ad; padding: 0.25em 0.5em; vertical-align: top; text-align: left; }
-  #ra-nav { position: fixed; right: 12px; bottom: 12px; z-index: 10; display: flex; gap: 4px; font: 13px/1 system-ui, sans-serif; }
-  #ra-nav button { background: #1a7f37; color: #fff; border: 0; border-radius: 4px; padding: 7px 10px; cursor: pointer; font: inherit; }
-  #ra-nav button:focus-visible { outline: 2px solid #0b5394; outline-offset: 2px; }
-  #ra-nav span { align-self: center; background: #fff; border: 1px solid #9fd5ad; border-radius: 4px; padding: 6px 8px; color: #1a7f37; }
-  .ra-current { outline: 3px solid #d4a72c; outline-offset: 2px; }
-  #ra-status { font: 16px/1.5 system-ui, sans-serif; padding: 2em; max-width: 44em; }
-</style>
-</head>
-<body>
-<div id="ra-banner">
-  <p><strong>OWL-array redline</strong> of the <a href="https://www.w3.org/TR/owl2-direct-semantics/">OWL 2 Direct Semantics (Second Edition)</a>.
-    <span class="key"><ins class="ra">Green</ins> is new text and <del class="ra">red struck</del> text is removed.</span>
-    Only changes to the interpretations or to what is entailed are marked. The examples extend the OWL 2 Structural Specification's
-    Griffin family with one ordered list.</p>
-  <p>The page fetches the Recommendation from w3.org and applies OWL-array's changes in your browser, so the W3C text is the
-    published one. The design is <a href="owl-array.html">owl-array.md</a> §3 and §10, the same changes without the original are
-    <a href="owl-array-semantics.html">owl-array-semantics</a>, and the entailments were checked with HermiT
-    (<a href="https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity">examples/owl-identity</a>, Family.java).</p>
-  <details><summary>Changes (<span id="ra-count">0</span>)</summary><ol id="ra-list"></ol></details>
-</div>
-<div id="ra-nav" hidden><button id="ra-prev" type="button" title="Previous change">↑</button><span id="ra-pos">–</span><button id="ra-next" type="button" title="Next change">Next change ↓</button></div>
-<div id="ra-status">Loading the OWL 2 Direct Semantics from w3.org…</div>
-<div id="ra-doc"></div>
-<script>
+/* Redlines of the OWL 2 Direct Semantics (Second Edition) for the rdf-array project.
+ *
+ * A redline page holds only its changes. When it is opened, redline() fetches the Recommendation
+ * from w3.org (w3.org allows the request), moves its body into the page and applies the changes to
+ * it in the reader's browser, so the W3C text shown is the published one. Each change is one call
+ * of the helpers below; a change of the layer under review is marked, new text as <ins class="ra">
+ * and removed text as <del class="ra">, and listed in the banner. A layer accepted earlier (the
+ * OWL-array changes under the rdf-undef redline) is applied first with the class "acc", unmarked
+ * unless body.ra-show-acc is set.
+ *
+ *   redline({ layers: [ { changes: OWL_ARRAY, mark: false }, { changes: myChanges, mark: true } ] })
+ *
+ * A changes function receives the helpers bound to its layer:
+ *   section(id)                      the elements of the section whose anchor is <a id="id">
+ *   find(id, selector, text)         the innermost element of the section matching both
+ *   lastOf(id, selector)             the last top-level element of the section that matches
+ *   edit(el, text, html, label, delPart, before)
+ *                                    after the first occurrence of `text` in el (before it, with
+ *                                    `before`), insert `html`; `delPart`, a suffix of `text`, is marked removed
+ *   block(ref, 'before'|'after', html, label, example)   a new <div>, an example when `example`
+ *   li(ref, html, label)             a new list item after `ref`
+ *   row(ref, cells, label)           a new table row after `ref`, cells an array of HTML strings
+ *   insAfter(node, html, label)      a new <ins> right after a node
+ *   splice(textNode, start, length, html, label)   mark `length` characters of a text node removed and insert `html` after them
+ *   INS(html)                        '<ins class="…">html</ins>', for HTML strings
+ *   I(s), SEQ, LEN, EL               italics and the names of the interpretation's new parts
+ */
 (function () {
   var SRC = 'https://www.w3.org/TR/owl2-direct-semantics/';
-  var doc, count = 0;
-  var list = document.getElementById('ra-list');
 
   function norm(s) { return s.replace(/\s+/g, ' ').trim(); }
-  function frag(html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content; }
-  function mark(el, label) {
-    count++; el.id = 'ra-' + count;
-    var li = document.createElement('li'); li.innerHTML = '<a href="#ra-' + count + '">' + label + '</a>'; list.appendChild(li);
-    return el;
-  }
-  // The elements of a section: the siblings after its anchor, up to the next section anchor.
-  function section(id) {
-    var a = doc.querySelector('a[id="' + id + '"]'), out = [];
-    for (var el = a.nextElementSibling.nextElementSibling; el; el = el.nextElementSibling) {
-      if (el.tagName === 'A' && el.id && el.nextElementSibling && /^H[2-4]$/.test(el.nextElementSibling.tagName)) break;
-      out.push(el);
-    }
-    return out;
-  }
-  function find(id, selector, text) {
-    var els = section(id);
-    for (var i = 0; i < els.length; i++) {
-      // The innermost match: a nested list item rather than the item that holds its list.
-      var cands = [els[i]].concat([].slice.call(els[i].querySelectorAll(selector))), hit = null;
-      for (var j = 0; j < cands.length; j++)
-        if (cands[j].matches(selector) && (!text || norm(cands[j].textContent).indexOf(text) >= 0)) hit = cands[j];
-      if (hit) return hit;
-    }
-    throw new Error('not found in ' + id + ': ' + selector + ' "' + text + '"');
-  }
-  function lastOf(id, selector) { var els = section(id).filter(function (e) { return e.matches(selector); }); return els[els.length - 1]; }
-  // In the text of el, after the first occurrence of `text`, put the new HTML; with `delPart`, a
-  // suffix of `text`, that suffix is marked removed and the new HTML takes its place.
-  function edit(el, text, insHtml, label, delPart) {
-    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), node;
-    while ((node = walker.nextNode())) {
-      var k = node.data.replace(/ /g, ' ').indexOf(text);
-      if (k < 0) continue;
-      var after = node.splitText(k + text.length);
-      var parent = node.parentNode;
-      if (delPart) {
-        var old = node.splitText(k + text.length - delPart.length);
-        var del = document.createElement('del'); del.className = 'ra'; parent.replaceChild(del, old); del.appendChild(old);
-      }
-      var ins = document.createElement('ins'); ins.className = 'ra'; ins.innerHTML = insHtml;
-      parent.insertBefore(ins, after);
-      return mark(ins, label);
-    }
-    throw new Error('text not found: ' + text);
-  }
-  function block(ref, where, html, label, example) {
-    var d = document.createElement('div'); d.className = 'ra-ins' + (example ? ' example' : ''); d.innerHTML = html;
-    ref.parentNode.insertBefore(d, where === 'before' ? ref : ref.nextSibling);
-    return mark(d, label);
-  }
-  function li(ref, html, label) {
-    var l = document.createElement('li'); l.className = 'ra-ins'; l.innerHTML = '<ins class="ra">' + html + '</ins>';
-    ref.parentNode.insertBefore(l, ref.nextSibling);
-    return mark(l, label);
-  }
-  var I = function (s) { return '<i>' + s + '</i>'; };
-  var SEQ = I('SEQ'), LEN = I('len'), EL = I('el');
 
-  function apply() {
+  function helpers(doc, cls, marked, list, counter) {
+    var h = {};
+    function mark(el, label) {
+      if (!marked) return el;
+      counter.n++; el.id = 'ra-' + counter.n;
+      var li = document.createElement('li'); li.innerHTML = '<a href="#ra-' + counter.n + '">' + label + '</a>'; list.appendChild(li);
+      return el;
+    }
+    function insEl(html) { var ins = document.createElement('ins'); ins.className = cls; ins.innerHTML = html; return ins; }
+    h.INS = function (html) { return '<ins class="' + cls + '">' + html + '</ins>'; };
+    h.I = function (s) { return '<i>' + s + '</i>'; };
+    h.SEQ = h.I('SEQ'); h.LEN = h.I('len'); h.EL = h.I('el');
+    // The elements of a section: the siblings after its anchor, up to the next section anchor.
+    h.section = function (id) {
+      var a = doc.querySelector('a[id="' + id + '"]'), out = [];
+      for (var el = a.nextElementSibling.nextElementSibling; el; el = el.nextElementSibling) {
+        if (el.tagName === 'A' && el.id && el.nextElementSibling && /^H[2-4]$/.test(el.nextElementSibling.tagName)) break;
+        out.push(el);
+      }
+      return out;
+    };
+    h.find = function (id, selector, text) {
+      var els = h.section(id);
+      for (var i = 0; i < els.length; i++) {
+        // The innermost match: a nested list item rather than the item that holds its list.
+        var cands = [els[i]].concat([].slice.call(els[i].querySelectorAll(selector))), hit = null;
+        for (var j = 0; j < cands.length; j++)
+          if (cands[j].matches(selector) && (!text || norm(cands[j].textContent).indexOf(text) >= 0)) hit = cands[j];
+        if (hit) return hit;
+      }
+      throw new Error('not found in ' + id + ': ' + selector + ' "' + text + '"');
+    };
+    h.lastOf = function (id, selector) {
+      var els = h.section(id).filter(function (e) { return e.matches(selector); });
+      if (!els.length) throw new Error('not found in ' + id + ': ' + selector);
+      return els[els.length - 1];
+    };
+    // In the text node `node`, mark the `length` characters at `start` removed (none when 0) and put the new HTML after them.
+    h.splice = function (node, start, length, insHtml, label) {
+      var parent = node.parentNode, tail = node.splitText(start + length), ins = insEl(insHtml);
+      if (length) {
+        var old = node.splitText(start);
+        var del = document.createElement('del'); del.className = cls; parent.replaceChild(del, old); del.appendChild(old);
+      }
+      parent.insertBefore(ins, tail);
+      return mark(ins, label);
+    };
+    h.edit = function (el, text, insHtml, label, delPart, before) {
+      var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), node;
+      while ((node = walker.nextNode())) {
+        var k = node.data.replace(/ /g, ' ').indexOf(text);
+        if (k < 0) continue;
+        if (before) return h.splice(node, k, 0, insHtml, label);
+        var n = delPart ? delPart.length : 0;
+        return h.splice(node, k + text.length - n, n, insHtml, label);
+      }
+      throw new Error('text not found: ' + text);
+    };
+    h.insAfter = function (node, html, label) {
+      var ins = insEl(html); node.parentNode.insertBefore(ins, node.nextSibling); return mark(ins, label);
+    };
+    h.block = function (ref, where, html, label, example) {
+      var d = document.createElement('div'); d.className = cls + '-ins' + (example ? ' example' : ''); d.innerHTML = html;
+      ref.parentNode.insertBefore(d, where === 'before' ? ref : ref.nextSibling);
+      return mark(d, label);
+    };
+    h.li = function (ref, html, label) {
+      var l = document.createElement('li'); l.className = cls + '-ins'; l.innerHTML = h.INS(html);
+      ref.parentNode.insertBefore(l, ref.nextSibling);
+      return mark(l, label);
+    };
+    h.row = function (ref, cells, label) {
+      var tr = document.createElement('tr'); tr.className = cls + '-ins';
+      tr.innerHTML = cells.map(function (c, i) { return '<td' + (i === 0 ? ' class="name"' : '') + '>' + h.INS(c) + '</td>'; }).join('');
+      ref.parentNode.insertBefore(tr, ref.nextSibling);
+      return mark(tr, label);
+    };
+    return h;
+  }
+
+  // OWL-array: sequence terms in the data, each occurrence an anonymous individual of its own,
+  // the ra: built-ins and ObjectTupleOf. The design is owl-array.md §3 and §10.
+  function OWL_ARRAY(h) {
+    var I = h.I, SEQ = h.SEQ, LEN = h.LEN, EL = h.EL, find = h.find, edit = h.edit, block = h.block, li = h.li, lastOf = h.lastOf;
+
     // 1 Introduction: the running example.
     block(lastOf('Introduction', 'p'), 'after',
       '<p>OWL-array changes the semantics in one place: an ontology may hold <i>sequence terms</i> ( t<sub>1</sub> … t<sub>n</sub> ), each ' +
@@ -150,8 +146,7 @@
     // 2.2 Interpretations.
     var p22 = find('Interpretations', 'p', 'is a 10-tuple');
     var named = [].slice.call(p22.querySelectorAll('i')).filter(function (i) { return i.textContent === 'NAMED'; })[0];
-    var ins = document.createElement('ins'); ins.className = 'ra'; ins.innerHTML = ' , ' + SEQ + ' , ' + LEN + ' , ' + EL;
-    named.parentNode.insertBefore(ins, named.nextSibling); mark(ins, '2.2 interpretation: SEQ, len, el');
+    h.insAfter(named, ' , ' + SEQ + ' , ' + LEN + ' , ' + EL, '2.2 interpretation: SEQ, len, el');
     edit(p22, '10-tuple', '13-tuple', '2.2 a 13-tuple', '10-tuple');
     var cl = find('Interpretations', 'li', '(owl:Nothing)');
     edit(cl, '∅.', ' and', '2.2 ⋅C: one more condition', '.');
@@ -166,18 +161,14 @@
       ' are as for <i>ra:member</i>, <i>ra:first</i> and <i>ra:last</i> with <i>Δ<sub>D</sub></i> in place of <i>Δ<sub>I</sub></i>, and ' +
       I('(ra:length)<sup>DP</sup>') + ' = { ( <i>x</i> , ' + LEN + '(<i>x</i>) ) | <i>x</i> ∈ ' + SEQ + ' }.', '2.2 ra:memberValue, ra:length, …');
     var ind = find('Interpretations', 'li', 'individual interpretation function');
-    var indIns = document.createElement('ins'); indIns.className = 'ra';
-    indIns.innerHTML = ' such that, for each sequence term <i>s</i> = ( t<sub>1</sub> … t<sub>n</sub> ) ∈ <i>V<sub>I</sub></i>, <i>(s)<sup>I</sup></i> ∈ ' + SEQ +
+    var indHtml = ' such that, for each sequence term <i>s</i> = ( t<sub>1</sub> … t<sub>n</sub> ) ∈ <i>V<sub>I</sub></i>, <i>(s)<sup>I</sup></i> ∈ ' + SEQ +
       ', ' + LEN + '(<i>(s)<sup>I</sup></i>) = n, and ' + EL + '(<i>(s)<sup>I</sup></i>, i) is <i>(t<sub>i</sub>)<sup>I</sup></i> when t<sub>i</sub> is an individual and <i>(t<sub>i</sub>)<sup>LT</sup></i> when it is a literal; ' +
       'and <i>(a)<sup>I</sup></i> ∉ ' + SEQ + ' for each individual <i>a</i>, named or anonymous, that is not a sequence term.';
     // The item ends "… ∈ ΔI." : strike that last period and put the new conditions in its place.
     var walker = document.createTreeWalker(ind, NodeFilter.SHOW_TEXT), tn, dot = null;
     while ((tn = walker.nextNode())) if (/^\s*\./.test(tn.data)) dot = tn;
-    if (dot) {
-      var at = dot.data.indexOf('.'), rest = dot.splitText(at).splitText(1);
-      var d = document.createElement('del'); d.className = 'ra'; rest.parentNode.replaceChild(d, rest.previousSibling); d.textContent = '.';
-      rest.parentNode.insertBefore(indIns, rest);
-    } else ind.appendChild(indIns); mark(indIns, '2.2 ⋅I: what a sequence term denotes');
+    if (dot) h.splice(dot, dot.data.indexOf('.'), 1, indHtml, '2.2 ⋅I: what a sequence term denotes');
+    else h.insAfter(ind.lastChild, indHtml, '2.2 ⋅I: what a sequence term denotes');
     li(find('Interpretations', 'li', 'NAMED is a subset of'),
       SEQ + ' is a subset of <i>Δ<sub>I</sub></i> called the set of <i>sequences</i>; ' + LEN + ' is a function from ' + SEQ +
       ' to the non-negative integers; and ' + EL + ' assigns to each <i>x</i> ∈ ' + SEQ + ' and 1 ≤ <i>i</i> ≤ ' + LEN + '(<i>x</i>) an element ' +
@@ -194,11 +185,11 @@
       '2.2 example: the built-ins', true);
 
     // 2.2.3 Class Expressions: Table 4.
-    var last4 = find('Class_Expressions', 'tr', 'DataExactCardinality( n DPE DR )');
-    var tr = document.createElement('tr'); tr.className = 'ra-ins';
-    tr.innerHTML = '<td class="name"><ins class="ra">ObjectTupleOf( u<sub>1</sub> ... u<sub>n</sub> )</ins></td><td><ins class="ra">{ <i>x</i> ∈ ' + SEQ + ' | ' + LEN +
-      '(<i>x</i>) = n and, for each 1 ≤ i ≤ n, ' + EL + '(<i>x</i>, i) ∈ <i>(u<sub>i</sub>)<sup>C</sup></i> if u<sub>i</sub> is a class expression, ∈ <i>(u<sub>i</sub>)<sup>DT</sup></i> if a data range, = <i>(u<sub>i</sub>)<sup>I</sup></i> if a named individual, = <i>(u<sub>i</sub>)<sup>LT</sup></i> if a literal }</ins></td>';
-    last4.parentNode.insertBefore(tr, last4.nextSibling); mark(tr, '2.2.3 Table 4: ObjectTupleOf');
+    h.row(find('Class_Expressions', 'tr', 'DataExactCardinality( n DPE DR )'),
+      ['ObjectTupleOf( u<sub>1</sub> ... u<sub>n</sub> )',
+       '{ <i>x</i> ∈ ' + SEQ + ' | ' + LEN + '(<i>x</i>) = n and, for each 1 ≤ i ≤ n, ' + EL +
+       '(<i>x</i>, i) ∈ <i>(u<sub>i</sub>)<sup>C</sup></i> if u<sub>i</sub> is a class expression, ∈ <i>(u<sub>i</sub>)<sup>DT</sup></i> if a data range, = <i>(u<sub>i</sub>)<sup>I</sup></i> if a named individual, = <i>(u<sub>i</sub>)<sup>LT</sup></i> if a literal }'],
+      '2.2.3 Table 4: ObjectTupleOf');
     var rule = block(lastOf('Class_Expressions', 'div'), 'after',
       '<p>An individual in <span class="name">ObjectTupleOf</span> must be named, as one in <span class="name">ObjectHasValue</span> must; a sequence term never appears in a class expression.</p>',
       '2.2.3 ObjectTupleOf takes named individuals');
@@ -227,10 +218,10 @@
     // 2.3.7 Ontologies.
     var p237 = find('Ontologies', 'p', 'standardized apart');
     edit(p237, 'with anonymous individuals', ' and sequence terms', '2.3.7 sequence terms standardized apart');
-    block(p237, 'after',
+    var occ = block(p237, 'after',
       '<p>Every occurrence of a sequence term in the axiom closure is a distinct anonymous individual, including two occurrences in one axiom and occurrences in different imported ontologies; ' +
       'a structurally equal axiom stated twice is still one axiom.</p>', '2.3.7 occurrences');
-    block(section('Ontologies').filter(function (e) { return e.classList && e.classList.contains('ra-ins'); }).pop(), 'after',
+    block(occ, 'after',
       '<p>Add Lois with the same children, and compare a data value from §9.5 (Keys):</p><table>' +
       '<tr><td><i>O<sub>G</sub></i> ∪ { ObjectPropertyAssertion( a:children a:Lois ( a:Meg a:Chris a:Stewie ) ) } ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Megan a:Chris a:Stewie ) ) a:Lois )</td></tr>' +
       '<tr><td>the same ⊭</td><td class="ra-ent">∃ x : a:children(a:Peter, x) ∧ a:children(a:Lois, x)</td></tr>' +
@@ -249,45 +240,57 @@
       '2.4 example: list entails list', true);
   }
 
-  fetch(SRC).then(function (r) {
-    if (!r.ok) throw new Error('w3.org answered ' + r.status);
-    var base = r.url;
-    return r.text().then(function (text) {
-      var src = new DOMParser().parseFromString(text, 'text/html');
-      [].forEach.call(src.querySelectorAll('[href], [src]'), function (e) {
-        ['href', 'src'].forEach(function (a) {
-          var v = e.getAttribute(a);
-          if (v && v.charAt(0) !== '#') e.setAttribute(a, new URL(v, base).href);
+  // Fetch the Recommendation, apply the layers, and wire the banner's list and the navigation.
+  function redline(opts) {
+    var counter = { n: 0 }, list = document.getElementById('ra-list');
+    var status = document.createElement('div'); status.id = 'ra-status'; status.textContent = 'Loading the OWL 2 Direct Semantics from w3.org…';
+    var target = document.createElement('div'); target.id = 'ra-doc';
+    var nav = document.createElement('div'); nav.id = 'ra-nav'; nav.hidden = true;
+    nav.innerHTML = '<button id="ra-prev" type="button" title="Previous change">↑</button><span id="ra-pos">–</span><button id="ra-next" type="button" title="Next change">Next change ↓</button>';
+    document.body.appendChild(nav); document.body.appendChild(status); document.body.appendChild(target);
+    var show = document.getElementById('ra-show-acc');
+    if (show) show.onchange = function () { document.body.classList.toggle('ra-show-acc', show.checked); };
+
+    fetch(SRC).then(function (r) {
+      if (!r.ok) throw new Error('w3.org answered ' + r.status);
+      var base = r.url;
+      return r.text().then(function (text) {
+        var src = new DOMParser().parseFromString(text, 'text/html');
+        [].forEach.call(src.querySelectorAll('[href], [src]'), function (e) {
+          ['href', 'src'].forEach(function (a) {
+            var v = e.getAttribute(a);
+            if (v && v.charAt(0) !== '#') e.setAttribute(a, new URL(v, base).href);
+          });
         });
+        [].forEach.call(src.head.querySelectorAll('link[rel~="stylesheet"], style'), function (e) {
+          document.head.insertBefore(document.importNode(e, true), document.head.firstChild);
+        });
+        [].forEach.call(src.body.querySelectorAll('script'), function (s) { s.remove(); });
+        while (src.body.firstChild) target.appendChild(document.adoptNode(src.body.firstChild));
+        opts.layers.forEach(function (layer) {
+          layer.changes(helpers(target, layer.mark ? 'ra' : 'acc', layer.mark, list, counter));
+        });
+        var count = counter.n;
+        document.getElementById('ra-count').textContent = count;
+        status.remove();
+        var pos = 0, cur = null;
+        function go(k) {
+          pos = Math.max(1, Math.min(count, k));
+          if (cur) cur.classList.remove('ra-current');
+          cur = document.getElementById('ra-' + pos); cur.classList.add('ra-current');
+          cur.scrollIntoView({ block: 'center' });
+          document.getElementById('ra-pos').textContent = pos + ' / ' + count;
+        }
+        document.getElementById('ra-next').onclick = function () { go(pos + 1); };
+        document.getElementById('ra-prev').onclick = function () { go(pos - 1); };
+        nav.hidden = false;
+        if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
       });
-      [].forEach.call(src.head.querySelectorAll('link[rel~="stylesheet"], style'), function (e) {
-        document.head.insertBefore(document.importNode(e, true), document.head.firstChild);
-      });
-      [].forEach.call(src.body.querySelectorAll('script'), function (s) { s.remove(); });
-      var target = document.getElementById('ra-doc');
-      while (src.body.firstChild) target.appendChild(document.adoptNode(src.body.firstChild));
-      doc = target;
-      apply();
-      document.getElementById('ra-count').textContent = count;
-      document.getElementById('ra-status').remove();
-      var pos = 0, cur = null;
-      function go(k) {
-        pos = Math.max(1, Math.min(count, k));
-        if (cur) cur.classList.remove('ra-current');
-        cur = document.getElementById('ra-' + pos); cur.classList.add('ra-current');
-        cur.scrollIntoView({ block: 'center' });
-        document.getElementById('ra-pos').textContent = pos + ' / ' + count;
-      }
-      document.getElementById('ra-next').onclick = function () { go(pos + 1); };
-      document.getElementById('ra-prev').onclick = function () { go(pos - 1); };
-      document.getElementById('ra-nav').hidden = false;
-      if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
+    }).catch(function (e) {
+      status.innerHTML = 'Could not build the redline (' + String(e.message || e).replace(/</g, '&lt;') +
+        '). The page needs to fetch the OWL 2 Direct Semantics from <a href="' + SRC + '">w3.org</a>; the changes it would mark are listed in its script.';
     });
-  }).catch(function (e) {
-    document.getElementById('ra-status').innerHTML = 'Could not build the redline (' + String(e.message || e).replace(/</g, '&lt;') +
-      '). The same changes, without the original text around them, are in <a href="owl-array-semantics.html">owl-array-semantics.html</a>.';
-  });
+  }
+
+  window.owlRedline = { redline: redline, OWL_ARRAY: OWL_ARRAY };
 })();
-</script>
-</body>
-</html>

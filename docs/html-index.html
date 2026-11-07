@@ -32,8 +32,8 @@
     <dd>RDFC-array: RDFC-1.0 canonicalization over sequences, from <a href="rdfc-array.md">rdfc-array.md</a>.</dd>
     <dt><a href="owl-array.html">owl-array.html</a></dt>
     <dd>OWL-array: OWL's own lists are sequences, and a sequence in the data is an individual whose members, length, first and last element the built-in <code>ra:member</code>, <code>ra:memberValue</code>, <code>ra:length</code>, <code>ra:first</code> and <code>ra:last</code> give, so a class expression can constrain the members of a list-valued property in OWL 2 DL. Implemented in <a href="https://github.com/rdf-array/owlapi-array">owlapi-array</a>.</dd>
-    <dt><a href="owl-array-semantics.html">owl-array-semantics.html</a> and <a href="owl-array-redline.html">owl-array-redline.html</a></dt>
-    <dd>OWL-array's model theory as changes to the OWL 2 Direct Semantics: on their own, following its sections, and marked as insertions and deletions in the Recommendation's own text, which the redline fetches from w3.org when opened. The examples extend the OWL 2 Structural Specification's Griffin family with one ordered list.</dd>
+    <dt><a href="owl-direct-semantics-array.html">owl-direct-semantics-array.html</a></dt>
+    <dd>OWL-array's model theory as a redline of the OWL 2 Direct Semantics: its changes marked as insertions and deletions in the Recommendation's own text, which the page fetches from w3.org when opened. The examples extend the OWL 2 Structural Specification's Griffin family with one ordered list.</dd>
     <dt><a href="array-syntax.html">array-syntax.html</a></dt>
     <dd>A design note: the syntax proposed to replace the <code>((x))[i]</code> strawman, <code>UNNEST</code>, <code>...</code>, <code>expr[i]</code> and <code>IN ?seq</code> in SPARQL-array and <code>LIST</code> in ShEx-array, checked for LALR(1) conflicts in the whole grammars, run on lists of lists, tuples of tuples and trees, and measured against SQL, Cypher, XQuery, JSONPath, numpy and CDDL.</dd>
     <dt><a href="protege-array.html">protege-array.html</a></dt>
@@ -45,6 +45,7 @@
     <dt><a href="../vocab/">vocab/</a></dt>
     <dd>The <code>ra:</code> vocabulary: what a test of the rdf-array suites requires (<code>mf:requires</code>), marking the tests that use the array syntax proposed today, and the OWL-array vocabulary ontology (<a href="../vocab/owl-array.ttl">owl-array.ttl</a>).</dd>
   </dl>
-  <footer>Each page is generated from its Markdown source by <code>tools/md-to-respec.py</code> in the repository, whose README lists every fork of the <a href="https://github.com/rdf-array">rdf-array</a> organisation.</footer>
+  <footer>Each page is generated from its Markdown source by <code>tools/md-to-respec.py</code> in the repository, whose README lists every fork of the <a href="https://github.com/rdf-array">rdf-array</a> organisation.
+    These are the documents of the <code>rdf-sequences</code> branch; the site's <a href="https://rdf-array.github.io/rdf-array/">front page</a> lists the branches published beside it, each under its own name.</footer>
 </body>
 </html>
