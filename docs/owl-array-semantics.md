@@ -8,6 +8,8 @@ section that is not mentioned is unchanged. The examples extend the running Grif
 of the [OWL 2 Structural Specification] with one ordered list. *2026-11-06; the design and the
 alternatives it was chosen from are in [owl-array.md](owl-array.html) §3 and §10.*
 
+## 1. [Introduction](https://www.w3.org/TR/owl2-direct-semantics/#Introduction): the running example
+
 <style>
   .delta { border-left: 4px solid #b4530a; background: rgba(180, 83, 10, 0.07); padding: 0.4em 1em 0.6em; margin: 1em 0; }
   .delta::before { content: attr(data-kind) " change"; display: block; font: 600 0.75em/1.6 sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: #b4530a; }
@@ -15,8 +17,6 @@ alternatives it was chosen from are in [owl-array.md](owl-array.html) §3 and §
   .delta table { margin: 0.5em 0; }
   .ent { font-family: monospace; font-size: 0.92em; }
 </style>
-
-## 1. [Introduction](https://www.w3.org/TR/owl2-direct-semantics/#Introduction): the running example
 
 Five axioms. Three come from the Structural Specification's examples, and two are new. One new
 axiom holds a list, Peter's children from eldest to youngest. The other connects the list to
