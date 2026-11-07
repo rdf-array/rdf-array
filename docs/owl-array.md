@@ -116,9 +116,9 @@ Manchester syntaxes have no RDF lists and are unchanged by this part.
 
 ### 3.1 Semantics
 
-The direct semantics changes in one place; [owl-array-semantics.md](owl-array-semantics.html)
-states it formally, as changes to the OWL 2 Direct Semantics, and [owl-array-redline.html](owl-array-redline.html)
-marks those changes in the Recommendation's own text. The object domain of an interpretation contains, beside
+The direct semantics changes in one place; [owl-direct-semantics-array.html](owl-direct-semantics-array.html)
+marks the changes as insertions and deletions in the OWL 2 Direct Semantics' own text, which it fetches
+from w3.org when opened. The object domain of an interpretation contains, beside
 the ordinary individuals, *sequences*: individuals each of which has a length n and an element at
 each position 1 … n, an element being an individual, a data value or a sequence. Each occurrence of
 a sequence term `( t1 … tn )` in an ontology denotes some sequence of length n whose i-th element is
@@ -477,7 +477,7 @@ entailments on which they differ, and the experiments behind §3.1's choice.
   The expansion is structural or hybrid (§6).
 - **B+K. B with identity on request.** An ontology that wants identity by elements asks for it.
   An OWL 2 key cannot do this: keys bind only individuals in NAMED, and a sequence is never named
-  ([owl-array-semantics.md](owl-array-semantics.html) §2.3.5). The experiment in §10.4 got the identity
+  ([owl-direct-semantics-array.html](owl-direct-semantics-array.html), the note at §2.3.5). The experiment in §10.4 got the identity
   from `HasKey( ra:Sequence ( o_1 … ) ( ra:length d_1 … ) )` only because the expansion names every
   occurrence, which the semantics does not. So B+K needs a built-in of its own, one that equates
   sequences with the same length and elements, at least when those elements are named.

@@ -1,0 +1,43 @@
+/* The redlines of the OWL 2 Direct Semantics (owl-direct-semantics-*.html): the marks of the
+   changes under review (.ra) and of the changes of an earlier layer, accepted into the text (.acc),
+   which body.ra-show-acc shows in blue. */
+ins.ra, div.ra-ins, tr.ra-ins td, li.ra-ins { background: #e6ffec; text-decoration: none; }
+ins.ra { border-bottom: 2px solid #2da44e; padding: 0 1px; }
+del.ra { background: #ffebe9; color: #82071e; text-decoration: line-through; }
+div.ra-ins { border-left: 4px solid #2da44e; padding: 0.3em 1em 0.5em; margin: 1em 0; }
+div.ra-ins.example { background: #f3faf5; }
+div.ra-ins::before { content: "new text"; display: block; font: 600 0.72em/1.6 sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: #1a7f37; }
+div.ra-ins.example::before { content: "example (informative, new)"; }
+tr.ra-ins td { border-color: #2da44e; }
+li.ra-ins { list-style-position: outside; }
+
+ins.acc { text-decoration: none; }
+del.acc { display: none; }
+div.acc-ins { margin: 1em 0; }
+div.acc-ins::before { display: none; }
+body.ra-show-acc ins.acc, body.ra-show-acc div.acc-ins, body.ra-show-acc tr.acc-ins td, body.ra-show-acc li.acc-ins { background: #eef3fb; }
+body.ra-show-acc ins.acc { border-bottom: 2px solid #6a8fd8; padding: 0 1px; }
+body.ra-show-acc del.acc { display: inline; background: #f3eef8; color: #6e4c7e; text-decoration: line-through; }
+body.ra-show-acc div.acc-ins { border-left: 4px solid #6a8fd8; padding: 0.3em 1em 0.5em; }
+body.ra-show-acc div.acc-ins::before { display: block; content: "accepted earlier"; font: 600 0.72em/1.6 sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: #3b5fa8; }
+body.ra-show-acc tr.acc-ins td { border-color: #6a8fd8; }
+
+.ra-ent { font-family: monospace; font-size: 0.9em; }
+div.ra-ins table, div.acc-ins table { border-collapse: collapse; margin: 0.4em 0; }
+div.ra-ins td, div.ra-ins th, div.acc-ins td, div.acc-ins th { border: 1px solid #9fd5ad; padding: 0.25em 0.5em; vertical-align: top; text-align: left; }
+div.acc-ins td, div.acc-ins th { border-color: #ccc; }
+
+#ra-banner { background: #fffbea; border-bottom: 1px solid #d4a72c; padding: 0.5em 1em; font: 14px/1.45 system-ui, sans-serif; color: #3b2f00; }
+#ra-banner p { margin: 0.2em 0; }
+#ra-banner a { color: #0b5394; }
+#ra-banner details summary { cursor: pointer; font-weight: 600; }
+#ra-banner ol { margin: 0.3em 0 0.2em 1.4em; padding: 0; columns: 2; font-size: 13px; }
+#ra-banner .key ins, #ra-banner .key del { padding: 0 3px; }
+#ra-banner .key ins.acc { display: inline; background: #eef3fb; border-bottom: 2px solid #6a8fd8; }
+#ra-banner label { cursor: pointer; }
+#ra-nav { position: fixed; right: 12px; bottom: 12px; z-index: 10; display: flex; gap: 4px; font: 13px/1 system-ui, sans-serif; }
+#ra-nav button { background: #1a7f37; color: #fff; border: 0; border-radius: 4px; padding: 7px 10px; cursor: pointer; font: inherit; }
+#ra-nav button:focus-visible { outline: 2px solid #0b5394; outline-offset: 2px; }
+#ra-nav span { align-self: center; background: #fff; border: 1px solid #9fd5ad; border-radius: 4px; padding: 6px 8px; color: #1a7f37; }
+.ra-current { outline: 3px solid #d4a72c; outline-offset: 2px; }
+#ra-status { font: 16px/1.5 system-ui, sans-serif; padding: 2em; max-width: 44em; }

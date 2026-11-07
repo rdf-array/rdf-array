@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OWL 2 Direct Semantics, OWL-array redline</title>
+<!--
+  A redline of the OWL 2 Direct Semantics for OWL-array. This file holds only the banner: the page
+  fetches the W3C Recommendation from w3.org when it is opened and owl-direct-semantics.js applies
+  OWL-array's changes to it in the reader's browser, marking new text as <ins> and removed text as <del>.
+-->
+<link rel="stylesheet" href="owl-direct-semantics.css">
+<script src="owl-direct-semantics.js"></script>
+</head>
+<body>
+<div id="ra-banner">
+  <p><strong>OWL-array redline</strong> of the <a href="https://www.w3.org/TR/owl2-direct-semantics/">OWL 2 Direct Semantics (Second Edition)</a>.
+    <span class="key"><ins class="ra">Green</ins> is new text and <del class="ra">red struck</del> text is removed.</span>
+    Only changes to the interpretations or to what is entailed are marked. The examples extend the OWL 2 Structural Specification's
+    Griffin family with one ordered list.</p>
+  <p>The page fetches the Recommendation from w3.org and applies OWL-array's changes in your browser, so the W3C text is the
+    published one. The design is <a href="owl-array.html">owl-array.md</a> §3 and §10, and the entailments were checked with HermiT
+    (<a href="https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity">examples/owl-identity</a>, Family.java).
+    The further changes of the rdf-undef branch are <a href="https://rdf-array.github.io/rdf-array/rdf-undef/docs/owl-direct-semantics-undef.html">owl-direct-semantics-undef.html</a>.</p>
+  <details><summary>Changes (<span id="ra-count">0</span>)</summary><ol id="ra-list"></ol></details>
+</div>
+<script>owlRedline.redline({ layers: [{ changes: owlRedline.OWL_ARRAY, mark: true }] });</script>
+</body>
+</html>
