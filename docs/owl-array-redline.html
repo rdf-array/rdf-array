@@ -199,8 +199,11 @@
     tr.innerHTML = '<td class="name"><ins class="ra">ObjectTupleOf( u<sub>1</sub> ... u<sub>n</sub> )</ins></td><td><ins class="ra">{ <i>x</i> ∈ ' + SEQ + ' | ' + LEN +
       '(<i>x</i>) = n and, for each 1 ≤ i ≤ n, ' + EL + '(<i>x</i>, i) ∈ <i>(u<sub>i</sub>)<sup>C</sup></i> if u<sub>i</sub> is a class expression, ∈ <i>(u<sub>i</sub>)<sup>DT</sup></i> if a data range, = <i>(u<sub>i</sub>)<sup>I</sup></i> if a named individual, = <i>(u<sub>i</sub>)<sup>LT</sup></i> if a literal }</ins></td>';
     last4.parentNode.insertBefore(tr, last4.nextSibling); mark(tr, '2.2.3 Table 4: ObjectTupleOf');
-    block(lastOf('Class_Expressions', 'div'), 'after',
-      '<p>An individual in <span class="name">ObjectTupleOf</span> must be named, as one in <span class="name">ObjectHasValue</span> must; a sequence term never appears in a class expression.</p><table>' +
+    var rule = block(lastOf('Class_Expressions', 'div'), 'after',
+      '<p>An individual in <span class="name">ObjectTupleOf</span> must be named, as one in <span class="name">ObjectHasValue</span> must; a sequence term never appears in a class expression.</p>',
+      '2.2.3 ObjectTupleOf takes named individuals');
+    block(rule, 'after',
+      '<table>' +
       '<tr><td><i>O<sub>G</sub></i> ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Megan a:Chris a:Stewie ) ) a:Peter )</td><td>one list entails another, through §9.6.1\'s SameIndividual</td></tr>' +
       '<tr><td><i>O<sub>G</sub></i> ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( owl:Thing owl:Thing a:Boy ) ) a:Peter )</td><td>a class at a position</td></tr>' +
       '<tr><td><i>O<sub>G</sub></i> ⊭</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Chris a:Megan a:Stewie ) ) a:Peter )</td><td>order matters</td></tr>' +

@@ -117,7 +117,8 @@ Manchester syntaxes have no RDF lists and are unchanged by this part.
 ### 3.1 Semantics
 
 The direct semantics changes in one place; [owl-array-semantics.md](owl-array-semantics.html)
-states it formally, as changes to the OWL 2 Direct Semantics. The object domain of an interpretation contains, beside
+states it formally, as changes to the OWL 2 Direct Semantics, and [owl-array-redline.html](owl-array-redline.html)
+marks those changes in the Recommendation's own text. The object domain of an interpretation contains, beside
 the ordinary individuals, *sequences*: individuals each of which has a length n and an element at
 each position 1 … n, an element being an individual, a data value or a sequence. Each occurrence of
 a sequence term `( t1 … tn )` in an ontology denotes some sequence of length n whose i-th element is

@@ -6,7 +6,8 @@ section numbers, and each heading links to the section it changes. Only changes 
 interpretations or to what is entailed are marked, in boxes. Unchanged text is not repeated, and a
 section that is not mentioned is unchanged. The examples extend the running Griffin family examples
 of the [OWL 2 Structural Specification] with one ordered list. *2026-11-06; the design and the
-alternatives it was chosen from are in [owl-array.md](owl-array.html) §3 and §10.*
+alternatives it was chosen from are in [owl-array.md](owl-array.html) §3 and §10. The same changes, marked in
+the text of the Recommendation itself, are [owl-array-redline.html](owl-array-redline.html).*
 
 Each box marks a change to the model or to what is entailed. A box labelled *Model change* alters the interpretations, and one labelled *Entailment change* shows what follows that did not in OWL 2. The entailments below were checked with HermiT 1.4.3 through the expansion of owl-array.md §6
 (`Family.java` in [examples/owl-identity](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity)).
