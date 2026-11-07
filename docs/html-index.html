@@ -34,6 +34,12 @@
     <dd>OWL-array: OWL's own lists are sequences, and a sequence in the data is an individual whose members, length, first and last element the built-in <code>ra:member</code>, <code>ra:memberValue</code>, <code>ra:length</code>, <code>ra:first</code> and <code>ra:last</code> give, so a class expression can constrain the members of a list-valued property in OWL 2 DL. Implemented in <a href="https://github.com/rdf-array/owlapi-array">owlapi-array</a>.</dd>
     <dt><a href="owl-direct-semantics-array.html">owl-direct-semantics-array.html</a></dt>
     <dd>OWL-array's model theory as a redline of the OWL 2 Direct Semantics: its changes marked as insertions and deletions in the Recommendation's own text, which the page fetches from w3.org when opened. The examples extend the OWL 2 Structural Specification's Griffin family with one ordered list.</dd>
+    <dt><a href="rdf-undef.html">rdf-undef.html</a></dt>
+    <dd>rdf-undef, this branch: a position of a sequence may be empty, <code>( 1 undef 3 )</code>. A slot is not a term and not an unknown value; it counts. What it means in each syntax, in SPARQL, in OWL (<code>ra:holes</code>, <code>ra:DenseSequence</code>) and in the rest of the stack, and the decisions still open.</dd>
+    <dt><a href="owl-direct-semantics-undef.html">owl-direct-semantics-undef.html</a></dt>
+    <dd>rdf-undef's model theory as a redline of the OWL 2 Direct Semantics over OWL-array's: <em>el</em> becomes partial, <code>ra:holes</code> and <code>ra:DenseSequence</code> are built in, <code>undef</code> names a slot in <code>ObjectTupleOf</code>, and a slot is not an unknown in either direction of entailment. OWL-array's own changes are in the text, accepted, and can be shown.</dd>
+    <dt><a href="protege-undef.html">protege-undef.html</a></dt>
+    <dd>Protégé reasons about days off: the <a href="../examples/roster/">roster example</a>, a week's shifts with days off as slots, in Protégé 5.6.9 with protege-owl-array's rdf-undef build, step by step with screenshots.</dd>
     <dt><a href="array-syntax.html">array-syntax.html</a></dt>
     <dd>A design note: the syntax proposed to replace the <code>((x))[i]</code> strawman, <code>UNNEST</code>, <code>...</code>, <code>expr[i]</code> and <code>IN ?seq</code> in SPARQL-array and <code>LIST</code> in ShEx-array, checked for LALR(1) conflicts in the whole grammars, run on lists of lists, tuples of tuples and trees, and measured against SQL, Cypher, XQuery, JSONPath, numpy and CDDL.</dd>
     <dt><a href="protege-array.html">protege-array.html</a></dt>
@@ -46,6 +52,6 @@
     <dd>The <code>ra:</code> vocabulary: what a test of the rdf-array suites requires (<code>mf:requires</code>), marking the tests that use the array syntax proposed today, and the OWL-array vocabulary ontology (<a href="../vocab/owl-array.ttl">owl-array.ttl</a>).</dd>
   </dl>
   <footer>Each page is generated from its Markdown source by <code>tools/md-to-respec.py</code> in the repository, whose README lists every fork of the <a href="https://github.com/rdf-array">rdf-array</a> organisation.
-    These are the documents of the <code>rdf-sequences</code> branch; the site's <a href="https://rdf-array.github.io/rdf-array/">front page</a> lists the branches published beside it, each under its own name.</footer>
+    These are the documents of the <code>rdf-undef</code> branch, published under <code>rdf-undef/</code>; the main line, <code>rdf-sequences</code>, is at the site's <a href="https://rdf-array.github.io/rdf-array/">root</a>.</footer>
 </body>
 </html>

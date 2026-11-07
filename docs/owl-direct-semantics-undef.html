@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OWL 2 Direct Semantics, rdf-undef redline</title>
+<!--
+  A redline of the OWL 2 Direct Semantics for the rdf-undef branch: what empty slots change, over
+  OWL-array. The page fetches the W3C Recommendation from w3.org when it is opened; owl-direct-semantics.js
+  applies OWL-array's changes to it first, as accepted text, and then the changes below, which are
+  marked, new text as <ins> and removed text as <del>. The design is rdf-undef.md §1 and §4.
+-->
+<link rel="stylesheet" href="owl-direct-semantics.css">
+<script src="owl-direct-semantics.js"></script>
+</head>
+<body>
+<div id="ra-banner">
+  <p><strong>rdf-undef redline</strong> of the <a href="https://www.w3.org/TR/owl2-direct-semantics/">OWL 2 Direct Semantics (Second Edition)</a>, over OWL-array.
+    <span class="key"><ins class="ra">Green</ins> is new text and <del class="ra">red struck</del> text is removed.</span>
+    <a href="owl-direct-semantics-array.html">OWL-array's own changes</a> are already in the text;
+    <label><input type="checkbox" id="ra-show-acc"> show them in <ins class="acc">blue</ins></label>.
+    Only changes to the interpretations or to what is entailed are marked.</p>
+  <p>rdf-undef adds one thing to a sequence: a position may be empty, written <span class="name">undef</span>. A slot is not an unknown
+    element; it is a position with nothing in it, and it counts. The page fetches the Recommendation from w3.org and applies the changes
+    in your browser, so the W3C text is the published one. The design is <a href="rdf-undef.html">rdf-undef.md</a> §1 and §4 and the
+    Protégé walk-through <a href="protege-undef.html">protege-undef.md</a>; the examples extend the Griffin family of OWL-array's redline.</p>
+  <details><summary>Changes (<span id="ra-count">0</span>)</summary><ol id="ra-list"></ol></details>
+</div>
+<script>
+(function () {
+  function RDF_UNDEF(h) {
+    var I = h.I, SEQ = h.SEQ, LEN = h.LEN, EL = h.EL, find = h.find, edit = h.edit, block = h.block, li = h.li, lastOf = h.lastOf;
+    var U = '<span class="name">undef</span>', OU = '<i>O<sub>U</sub></i>', OG = '<i>O<sub>G</sub></i>';
+
+    // 1 Introduction: the running example gains a list with a slot.
+    block(lastOf('Introduction', 'div.acc-ins'), 'after',
+      '<p>rdf-undef lets a position of a sequence term be empty: ( t<sub>1</sub> … t<sub>n</sub> ) where a t<sub>i</sub> may be the marker ' + U + '. ' +
+      'The examples below use ' + OU + ', which is ' + OG + ' and one more axiom:</p>' +
+      '<pre>ObjectPropertyAssertion( a:children a:Lois ( a:Meg undef a:Stewie ) )        <i>Lois\'s list: three positions, nothing at the second</i></pre>' +
+      '<p>In Turtle-array, <span class="name">a:Lois a:children ( a:Meg undef a:Stewie ) .</span>. The slot is not an unknown child: ' +
+      '<span class="name">( a:Meg _:c a:Stewie )</span> would say that someone is at the second position without saying who, and §2.4 reads it so. ' +
+      'The slot says that nothing is there, and the list is closed: later data cannot fill it.</p>',
+      'Introduction: a slot, and the running example', true);
+
+    // 2.1 Vocabulary.
+    edit(find('Vocabulary', 'li', 'is a set of classes'), 'ra:Sequence', ' and ra:DenseSequence', '2.1 V<sub>C</sub>: ra:DenseSequence');
+    edit(find('Vocabulary', 'li', 'is a set of data properties'), 'ra:lastValue', ' and ra:holes', '2.1 V<sub>DP</sub>: ra:holes');
+    edit(find('Vocabulary', 'li', 'denotes a sequence term'), 'is an individual or a literal', ' or the marker ' + U + ', an <i>empty slot</i>', '2.1 convention s: undef');
+    edit(find('Vocabulary', 'li', 'denotes a tuple item'), 'a named individual or a literal', ', or ' + U, '2.1 convention u: undef');
+
+    // 2.2 Interpretations: el is partial; the two built-ins.
+    var seq = find('Interpretations', 'li', 'is a subset of ΔI called the set of sequences');
+    edit(seq, '. Two sequences with the same', ', or nothing: ' + EL + ' is partial, and a position at which it is undefined is an <i>empty slot</i>',
+      '2.2 el is partial: empty slots', undefined, true);
+    edit(seq, 'at some position', ' (a slot differs from every element)', '2.2 a slot differs from every element');
+    edit(find('Interpretations', 'li', 'individual interpretation function'), 'when it is a literal',
+      ', and is undefined when t<sub>i</sub> is ' + U, '2.2 ⋅I: a slot denotes no element');
+    li(find('Interpretations', 'li', '(ra:Sequence)C'),
+      I('(ra:DenseSequence)<sup>C</sup>') + ' = { <i>x</i> ∈ ' + SEQ + ' | ' + EL + '(<i>x</i>, <i>i</i>) is defined for each 1 ≤ <i>i</i> ≤ ' + LEN + '(<i>x</i>) }.',
+      '2.2 (ra:DenseSequence)C');
+    edit(find('Interpretations', 'li', '(ra:member)OP'), ' }', ' (no pair at an empty slot)', '2.2 ra:member and the rest see past a slot');
+    li(find('Interpretations', 'li', '(ra:length)DP'),
+      I('(ra:holes)<sup>DP</sup>') + ' = { ( <i>x</i> , <i>h</i> ) | <i>x</i> ∈ ' + SEQ + ' , <i>h</i> is the number of positions 1 ≤ <i>i</i> ≤ ' + LEN +
+      '(<i>x</i>) at which ' + EL + '(<i>x</i>, <i>i</i>) is undefined }; ' + I('(ra:length)<sup>DP</sup>') + ' counts the slots, ' + I('(ra:first)<sup>OP</sup>') +
+      ' and ' + I('(ra:last)<sup>OP</sup>') + ' and their Value forms have no pair when that end is a slot.', '2.2 (ra:holes)DP');
+    block(lastOf('Interpretations', 'div.acc-ins'), 'after',
+      '<p>In every model of ' + OU + ', Lois\'s <i>a:children</i> value is a sequence <i>y</i> with ' + LEN + '(<i>y</i>) = 3, ' + EL + '(<i>y</i>, 2) undefined, ' +
+      EL + '(<i>y</i>, 1) = <i>(a:Meg)<sup>I</sup></i> and ' + EL + '(<i>y</i>, 3) = <i>(a:Stewie)<sup>I</sup></i>:</p><table>' +
+      '<tr><td>' + OU + ' ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectIntersectionOf( DataHasValue( ra:length "3"^^xsd:integer ) DataHasValue( ra:holes "1"^^xsd:integer ) ) ) a:Lois )</td><td>the slot counts in the length</td></tr>' +
+      '<tr><td>' + OU + ' ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectExactCardinality( 2 ra:member ) ) a:Lois )</td><td>two members, by §9.6.2\'s DifferentIndividuals</td></tr>' +
+      '<tr><td>' + OU + ' ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectAllValuesFrom( ra:member ObjectOneOf( a:Megan a:Stewie ) ) ) a:Lois )</td><td><span class="name">only</span> is vacuous at the slot</td></tr>' +
+      '<tr><td>' + OU + ' ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectSomeValuesFrom( ra:last a:Boy ) ) a:Lois )</td><td><i>ra:last</i> is defined: the last position holds Stewie</td></tr>' +
+      '<tr><td>' + OU + ' ⊭</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ra:DenseSequence ) a:Lois )</td><td>and ' + OG + ' ⊨ the same of a:Peter</td></tr>' +
+      '<tr><td>' + OU + ' ∪ { SubObjectPropertyOf( ObjectPropertyChain( a:children ra:member ) a:motherOf ) } ⊭</td><td class="ra-ent">ObjectPropertyAssertion( a:motherOf a:Lois a:Chris )</td><td>no chain through a slot</td></tr></table>' +
+      '<p>"Every position holds a <i>C</i>" is no longer <span class="name">ObjectAllValuesFrom( ra:member C )</span> alone: with slots it is ' +
+      '<span class="name">ObjectIntersectionOf( ra:DenseSequence ObjectAllValuesFrom( ra:member C ) )</span>, and a sequence of slots is <span class="name">ObjectMaxCardinality( 0 ra:member )</span> without being empty, ' +
+      'the empty sequence being the one of length 0.</p>',
+      '2.2 example: the built-ins at a slot', true);
+
+    // 2.2.3 Class Expressions: ObjectTupleOf names a slot.
+    edit(find('Class_Expressions', 'tr', 'ObjectTupleOf'), 'for each 1 ≤ i ≤ n, ',
+      EL + '(<i>x</i>, i) is undefined if u<sub>i</sub> is ' + U + ', and otherwise is defined and ', '2.2.3 Table 4: undef in ObjectTupleOf');
+    block(lastOf('Class_Expressions', 'div.acc-ins'), 'after',
+      '<table>' +
+      '<tr><td>' + OU + ' ⊨</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Megan undef a:Stewie ) ) a:Lois )</td><td>the slot is named at its position</td></tr>' +
+      '<tr><td>' + OU + ' ⊭</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Megan owl:Thing a:Stewie ) ) a:Lois )</td><td>nothing is at the second position, so no class holds there</td></tr>' +
+      '<tr><td>' + OU + ' ⊭</td><td class="ra-ent">ClassAssertion( ObjectSomeValuesFrom( a:children ObjectTupleOf( a:Megan undef a:Stewie ) ) a:Peter )</td><td>Chris is at Peter\'s second position</td></tr>' +
+      '<tr><td>⊨</td><td class="ra-ent">EquivalentClasses( ObjectTupleOf( undef undef undef ) ObjectIntersectionOf( ra:Sequence DataHasValue( ra:length "3"^^xsd:integer ) DataHasValue( ra:holes "3"^^xsd:integer ) ) )</td><td>in every interpretation</td></tr></table>',
+      '2.2.3 example: ObjectTupleOf with a slot', true);
+
+    // 2.4 Models: a slot is not an unknown, in both directions.
+    block(lastOf('Models', 'div.acc-ins'), 'after',
+      '<p>An anonymous individual at a position is read existentially, as §2.4 reads every anonymous individual; a slot is not:</p><table>' +
+      '<tr><td>' + OG + ' ⊨</td><td class="ra-ent">ObjectPropertyAssertion( a:children a:Peter ( a:Meg _:c a:Stewie ) )</td><td>Chris is the witness for _:c</td></tr>' +
+      '<tr><td>' + OG + ' ⊭</td><td class="ra-ent">ObjectPropertyAssertion( a:children a:Peter ( a:Meg undef a:Stewie ) )</td><td>a slot does not stand for Chris: in some model no value of a:children has an empty second position</td></tr>' +
+      '<tr><td>' + OU + ' ⊨</td><td class="ra-ent">ObjectPropertyAssertion( a:children a:Lois ( a:Megan undef a:Stewie ) )</td><td>one list with a slot entails another</td></tr>' +
+      '<tr><td>' + OU + ' ⊭</td><td class="ra-ent">ObjectPropertyAssertion( a:children a:Lois ( a:Meg _:c a:Stewie ) )</td><td>a slot is no witness for an anonymous individual</td></tr></table>' +
+      '<p>So ( a:Meg a:Chris a:Stewie ) and ( a:Meg undef a:Stewie ) entail each other in neither direction, which is rdf-undef.md §1: a slot is a hole, not an unknown value. ' +
+      'SPARQL-array agrees: a constant does not match a slot, and <span class="name">undef</span> in a pattern matches only a slot.</p>',
+      '2.4 example: a slot is not an unknown', true);
+  }
+  owlRedline.redline({ layers: [{ changes: owlRedline.OWL_ARRAY, mark: false }, { changes: RDF_UNDEF, mark: true }] });
+})();
+</script>
+</body>
+</html>

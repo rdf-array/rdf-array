@@ -85,7 +85,10 @@ before the code was to check that §1 and §3 leave it possible; §4.2 has what 
 
 The direct semantics of owl-array.md §3.1 gives sequences as tuples of denotations. rdf-undef adds one
 thing to what a tuple's element may be, a distinguished *hole*, which is not in the object or data
-domain:
+domain. (As a redline of the OWL 2 Direct Semantics over OWL-array's changes:
+[owl-direct-semantics-undef.html](owl-direct-semantics-undef.html). It follows owl-array.md §3.1 as it
+now stands, each occurrence of a sequence term an individual of its own, which this section predates:
+the identity and nominal points below are design A of owl-array.md §10.)
 
 - **Denotation.** `( t1 … undef … tn )` denotes the tuple with a hole at that position. A hole denotes
   itself in every interpretation.
