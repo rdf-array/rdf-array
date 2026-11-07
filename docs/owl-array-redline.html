@@ -256,7 +256,7 @@
       });
       [].forEach.call(src.body.querySelectorAll('script'), function (s) { s.remove(); });
       var target = document.getElementById('ra-doc');
-      while (src.body.firstChild) target.appendChild(document.importNode(src.body.firstChild, true));
+      while (src.body.firstChild) target.appendChild(document.adoptNode(src.body.firstChild));
       doc = target;
       apply();
       document.getElementById('ra-count').textContent = count;
