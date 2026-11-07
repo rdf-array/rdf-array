@@ -116,7 +116,8 @@ Manchester syntaxes have no RDF lists and are unchanged by this part.
 
 ### 3.1 Semantics
 
-The direct semantics changes in one place. The object domain of an interpretation contains, beside
+The direct semantics changes in one place; [owl-array-semantics.md](owl-array-semantics.html)
+states it formally, as changes to the OWL 2 Direct Semantics. The object domain of an interpretation contains, beside
 the ordinary individuals, *sequences*: individuals each of which has a length n and an element at
 each position 1 … n, an element being an individual, a data value or a sequence. Each occurrence of
 a sequence term `( t1 … tn )` in an ontology denotes some sequence of length n whose i-th element is
@@ -133,8 +134,8 @@ a sequence term `( t1 … tn )` in an ontology denotes some sequence of length n
   in every interpretation, and occurrences of `( ex:a )` and `( ex:b )` do whenever
   `ex:a owl:differentFrom ex:b`.
 - **Elements do not make sequences the same.** Equal elements are necessary for two occurrences to
-  denote one sequence, not sufficient. An ontology that wants identity by elements states it with a
-  key ([§10.3](#trade-offs)); [§10](#identity-the-alternatives) gives the design this replaces and
+  denote one sequence, not sufficient. An ontology that wants identity by elements needs a construct
+  for it that OWL 2 keys cannot supply ([§10.1](#the-designs), B+K); [§10](#identity-the-alternatives) gives the design this replaces and
   the entailments each gives.
 - **Sequences are a sort of their own.** No IRI, blank node or literal denotes a tuple, so a
   sequence is never `owl:sameAs` an IRI-named individual, as a literal is not, and `ra:Sequence` is
@@ -473,9 +474,12 @@ entailments on which they differ, and the experiments behind §3.1's choice.
 - **B. One individual per occurrence** (this document, §3.1). Each occurrence denotes some sequence
   with its elements; equal elements do not make two the same. `ra:tupleOf` replaces the nominal.
   The expansion is structural or hybrid (§6).
-- **B+K. B with a key.** An ontology that wants identity by elements adds a key on length and
-  positions, `HasKey( ra:Sequence ( o_1 … ) ( ra:length d_1 … ) )` in the expansion's terms. OWL 2
-  keys bind only named individuals with named values, so sequences holding blank nodes stay apart.
+- **B+K. B with identity on request.** An ontology that wants identity by elements asks for it.
+  An OWL 2 key cannot do this: keys bind only individuals in NAMED, and a sequence is never named
+  ([owl-array-semantics.md](owl-array-semantics.html) §2.3.5). The experiment in §10.4 got the identity
+  from `HasKey( ra:Sequence ( o_1 … ) ( ra:length d_1 … ) )` only because the expansion names every
+  occurrence, which the semantics does not. So B+K needs a built-in of its own, one that equates
+  sequences with the same length and elements, at least when those elements are named.
 - **D. A datatype.** A sequence of literals is a data value of a sequence datatype, equal by value
   for free. It cannot hold an individual, so "every author is a Person" is out of reach; §9 rejects it.
 - **E. Positional properties in the vocabulary.** B, with the expansion's position properties made
@@ -518,7 +522,7 @@ same tension where `DISTINCT` and `GROUP BY` meet joins by occurrence
 | O | nothing new | no list in the data is OWL 2 DL; no class expression can look into one; row 1 fails |
 | A | a sequence works like a literal: a nominal, in `owl:sameAs`, in `owl:oneOf`; row 1 with the familiar `value` | entails more than the data model it reads (rows 2, 3); a sequence holding a blank node is anonymous and gets no identity anyway ([#20](https://github.com/rdf-array/rdf-array/issues/20)); identity through `owl:sameAs` of elements needs a key per length, never implemented |
 | B | entails nothing the data model does not; treats a sequence as OWL 2 treats an anonymous individual; every occurrence can be named in the expansion whatever it holds; `ra:tupleOf` takes classes as well as values (`ra:tupleOf ( {ex:ada} foaf:Agent )`) | no sequence in `owl:hasValue`, `owl:oneOf`, `owl:sameAs`; one new class constructor for every syntax; structural `ra:tupleOf` is slow in HermiT and needs the hybrid expansion, which is incomplete under `owl:sameAs` of individual elements |
-| B+K | identity where an ontology asks for it, with an OWL 2 construct | the key needs a spelling that names positions (E, or a new built-in); keys bind named individuals and values only; cost at scale not measured |
+| B+K | identity where an ontology asks for it | needs a new built-in, since OWL 2 keys bind only named individuals and a sequence never is one; cost at scale not measured |
 | D | identity and facets for free | no individual members; OWL 2 DL keeps data values and individuals apart |
 | E | no new constructor, since `ra:tupleOf` becomes a macro; keys are written directly | an unbounded vocabulary split into object and data positions; invites ontologies to rebuild the ladder out of positions |
 
@@ -599,9 +603,10 @@ than HermiT were timed.
 
 ### 10.5 Open
 
-- **How an ontology asks for identity.** Design E's public positions, or one built-in assertion
-  that the expansion turns into the key (`ra:Sequence a ra:KeyedByElements`, say). Either way the
-  key covers only sequences whose elements are named.
+- **How an ontology asks for identity.** It needs a built-in, since an OWL 2 key does not reach sequences.
+  That could be one assertion (`ra:Sequence a ra:KeyedByElements`, say) whose semantics equates
+  sequences with equal lengths and elements, and which the expansion turns into the key of T4.
+  Design E's public positions would not be enough, for the same reason.
 - **Completeness of the hybrid expansion** with individual elements: whether to fall back to the
   structural form for a tuple whose elements take part in `owl:sameAs`, functional properties or
   keys, and what that costs.
