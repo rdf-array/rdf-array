@@ -83,12 +83,22 @@ and two things in Jena had to change for that:
 Implemented in owlapi-array and run in Protégé on 2026-11-02 (§4.1). The point of writing the plan
 before the code was to check that §1 and §3 leave it possible; §4.2 has what the reasoner then found.
 
-The direct semantics of owl-array.md §3.1 gives sequences as tuples of denotations. rdf-undef adds one
+This section was written over design A of [owl-array.md §10.1](owl-array.html#the-designs): the
+semantics of owl-array.md §3.1 from 2026-10-26 to
+[its revision of 2026-11-05](https://github.com/rdf-array/rdf-array/blob/3b7e5d4d9e08070e0471fbb76d650583f4279765/docs/owl-array.md#31-semantics), under which
+a sequence term denotes the tuple of its elements' denotations. rdf-undef adds one
 thing to what a tuple's element may be, a distinguished *hole*, which is not in the object or data
-domain. (As a redline of the OWL 2 Direct Semantics over OWL-array's changes:
-[owl-direct-semantics-undef.html](owl-direct-semantics-undef.html). It follows owl-array.md §3.1 as it
-now stands, each occurrence of a sequence term an individual of its own, which this section predates:
-the identity and nominal points below are design A of owl-array.md §10.)
+domain. Since 2026-11-06, owl-array.md §3.1 states design B, an individual per occurrence, normatively
+as the redline [owl-direct-semantics-array.html](owl-direct-semantics-array.html);
+[owl-direct-semantics-undef.html](owl-direct-semantics-undef.html) is this section restated over B,
+as a second layer of changes to the OWL 2 Direct Semantics: a slot is a position at which the
+element function *el* is undefined, and `ra:holes` and `ra:DenseSequence` are built-ins
+([§2.2](owl-direct-semantics-undef.html#Interpretations)); `undef` may stand in `ObjectTupleOf`
+([§2.2.3](owl-direct-semantics-undef.html#Class_Expressions)); and a slot is not an unknown in either
+direction of entailment ([§2.4](owl-direct-semantics-undef.html#Models)). Of the three points below,
+denotation and closure read the same under B; identity is A's, and under B it reads: a slot differs
+from every element, so occurrences of `( 1 undef )` and `( 1 2 )` denote different sequences, and
+nothing makes two occurrences of `( 1 undef )` the same.
 
 - **Denotation.** `( t1 … undef … tn )` denotes the tuple with a hole at that position. A hole denotes
   itself in every interpretation.
