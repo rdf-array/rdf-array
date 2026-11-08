@@ -116,42 +116,58 @@ Manchester syntaxes have no RDF lists and are unchanged by this part.
 
 ### 3.1 Semantics
 
-The direct semantics changes in one place; [owl-direct-semantics-array.html](owl-direct-semantics-array.html)
+The direct semantics changes in one place, the interpretation structure of its
+[§2.2 Interpretations](owl-direct-semantics-array.html#Interpretations); the rest follows from that.
+[owl-direct-semantics-array.html](owl-direct-semantics-array.html) is the normative statement: it
 marks the changes as insertions and deletions in the OWL 2 Direct Semantics' own text, which it fetches
-from w3.org when opened. The object domain of an interpretation contains, beside
+from w3.org when opened, and the section numbers below are that document's, each linked to its place
+in the redline. The object domain of an interpretation contains, beside
 the ordinary individuals, *sequences*: individuals each of which has a length n and an element at
 each position 1 … n, an element being an individual, a data value or a sequence. Each occurrence of
 a sequence term `( t1 … tn )` in an ontology denotes some sequence of length n whose i-th element is
-`ti^I`; an occurrence of `()` denotes some sequence of length 0. Consequently:
+`ti^I`; an occurrence of `()` denotes some sequence of length 0
+([§2.2](owl-direct-semantics-array.html#Interpretations), the 13-tuple with *SEQ*, *len* and *el*, and
+the interpretation of a sequence term under ⋅<sup>I</sup>). Consequently:
 
 - **An occurrence is an anonymous individual whose structure is fixed.** Two occurrences of
   `( 1 2 )`, in one document or in two, may denote one sequence or two, and nothing in OWL-array
   says which, just as nothing says whether two blank nodes with the same description denote one
   thing. This is the rdf-array data model, in which each written `( … )` is a term of its own
   ([rdf-array.md](rdf-array.html)), and it agrees with RDF simple entailment, under which
-  `:s :p (1 2), (1 2)` and `:s :p (1 2)` entail each other.
+  `:s :p (1 2), (1 2)` and `:s :p (1 2)` entail each other. In the redline, occurrences are
+  standardized apart where anonymous individuals are
+  ([§2.3.7](owl-direct-semantics-array.html#Assertions)).
 - **Elements tell sequences apart.** Sequences of different lengths, or with different elements at
   some position, are different: occurrences of `( 1 2 )` and `( 1 3 )` denote different individuals
   in every interpretation, and occurrences of `( ex:a )` and `( ex:b )` do whenever
-  `ex:a owl:differentFrom ex:b`.
+  `ex:a owl:differentFrom ex:b`. This follows from *len* and *el* being functions
+  ([§2.2](owl-direct-semantics-array.html#Interpretations)); the redline's
+  [§2.4](owl-direct-semantics-array.html#Models) example shows which list entails which.
 - **Elements do not make sequences the same.** Equal elements are necessary for two occurrences to
   denote one sequence, not sufficient. An ontology that wants identity by elements needs a construct
-  for it that OWL 2 keys cannot supply ([§10.1](#the-designs), B+K); [§10](#identity-the-alternatives) gives the design this replaces and
+  for it that OWL 2 keys cannot supply ([§10.1](#the-designs), B+K, and the redline's note at
+  [§2.3.5](owl-direct-semantics-array.html#Keys)); [§10](#identity-the-alternatives) gives the design this replaces and
   the entailments each gives.
 - **Sequences are a sort of their own.** No IRI, blank node or literal denotes a tuple, so a
   sequence is never `owl:sameAs` an IRI-named individual, as a literal is not, and `ra:Sequence` is
-  disjoint from every class of ordinary individuals.
+  disjoint from every class of ordinary individuals (the object domain is split into individuals
+  and *SEQ*, and the individual interpretation function stays on the individuals,
+  [§2.2](owl-direct-semantics-array.html#Interpretations)).
 - **A sequence is closed.** Its members are exactly its elements, in order; there is nothing more
-  to learn about them from other triples.
+  to learn about them from other triples (`ra:member` and the other built-ins are fixed by *len* and
+  *el* in every interpretation, [§2.2](owl-direct-semantics-array.html#Interpretations)).
 
-Where a sequence may stand in an ontology: wherever OWL 2 DL lets an anonymous individual stand. It
+Where a sequence may stand in an ontology: wherever OWL 2 DL lets an anonymous individual stand
+([§2.3.7](owl-direct-semantics-array.html#Assertions)). It
 may be the object of a property assertion, the individual of a class assertion, an element of
 another sequence, and an annotation value. OWL 2's
 [restrictions on anonymous individuals](https://www.w3.org/TR/owl2-syntax/#The_Restrictions_on_the_Axiom_Closure)
 keep it out of `owl:hasValue`, `owl:oneOf`, `owl:sameAs`, `owl:differentFrom` and negative property
 assertions, where an individual that no other axiom can name would say nothing useful. A class
-expression about a particular sequence uses `ra:tupleOf` instead: `ex:rgb some ra:tupleOf ( 255 0 0 )`
-where an earlier draft wrote `ex:rgb value ( 255 0 0 )`. The link between a sequence and its
+expression about a particular sequence uses `ra:tupleOf` instead
+(`ObjectTupleOf` in Table 4, [§2.2.3](owl-direct-semantics-array.html#Class_Expressions)):
+`ex:rgb some ra:tupleOf ( 255 0 0 )`
+where the earlier semantics, design A of [§10.1](#the-designs), wrote `ex:rgb value ( 255 0 0 )`. The link between a sequence and its
 elements is not an `ObjectPropertyAssertion`, so it does not count toward the forest condition on
 anonymous individuals in those restrictions.
 In RDF a sequence may only be an object, so an axiom that would need one as a subject has no RDF form
@@ -177,6 +193,9 @@ sequence in the world, as an axiom about `owl:topObjectProperty` would.
 | `ra:firstValue`, `ra:lastValue` | functional data properties | the first and the last element of `s`, when it is a literal |
 | `ra:tupleOf ( c1 … cn )` | class expression | the sequences `s` of length n whose i-th element is in `ci`, where `ci` is a class expression, a data range, an individual (that individual) or a literal (that value) |
 
+The redline fixes the extension of each built-in from *len* and *el* in
+[§2.2](owl-direct-semantics-array.html#Interpretations), and gives `ra:tupleOf` as the class
+expression `ObjectTupleOf` in [§2.2.3](owl-direct-semantics-array.html#Class_Expressions), Table 4.
 `ra:tupleOf` is the one new constructor. Its positions are exact, since a sequence is closed:
 `ra:tupleOf ( 255 0 0 )` holds `( 255 0 0 )` and not `( 255 0 0 7 )`. In RDF, an IRI element of its
 list is a class when the imports closure declares it `owl:Class`, a datatype when it declares it
@@ -264,10 +283,12 @@ From the ontology above, a reasoner that implements OWL-array (§6) concludes:
   ra:tupleOf ( { ex:adaL } ex:alan ex:grace ))`;
 - `ex:ring a ex:Ring` with three points is inconsistent, and `ex:red ex:rgb ( 255 0 )` with
   `ex:red a ex:Swatch` is inconsistent;
-- `ex:x ex:rgb ( 255 0 0 )` entails `ex:x a ex:RedThing`, whichever document each comes from;
+- `ex:x ex:rgb ( 255 0 0 )` entails `ex:x a ex:RedThing`, whichever document each comes from
+  (`ObjectTupleOf` asks only about the elements, [§2.2.3](owl-direct-semantics-array.html#Class_Expressions));
 - `ex:x ex:rgb ( 255 0 0 ) . ex:y ex:rgb ( 0 0 255 )` entails that the two sequences are different
   individuals; `ex:x ex:rgb ( 255 0 0 ) . ex:y ex:rgb ( 255 0 0 )` entails neither that they are
-  the same nor that they are different.
+  the same nor that they are different ([§2.3.7](owl-direct-semantics-array.html#Assertions) and the
+  example in [§2.4](owl-direct-semantics-array.html#Models)).
 
 Nothing follows about the members of a list from the list alone: `( ex:ada ex:alan )` says that
 `ex:ada` is a member of it and nothing more, as a triple says nothing more than itself.
@@ -466,18 +487,30 @@ entailments on which they differ, and the experiments behind §3.1's choice.
 
 ### 10.1 The designs
 
-- **O. OWL 2 as it is.** A list in the data is an RDF 1.1 list: a blank node with `rdf:first` and
-  `rdf:rest` triples. The baseline: what an ontology gets today.
-- **A. Identity by elements** (OWL-array from 2026-10-26 to 2026-11-05). A sequence term denotes the
-  tuple of its elements' denotations, so equal sequences are one individual in every document, as a
-  literal denotes one value. A sequence may be a nominal: `ex:rgb value ( 255 0 0 )`. The expansion
-  gives each distinct ground sequence one named individual.
-- **B. One individual per occurrence** (this document, §3.1). Each occurrence denotes some sequence
-  with its elements; equal elements do not make two the same. `ra:tupleOf` replaces the nominal.
-  The expansion is structural or hybrid (§6).
+- **O. OWL 2 as it is.** The [OWL 2 Direct Semantics] unchanged. A list in the data is an RDF 1.1
+  list: a blank node with `rdf:first` and `rdf:rest` triples. The baseline: what an ontology gets today.
+- **A. Identity by elements.** The semantics of this document's §3.1 from its first revision
+  (2026-10-26) to [the revision of 2026-11-05](https://github.com/rdf-array/rdf-array/blob/3b7e5d4d9e08070e0471fbb76d650583f4279765/docs/owl-array.md#31-semantics),
+  stated there in prose and never as a redline: "a sequence term `( t1 … tn )` denotes the tuple of
+  its elements' denotations", so equal sequences are one individual in every document, as a
+  literal denotes one value, and `( ex:a )` and `( ex:b )` are one individual whenever
+  `ex:a owl:sameAs ex:b`. A sequence may be a nominal: `ex:rgb value ( 255 0 0 )`, and may stand in
+  `owl:oneOf`, `owl:sameAs` and `owl:differentFrom`. The expansion gives each distinct ground
+  sequence one named individual. The rdf-undef branch's
+  [rdf-undef.md §4](https://rdf-array.github.io/rdf-array/rdf-undef/docs/rdf-undef.html#owl) was
+  written over this design on 2026-11-02 and says so.
+- **B. One individual per occurrence.** The semantics of §3.1 since 2026-11-06, stated normatively
+  by the redline [owl-direct-semantics-array.html](owl-direct-semantics-array.html): each occurrence
+  denotes some sequence with its elements
+  ([§2.2](owl-direct-semantics-array.html#Interpretations)); equal elements do not make two the
+  same ([§2.3.7](owl-direct-semantics-array.html#Assertions)); `ra:tupleOf` replaces the nominal
+  ([§2.2.3](owl-direct-semantics-array.html#Class_Expressions)). The expansion is structural or
+  hybrid (§6). On the rdf-undef branch,
+  [owl-direct-semantics-undef.html](https://rdf-array.github.io/rdf-array/rdf-undef/docs/owl-direct-semantics-undef.html)
+  adds empty slots to this design.
 - **B+K. B with identity on request.** An ontology that wants identity by elements asks for it.
   An OWL 2 key cannot do this: keys bind only individuals in NAMED, and a sequence is never named
-  ([owl-direct-semantics-array.html](owl-direct-semantics-array.html), the note at §2.3.5). The experiment in §10.4 got the identity
+  ([owl-direct-semantics-array.html](owl-direct-semantics-array.html#Keys), the note at §2.3.5). The experiment in §10.4 got the identity
   from `HasKey( ra:Sequence ( o_1 … ) ( ra:length d_1 … ) )` only because the expansion names every
   occurrence, which the semantics does not. So B+K needs a built-in of its own, one that equates
   sequences with the same length and elements, at least when those elements are named.
@@ -489,7 +522,8 @@ entailments on which they differ, and the experiments behind §3.1's choice.
 
 ### 10.2 Differential entailments
 
-Each row is a premise set and a conclusion; each cell says whether the design entails it. In
+Each row is a premise set and a conclusion; each cell says whether the design entails it. Column A
+is §3.1 as it stood until 2026-11-05 and column B is §3.1 and the redline as they stand (§10.1). In
 column O the sequence is an RDF 1.1 list. In column B the premise's `ex:rgb value ( 255 0 0 )` is
 written `ex:rgb some ra:tupleOf ( 255 0 0 )`. The test numbers in brackets are §10.4's.
 
