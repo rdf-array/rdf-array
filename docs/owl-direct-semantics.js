@@ -262,8 +262,11 @@
             if (v && v.charAt(0) !== '#') e.setAttribute(a, new URL(v, base).href);
           });
         });
+        var loads = [];   // the imported stylesheets; the layout moves as each arrives
         [].forEach.call(src.head.querySelectorAll('link[rel~="stylesheet"], style'), function (e) {
-          document.head.insertBefore(document.importNode(e, true), document.head.firstChild);
+          var n = document.importNode(e, true);
+          if (n.tagName === 'LINK') loads.push(new Promise(function (ok) { n.onload = n.onerror = ok; setTimeout(ok, 3000); }));
+          document.head.insertBefore(n, document.head.firstChild);
         });
         [].forEach.call(src.body.querySelectorAll('script'), function (s) { s.remove(); });
         while (src.body.firstChild) target.appendChild(document.adoptNode(src.body.firstChild));
@@ -284,7 +287,10 @@
         document.getElementById('ra-next').onclick = function () { go(pos + 1); };
         document.getElementById('ra-prev').onclick = function () { go(pos - 1); };
         nav.hidden = false;
-        if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
+        // The browser could not scroll to the hash before the text arrived; do it now, and again
+        // once the stylesheets have loaded and the layout is final.
+        function toHash() { if (location.hash) { var t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); } }
+        toHash(); Promise.all(loads).then(toHash);
       });
     }).catch(function (e) {
       status.innerHTML = 'Could not build the redline (' + String(e.message || e).replace(/</g, '&lt;') +
