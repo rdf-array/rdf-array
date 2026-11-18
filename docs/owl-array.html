@@ -237,21 +237,22 @@ ex:cc fhir:coding ( [ fhir:system [ fhir:v "http://loinc.org"^^xsd:anyURI ] ; fh
     </section>
     <section id="differential-entailments">
     <h3>Differential entailments</h3>
-    <p>Each row is a premise set and a conclusion; each cell says whether the design entails it. Column A is §3.1 as it stood until 2026-11-05 and column B is §3.1 and the redline as they stand (§10.1). In column O the sequence is an RDF 1.1 list. In column B the premise's <code>ex:rgb value ( 255 0 0 )</code> is written <code>ex:rgb some ra:tupleOf ( 255 0 0 )</code>. The test numbers in brackets are §10.4's.</p>
+    <p>Each row is a premise set and a conclusion; each cell says whether the design entails it. Column A is §3.1 as it stood until 2026-11-05 and column B is §3.1 and the redline as they stand (§10.1). In column O the sequence is an RDF 1.1 list. In column B the premise's <code>ex:rgb value ( 255 0 0 )</code> is written <code>ex:rgb some ra:tupleOf ( 255 0 0 )</code>. The bracketed names are §10.4's experiments.</p>
     <table class="simple">
     <thead><tr><th>#</th><th>Premises</th><th>Conclusion</th><th>O</th><th>A</th><th>B</th><th>B+K</th><th>D</th></tr></thead>
     <tbody>
-    <tr><td>1</td><td><code>RedThing ≡ ex:rgb value ( 255 0 0 )</code> in one document; <code>ex:x ex:rgb ( 255 0 0 )</code> in another</td><td><code>ex:x a RedThing</code></td><td>no [R1–R3]</td><td>yes</td><td>yes [T1]</td><td>yes</td><td>yes</td></tr>
-    <tr><td>2</td><td><code>:N1 :p (1 2) . :N2 :p (1 2)</code></td><td>the two sequences are one individual (N1 and N2 have a common <code>:p</code> value)</td><td>no</td><td>yes</td><td>no [T3]</td><td>yes [T4]</td><td>yes</td></tr>
-    <tr><td>3</td><td><code>:code</code> inverse functional (for D, <code>HasKey( owl:Thing () ( :code ) )</code>); <code>:a :code (1 2) . :b :code (1 2)</code></td><td><code>:a owl:sameAs :b</code></td><td>no</td><td>yes</td><td>no [T4]</td><td>yes [T4]</td><td>yes</td></tr>
-    <tr><td>4</td><td><code>:p :authorList ( :ada :alan :grace ) . :ada owl:sameAs :adaL</code></td><td><code>:p a (:authorList some ra:tupleOf ( {:adaL} :alan :grace ))</code> (in A, <code>:p :authorList ( :adaL :alan :grace )</code>)</td><td>no</td><td>yes</td><td>yes [T2], and with the hybrid expansion only through a structural query [T8]</td><td>yes</td><td>n/a</td></tr>
-    <tr><td>5</td><td><code>:s :p (1 2) . :t :p (1 3)</code></td><td>the two sequences are different</td><td>no</td><td>yes</td><td>yes [T3]</td><td>yes</td><td>yes</td></tr>
-    <tr><td>6</td><td><code>Swatch ⊑ ex:rgb only (ra:length value 3)</code>; <code>:red a Swatch ; ex:rgb (255 0)</code></td><td>inconsistent</td><td>no</td><td>yes</td><td>yes [T6]</td><td>yes</td><td>yes</td></tr>
+    <tr><td>1</td><td><code>RedThing ≡ ex:rgb value ( 255 0 0 )</code> in one document; <code>ex:x ex:rgb ( 255 0 0 )</code> in another</td><td><code>ex:x a RedThing</code></td><td>no [R1–R3]</td><td>yes</td><td>yes [T1 RedThing]</td><td>yes</td><td>yes</td></tr>
+    <tr><td>2</td><td><code>:N1 :p (1 2) . :N2 :p (1 2)</code></td><td>the two sequences are one individual (N1 and N2 have a common <code>:p</code> value)</td><td>no</td><td>yes</td><td>no [T3 two (1 2)]</td><td>yes [T4 key]</td><td>yes</td></tr>
+    <tr><td>3</td><td><code>:code</code> inverse functional (for D, <code>HasKey( owl:Thing () ( :code ) )</code>); <code>:a :code (1 2) . :b :code (1 2)</code></td><td><code>:a owl:sameAs :b</code></td><td>no</td><td>yes</td><td>no [T4 key]</td><td>yes [T4 key]</td><td>yes</td></tr>
+    <tr><td>4</td><td><code>:p :authorList ( :ada :alan :grace ) . :ada owl:sameAs :adaL</code></td><td><code>:p a (:authorList some ra:tupleOf ( {:adaL} :alan :grace ))</code> (in A, <code>:p :authorList ( :adaL :alan :grace )</code>)</td><td>no</td><td>yes</td><td>yes [T2 element sameAs], and with the hybrid expansion only through a structural query [T8 hybrid]</td><td>yes</td><td>n/a</td></tr>
+    <tr><td>5</td><td><code>:s :p (1 2) . :t :p (1 3)</code></td><td>the two sequences are different</td><td>no</td><td>yes</td><td>yes [T3 two (1 2)]</td><td>yes</td><td>yes</td></tr>
+    <tr><td>6</td><td><code>Swatch ⊑ ex:rgb only (ra:length value 3)</code>; <code>:red a Swatch ; ex:rgb (255 0)</code></td><td>inconsistent</td><td>no</td><td>yes</td><td>yes [T6 length]</td><td>yes</td><td>yes</td></tr>
     <tr><td>7</td><td><code>:s :p (1 2), (1 2)</code></td><td><code>:s a (:p min 2 owl:Thing)</code></td><td>no</td><td>no</td><td>no</td><td>no</td><td>no</td></tr>
     <tr><td>8</td><td><code>:s :p (1 2)</code></td><td><code>:s :p (1 2), (1 2)</code> (read as two occurrences)</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr>
+    <tr><td>9</td><td><code>Many ≡ ex:rgb min 2 ra:tupleOf ( 255 0 0 )</code> (in A, <code>ex:rgb min 2 {( 255 0 0 )}</code>); <code>:m a Many</code></td><td>inconsistent: there are not two of them</td><td>no</td><td>yes</td><td>no [T7 min 2]</td><td>yes, though the <code>HasKey</code> stand-in cannot show it, since an OWL 2 key equates only named individuals [T7 min 2]</td><td>yes</td></tr>
     </tbody></table>
-    <p>Rows 2 and 3 are where the designs part. A, B+K and D say that equal sequences are one thing. O and B say that they may be, and RDF says the same of two blank nodes with one description. Rows 7 and 8 hold in every design: no design counts occurrences, which matches RDF simple entailment and makes a repeated occurrence redundant, not meaningful. Row 1 is the case that seemed to need A. It does not hold in OWL 2 today (§10.4.1), and B gets it back with <code>ra:tupleOf</code>.</p>
-    <p>What A entails beyond B is all of one kind: conclusions that equate sequences, or the things that hold them, because their elements are equal. Under A, OWL-array entails <code>:N1 :p _:x . :N2 :p _:x</code> from row 2's premises, which rdf-array's own data model, read as RDF, does not. SPARQL-array has the same tension where <code>DISTINCT</code> and <code>GROUP BY</code> meet joins by occurrence (<a href="rdf-array.html#distinct-and-group-by-under-joins-by-occurrence">rdf-array.md</a>).</p>
+    <p>Rows 2, 3 and 9 are where the designs part. A, B+K and D say that equal sequences are one thing. O and B say that they may be, and RDF says the same of two blank nodes with one description. Rows 7 and 8 hold in every design: no design counts occurrences, which matches RDF simple entailment and makes a repeated occurrence redundant, not meaningful. Row 1 is the case that seemed to need A. It does not hold in OWL 2 today (§10.4.1), and B gets it back with <code>ra:tupleOf</code>.</p>
+    <p>What A entails beyond B is all of one kind: conclusions that equate sequences, or the things that hold them, because their elements are equal. Row 9 is the same fact seen from the other side: under A there is one <code>( 255 0 0 )</code> in every interpretation, so nothing can have two, while under B a model may hold as many occurrences of it as an axiom asks for. Under A, OWL-array entails <code>:N1 :p _:x . :N2 :p _:x</code> from row 2's premises, which rdf-array's own data model, read as RDF, does not. SPARQL-array has the same tension where <code>DISTINCT</code> and <code>GROUP BY</code> meet joins by occurrence (<a href="rdf-array.html#distinct-and-group-by-under-joins-by-occurrence">rdf-array.md</a>).</p>
     </section>
     <section id="trade-offs">
     <h3>Trade-offs</h3>
@@ -261,7 +262,7 @@ ex:cc fhir:coding ( [ fhir:system [ fhir:v "http://loinc.org"^^xsd:anyURI ] ; fh
     <tr><td>O</td><td>nothing new</td><td>no list in the data is OWL 2 DL; no class expression can look into one; row 1 fails</td></tr>
     <tr><td>A</td><td>a sequence works like a literal: a nominal, in <code>owl:sameAs</code>, in <code>owl:oneOf</code>; row 1 with the familiar <code>value</code></td><td>entails more than the data model it reads (rows 2, 3); a sequence holding a blank node is anonymous and gets no identity anyway (<a href="https://github.com/rdf-array/rdf-array/issues/20">#20</a>); identity through <code>owl:sameAs</code> of elements needs a key per length, never implemented</td></tr>
     <tr><td>B</td><td>entails nothing the data model does not; treats a sequence as OWL 2 treats an anonymous individual; every occurrence can be named in the expansion whatever it holds; <code>ra:tupleOf</code> takes classes as well as values (<code>ra:tupleOf ( {ex:ada} foaf:Agent )</code>)</td><td>no sequence in <code>owl:hasValue</code>, <code>owl:oneOf</code>, <code>owl:sameAs</code>; one new class constructor for every syntax; structural <code>ra:tupleOf</code> is slow in HermiT and needs the hybrid expansion, which is incomplete under <code>owl:sameAs</code> of individual elements</td></tr>
-    <tr><td>B+K</td><td>identity where an ontology asks for it</td><td>needs a new built-in, since OWL 2 keys bind only named individuals and a sequence never is one; cost at scale not measured</td></tr>
+    <tr><td>B+K</td><td>identity where an ontology asks for it</td><td>needs a new built-in, since OWL 2 keys bind only named individuals and a sequence never is one (row 9 of §10.2 shows the gap); cost at scale not measured</td></tr>
     <tr><td>D</td><td>identity and facets for free</td><td>no individual members; OWL 2 DL keeps data values and individuals apart</td></tr>
     <tr><td>E</td><td>no new constructor, since <code>ra:tupleOf</code> becomes a macro; keys are written directly</td><td>an unbounded vocabulary split into object and data positions; invites ontologies to rebuild the ladder out of positions</td></tr>
     </tbody></table>
@@ -269,38 +270,42 @@ ex:cc fhir:coding ( [ fhir:system [ fhir:v "http://loinc.org"^^xsd:anyURI ] ; fh
     </section>
     <section id="results">
     <h3>Results</h3>
-    <p>All runs used the OWL API 4.5.29 and HermiT 1.4.3 as bundled in Protégé 5.6.9, and Apache Jena 4.8.0, on Java 21. The sources are in <a href="https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity">examples/owl-identity</a>.</p>
+    <p>All runs used the OWL API 4.5.29 and HermiT 1.4.3 as bundled in Protégé 5.6.9, and Apache Jena 4.8.0, on Java 21; §10.4.2 was run again under JFact 4.0.4. The sources are in <a href="https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity">examples/owl-identity</a>.</p>
       <section id="owl-2-today-the-redthing-case-red-java-redj-java">
       <h4>OWL 2 today: the RedThing case (<code>Red.java</code>, <code>RedJ.java</code>)</h4>
       <p><code>ex:RedThing owl:equivalentClass [ owl:onProperty ex:rgb ; owl:hasValue ( 255 0 0 ) ]</code> and <code>ex:x ex:rgb ( 255 0 0 )</code>, read as Turtle 1.1, with a named individual <code>ex:red</code> in place of the list as a control:</p>
       <table class="simple">
-      <thead><tr><th>#</th><th>Reading</th><th><code>ex:x a ex:RedThing</code></th></tr></thead>
+      <thead><tr><th>#</th><th>Name</th><th>Reading</th><th><code>ex:x a ex:RedThing</code></th></tr></thead>
       <tbody>
-      <tr><td>R1</td><td>OWL API + HermiT, list, the two triples in two documents</td><td>not entailed</td></tr>
-      <tr><td>R2</td><td>OWL API + HermiT, list, one document</td><td>not entailed</td></tr>
-      <tr><td>R3</td><td>Jena OWL rules and OWL Micro rules, list, one graph</td><td>not entailed</td></tr>
-      <tr><td>R4</td><td>all three, <code>ex:red</code> in place of the list</td><td>entailed</td></tr>
+      <tr><td>R1</td><td>two documents</td><td>OWL API + HermiT, list, the two triples in two documents</td><td>not entailed</td></tr>
+      <tr><td>R2</td><td>one document</td><td>OWL API + HermiT, list, one document</td><td>not entailed</td></tr>
+      <tr><td>R3</td><td>Jena rules</td><td>Jena OWL rules and OWL Micro rules, list, one graph</td><td>not entailed</td></tr>
+      <tr><td>R4</td><td>named control</td><td>all three, <code>ex:red</code> in place of the list</td><td>entailed</td></tr>
       </tbody></table>
       <p>The list's head is a blank node, so the restriction names an anonymous individual, which OWL 2 DL forbids in <code>ObjectHasValue</code> (<a href="https://www.w3.org/TR/owl2-syntax/#The_Restrictions_on_the_Axiom_Closure">OWL 2 Syntax §11.2</a>). The OWL API takes it anyway: it drops the <code>rdf:first</code>/<code>rdf:rest</code> triples, reports no unparsed triples, and its OWL 2 DL profile checker passes the ontology, a gap in the checker. Read that way, the two lists are two anonymous individuals, even in one document, and nothing makes them one. The RDF-Based Semantics has no extensionality for lists either, so OWL 2 Full does not equate them, and Jena's rules agree. The named individual works because both axioms name the same thing. A literal works for the same reason: it denotes its value in every interpretation, which is what design A gave sequences.</p>
       </section>
       <section id="design-b-checked-case-by-case-tuple-java">
       <h4>Design B checked case by case (<code>Tuple.java</code>)</h4>
-      <p>The structural expansion of §6, with every result as wanted:</p>
+      <p>The structural expansion of §6, with every result as wanted under HermiT. JFact 4.0.4, a second complete OWL 2 DL reasoner, gives the same answer to every check but the two that rest on <code>HasKey</code>, T4's key over sequences and its sequence-free control alike: JFact does not implement keys. The checks that bear on the identity of sequences do not depend on the reasoner.</p>
       <table class="simple">
-      <thead><tr><th>#</th><th>Premises</th><th>Question</th><th>Result</th></tr></thead>
+      <thead><tr><th>#</th><th>Name</th><th>Premises</th><th>Question</th><th>Result</th></tr></thead>
       <tbody>
-      <tr><td>T1</td><td><code>RedThing ≡ ex:rgb some ra:tupleOf ( 255 0 0 )</code>; <code>x rgb (255 0 0)</code>, <code>y rgb (0 0 255)</code>, <code>z rgb (255 0)</code></td><td>x, y, z a RedThing?</td><td>x yes; y, z no</td></tr>
-      <tr><td>T1</td><td><code>rgbF</code> functional, <code>RedF ≡ rgbF some ra:tupleOf ( 255 0 0 )</code>; <code>w rgbF (0 0 255)</code></td><td><code>w a not RedF</code>?</td><td>yes</td></tr>
-      <tr><td>T1</td><td>the occurrences of (255 0 0), (0 0 255) and (255 0)</td><td>different from each other?</td><td>yes, by element and by length</td></tr>
-      <tr><td>T2</td><td><code>paper authorList (ada alan grace)</code>, <code>ada sameAs adaL</code></td><td><code>paper a authorList some ra:tupleOf ({adaL} alan grace)</code>?</td><td>yes; with <code>alan</code> and <code>ada</code> swapped, no</td></tr>
-      <tr><td>T3</td><td><code>N1 p (1 2) . N2 p (1 2) . N3 p (1 3)</code></td><td>the two (1 2) the same? different?</td><td>neither</td></tr>
-      <tr><td>T3</td><td></td><td>(1 2) and (1 3) different?</td><td>yes</td></tr>
-      <tr><td>T3</td><td></td><td><code>N2 a (p value</code> N1's sequence<code>)</code>?</td><td>no</td></tr>
-      <tr><td>T4</td><td><code>code</code> inverse functional; <code>a code (1 2) . b code (1 2)</code></td><td><code>a sameAs b</code>?</td><td>no; with <code>HasKey( ra:Sequence () ( ra:length d_1 d_2 ) )</code>, yes</td></tr>
-      <tr><td>T5</td><td><code>FromOrigin ≡ pts some ra:tupleOf ( ra:tupleOf ( 0 0 ) ( ra:Sequence and ra:length value 2 ) )</code></td><td><code>seg pts ((0 0) (1 0))</code>, <code>seg2 pts ((1 1) (1 0))</code> in FromOrigin?</td><td>seg yes, seg2 no</td></tr>
-      <tr><td>T6</td><td><code>Swatch ⊑ rgb only (ra:length value 3)</code>; <code>red a Swatch ; rgb (255 0)</code></td><td>inconsistent?</td><td>yes</td></tr>
-      <tr><td>T8</td><td>hybrid: <code>ByAdaL ≡ authorList some T</code>, <code>T ⊑ ra:tupleOf ({adaL} alan grace)</code>; the occurrence of (ada alan grace) asserted into its own tuple class; <code>ada sameAs adaL</code></td><td><code>paper a ByAdaL</code>?</td><td>no: the hybrid's incompleteness</td></tr>
-      <tr><td>T8</td><td></td><td><code>paper a authorList some ra:tupleOf ({adaL} alan grace)</code> (structural)?</td><td>yes</td></tr>
+      <tr><td>T1</td><td>RedThing</td><td><code>RedThing ≡ ex:rgb some ra:tupleOf ( 255 0 0 )</code>; <code>x rgb (255 0 0)</code>, <code>y rgb (0 0 255)</code>, <code>z rgb (255 0)</code></td><td>x, y, z a RedThing?</td><td>x yes; y, z no</td></tr>
+      <tr><td>T1</td><td>RedThing</td><td><code>rgbF</code> functional, <code>RedF ≡ rgbF some ra:tupleOf ( 255 0 0 )</code>; <code>w rgbF (0 0 255)</code></td><td><code>w a not RedF</code>?</td><td>yes</td></tr>
+      <tr><td>T1</td><td>RedThing</td><td>the occurrences of (255 0 0), (0 0 255) and (255 0)</td><td>different from each other?</td><td>yes, by element and by length</td></tr>
+      <tr><td>T2</td><td>element sameAs</td><td><code>paper authorList (ada alan grace)</code>, <code>ada sameAs adaL</code></td><td><code>paper a authorList some ra:tupleOf ({adaL} alan grace)</code>?</td><td>yes; with <code>alan</code> and <code>ada</code> swapped, no</td></tr>
+      <tr><td>T3</td><td>two (1 2)</td><td><code>N1 p (1 2) . N2 p (1 2) . N3 p (1 3)</code></td><td>the two (1 2) the same? different?</td><td>neither</td></tr>
+      <tr><td>T3</td><td>two (1 2)</td><td></td><td>(1 2) and (1 3) different?</td><td>yes</td></tr>
+      <tr><td>T3</td><td>two (1 2)</td><td></td><td><code>N2 a (p value</code> N1's sequence<code>)</code>?</td><td>no</td></tr>
+      <tr><td>T4</td><td>key</td><td><code>code</code> inverse functional; <code>a code (1 2) . b code (1 2)</code></td><td><code>a sameAs b</code>?</td><td>no; with <code>HasKey( ra:Sequence () ( ra:length d_1 d_2 ) )</code>, yes</td></tr>
+      <tr><td>T4</td><td>key</td><td>control: <code>HasKey( Person () ( ssn ) )</code>; <code>c1 ssn "1" . c2 ssn "1"</code></td><td><code>c1 sameAs c2</code>?</td><td>yes</td></tr>
+      <tr><td>T5</td><td>nested</td><td><code>FromOrigin ≡ pts some ra:tupleOf ( ra:tupleOf ( 0 0 ) ( ra:Sequence and ra:length value 2 ) )</code></td><td><code>seg pts ((0 0) (1 0))</code>, <code>seg2 pts ((1 1) (1 0))</code> in FromOrigin?</td><td>seg yes, seg2 no</td></tr>
+      <tr><td>T6</td><td>length</td><td><code>Swatch ⊑ rgb only (ra:length value 3)</code>; <code>red a Swatch ; rgb (255 0)</code></td><td>inconsistent?</td><td>yes</td></tr>
+      <tr><td>T7</td><td>min 2</td><td><code>Many ≡ rgb min 2 ra:tupleOf ( 255 0 0 )</code>; <code>m a Many</code></td><td>consistent?</td><td>yes: two occurrences may differ</td></tr>
+      <tr><td>T7</td><td>min 2</td><td><code>m2 rgb (255 0 0), (255 0 0)</code></td><td><code>m2 a Many</code>?</td><td>no: without unique names the two occurrences may be one</td></tr>
+      <tr><td>T7</td><td>min 2</td><td>with <code>HasKey( ra:Sequence () ( ra:length d_1 d_2 d_3 ) )</code></td><td>inconsistent?</td><td>no: a key equates only named individuals, and <code>m</code>'s two fillers are not named</td></tr>
+      <tr><td>T8</td><td>hybrid</td><td>hybrid: <code>ByAdaL ≡ authorList some T</code>, <code>T ⊑ ra:tupleOf ({adaL} alan grace)</code>; the occurrence of (ada alan grace) asserted into its own tuple class; <code>ada sameAs adaL</code></td><td><code>paper a ByAdaL</code>?</td><td>no: the hybrid's incompleteness</td></tr>
+      <tr><td>T8</td><td>hybrid</td><td></td><td><code>paper a authorList some ra:tupleOf ({adaL} alan grace)</code> (structural)?</td><td>yes</td></tr>
       </tbody></table>
       </section>
       <section id="reasoning-cost">
@@ -323,7 +328,7 @@ ex:cc fhir:coding ( [ fhir:system [ fhir:v "http://loinc.org"^^xsd:anyURI ] ; fh
     </section>
     <section id="open">
     <h3>Open</h3>
-    <ul><li><strong>How an ontology asks for identity.</strong> It needs a built-in, since an OWL 2 key does not reach sequences. That could be one assertion (<code>ra:Sequence a ra:KeyedByElements</code>, say) whose semantics equates sequences with equal lengths and elements, and which the expansion turns into the key of T4. Design E's public positions would not be enough, for the same reason.</li><li><strong>Completeness of the hybrid expansion</strong> with individual elements: whether to fall back to the structural form for a tuple whose elements take part in <code>owl:sameAs</code>, functional properties or keys, and what that costs.</li><li><strong>Other reasoners</strong> (ELK, JFact, Pellet, Konclude), and the cost of B+K's key at scale.</li><li><strong>OWL 2 Full.</strong> The RDF-Based Semantics is not addressed (§3.1). Design B needs no extensionality condition there, where design A would have needed one.</li></ul>
+    <ul><li><strong>How an ontology asks for identity.</strong> It needs a built-in, since an OWL 2 key does not reach sequences. That could be one assertion (<code>ra:Sequence a ra:KeyedByElements</code>, say) whose semantics equates sequences with equal lengths and elements, and which the expansion turns into the key of T4. Design E's public positions would not be enough, for the same reason.</li><li><strong>Completeness of the hybrid expansion</strong> with individual elements: whether to fall back to the structural form for a tuple whose elements take part in <code>owl:sameAs</code>, functional properties or keys, and what that costs.</li><li><strong>Other reasoners.</strong> §10.4.2 holds under JFact except where it needs a key. ELK, Openllet and Konclude are not tried, no reasoner but HermiT is timed, and the cost of B+K's key at scale is open.</li><li><strong>OWL 2 Full.</strong> The RDF-Based Semantics is not addressed (§3.1). Design B needs no extensionality condition there, where design A would have needed one.</li></ul>
     </section>
   </section>
   <script>
