@@ -525,27 +525,30 @@ entailments on which they differ, and the experiments behind §3.1's choice.
 Each row is a premise set and a conclusion; each cell says whether the design entails it. Column A
 is §3.1 as it stood until 2026-11-05 and column B is §3.1 and the redline as they stand (§10.1). In
 column O the sequence is an RDF 1.1 list. In column B the premise's `ex:rgb value ( 255 0 0 )` is
-written `ex:rgb some ra:tupleOf ( 255 0 0 )`. The test numbers in brackets are §10.4's.
+written `ex:rgb some ra:tupleOf ( 255 0 0 )`. The bracketed names are §10.4's experiments.
 
 | # | Premises | Conclusion | O | A | B | B+K | D |
 |---|---|---|---|---|---|---|---|
-| 1 | `RedThing ≡ ex:rgb value ( 255 0 0 )` in one document; `ex:x ex:rgb ( 255 0 0 )` in another | `ex:x a RedThing` | no [R1–R3] | yes | yes [T1] | yes | yes |
-| 2 | `:N1 :p (1 2) . :N2 :p (1 2)` | the two sequences are one individual (N1 and N2 have a common `:p` value) | no | yes | no [T3] | yes [T4] | yes |
-| 3 | `:code` inverse functional (for D, `HasKey( owl:Thing () ( :code ) )`); `:a :code (1 2) . :b :code (1 2)` | `:a owl:sameAs :b` | no | yes | no [T4] | yes [T4] | yes |
-| 4 | `:p :authorList ( :ada :alan :grace ) . :ada owl:sameAs :adaL` | `:p a (:authorList some ra:tupleOf ( {:adaL} :alan :grace ))` (in A, `:p :authorList ( :adaL :alan :grace )`) | no | yes | yes [T2], and with the hybrid expansion only through a structural query [T8] | yes | n/a |
-| 5 | `:s :p (1 2) . :t :p (1 3)` | the two sequences are different | no | yes | yes [T3] | yes | yes |
-| 6 | `Swatch ⊑ ex:rgb only (ra:length value 3)`; `:red a Swatch ; ex:rgb (255 0)` | inconsistent | no | yes | yes [T6] | yes | yes |
+| 1 | `RedThing ≡ ex:rgb value ( 255 0 0 )` in one document; `ex:x ex:rgb ( 255 0 0 )` in another | `ex:x a RedThing` | no [R1–R3] | yes | yes [T1 RedThing] | yes | yes |
+| 2 | `:N1 :p (1 2) . :N2 :p (1 2)` | the two sequences are one individual (N1 and N2 have a common `:p` value) | no | yes | no [T3 two (1 2)] | yes [T4 key] | yes |
+| 3 | `:code` inverse functional (for D, `HasKey( owl:Thing () ( :code ) )`); `:a :code (1 2) . :b :code (1 2)` | `:a owl:sameAs :b` | no | yes | no [T4 key] | yes [T4 key] | yes |
+| 4 | `:p :authorList ( :ada :alan :grace ) . :ada owl:sameAs :adaL` | `:p a (:authorList some ra:tupleOf ( {:adaL} :alan :grace ))` (in A, `:p :authorList ( :adaL :alan :grace )`) | no | yes | yes [T2 element sameAs], and with the hybrid expansion only through a structural query [T8 hybrid] | yes | n/a |
+| 5 | `:s :p (1 2) . :t :p (1 3)` | the two sequences are different | no | yes | yes [T3 two (1 2)] | yes | yes |
+| 6 | `Swatch ⊑ ex:rgb only (ra:length value 3)`; `:red a Swatch ; ex:rgb (255 0)` | inconsistent | no | yes | yes [T6 length] | yes | yes |
 | 7 | `:s :p (1 2), (1 2)` | `:s a (:p min 2 owl:Thing)` | no | no | no | no | no |
 | 8 | `:s :p (1 2)` | `:s :p (1 2), (1 2)` (read as two occurrences) | yes | yes | yes | yes | yes |
+| 9 | `Many ≡ ex:rgb min 2 ra:tupleOf ( 255 0 0 )` (in A, `ex:rgb min 2 {( 255 0 0 )}`); `:m a Many` | inconsistent: there are not two of them | no | yes | no [T7 min 2] | yes, though the `HasKey` stand-in cannot show it, since an OWL 2 key equates only named individuals [T7 min 2] | yes |
 
-Rows 2 and 3 are where the designs part. A, B+K and D say that equal sequences are one thing. O and B
+Rows 2, 3 and 9 are where the designs part. A, B+K and D say that equal sequences are one thing. O and B
 say that they may be, and RDF says the same of two blank nodes with one description. Rows 7 and 8
 hold in every design: no design counts occurrences, which matches RDF simple entailment and makes a
 repeated occurrence redundant, not meaningful. Row 1 is the case that seemed to need A. It does not
 hold in OWL 2 today (§10.4.1), and B gets it back with `ra:tupleOf`.
 
 What A entails beyond B is all of one kind: conclusions that equate sequences, or the things that
-hold them, because their elements are equal. Under A, OWL-array entails `:N1 :p _:x . :N2 :p _:x`
+hold them, because their elements are equal. Row 9 is the same fact seen from the other side: under A
+there is one `( 255 0 0 )` in every interpretation, so nothing can have two, while under B a model
+may hold as many occurrences of it as an axiom asks for. Under A, OWL-array entails `:N1 :p _:x . :N2 :p _:x`
 from row 2's premises, which rdf-array's own data model, read as RDF, does not. SPARQL-array has the
 same tension where `DISTINCT` and `GROUP BY` meet joins by occurrence
 ([rdf-array.md](rdf-array.html#distinct-and-group-by-under-joins-by-occurrence)).
@@ -557,7 +560,7 @@ same tension where `DISTINCT` and `GROUP BY` meet joins by occurrence
 | O | nothing new | no list in the data is OWL 2 DL; no class expression can look into one; row 1 fails |
 | A | a sequence works like a literal: a nominal, in `owl:sameAs`, in `owl:oneOf`; row 1 with the familiar `value` | entails more than the data model it reads (rows 2, 3); a sequence holding a blank node is anonymous and gets no identity anyway ([#20](https://github.com/rdf-array/rdf-array/issues/20)); identity through `owl:sameAs` of elements needs a key per length, never implemented |
 | B | entails nothing the data model does not; treats a sequence as OWL 2 treats an anonymous individual; every occurrence can be named in the expansion whatever it holds; `ra:tupleOf` takes classes as well as values (`ra:tupleOf ( {ex:ada} foaf:Agent )`) | no sequence in `owl:hasValue`, `owl:oneOf`, `owl:sameAs`; one new class constructor for every syntax; structural `ra:tupleOf` is slow in HermiT and needs the hybrid expansion, which is incomplete under `owl:sameAs` of individual elements |
-| B+K | identity where an ontology asks for it | needs a new built-in, since OWL 2 keys bind only named individuals and a sequence never is one; cost at scale not measured |
+| B+K | identity where an ontology asks for it | needs a new built-in, since OWL 2 keys bind only named individuals and a sequence never is one (row 9 of §10.2 shows the gap); cost at scale not measured |
 | D | identity and facets for free | no individual members; OWL 2 DL keeps data values and individuals apart |
 | E | no new constructor, since `ra:tupleOf` becomes a macro; keys are written directly | an unbounded vocabulary split into object and data positions; invites ontologies to rebuild the ladder out of positions |
 
@@ -567,7 +570,7 @@ asks for identity, once the key has a spelling (§10.5).
 ### 10.4 Results
 
 All runs used the OWL API 4.5.29 and HermiT 1.4.3 as bundled in Protégé 5.6.9, and Apache Jena 4.8.0,
-on Java 21. The sources are in [examples/owl-identity](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity).
+on Java 21; §10.4.2 was run again under JFact 4.0.4. The sources are in [examples/owl-identity](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/examples/owl-identity).
 
 #### 10.4.1 OWL 2 today: the RedThing case (`Red.java`, `RedJ.java`)
 
@@ -575,12 +578,12 @@ on Java 21. The sources are in [examples/owl-identity](https://github.com/rdf-ar
 `ex:x ex:rgb ( 255 0 0 )`, read as Turtle 1.1, with a named individual `ex:red` in place of the
 list as a control:
 
-| # | Reading | `ex:x a ex:RedThing` |
-|---|---|---|
-| R1 | OWL API + HermiT, list, the two triples in two documents | not entailed |
-| R2 | OWL API + HermiT, list, one document | not entailed |
-| R3 | Jena OWL rules and OWL Micro rules, list, one graph | not entailed |
-| R4 | all three, `ex:red` in place of the list | entailed |
+| # | Name | Reading | `ex:x a ex:RedThing` |
+|---|---|---|---|
+| R1 | two documents | OWL API + HermiT, list, the two triples in two documents | not entailed |
+| R2 | one document | OWL API + HermiT, list, one document | not entailed |
+| R3 | Jena rules | Jena OWL rules and OWL Micro rules, list, one graph | not entailed |
+| R4 | named control | all three, `ex:red` in place of the list | entailed |
 
 The list's head is a blank node, so the restriction names an anonymous individual, which OWL 2 DL
 forbids in `ObjectHasValue`
@@ -595,22 +598,29 @@ sequences.
 
 #### 10.4.2 Design B checked case by case (`Tuple.java`)
 
-The structural expansion of §6, with every result as wanted:
+The structural expansion of §6, with every result as wanted under HermiT. JFact 4.0.4, a second
+complete OWL 2 DL reasoner, gives the same answer to every check but the two that rest on `HasKey`,
+T4's key over sequences and its sequence-free control alike: JFact does not implement keys. The
+checks that bear on the identity of sequences do not depend on the reasoner.
 
-| # | Premises | Question | Result |
-|---|---|---|---|
-| T1 | `RedThing ≡ ex:rgb some ra:tupleOf ( 255 0 0 )`; `x rgb (255 0 0)`, `y rgb (0 0 255)`, `z rgb (255 0)` | x, y, z a RedThing? | x yes; y, z no |
-| T1 | `rgbF` functional, `RedF ≡ rgbF some ra:tupleOf ( 255 0 0 )`; `w rgbF (0 0 255)` | `w a not RedF`? | yes |
-| T1 | the occurrences of (255 0 0), (0 0 255) and (255 0) | different from each other? | yes, by element and by length |
-| T2 | `paper authorList (ada alan grace)`, `ada sameAs adaL` | `paper a authorList some ra:tupleOf ({adaL} alan grace)`? | yes; with `alan` and `ada` swapped, no |
-| T3 | `N1 p (1 2) . N2 p (1 2) . N3 p (1 3)` | the two (1 2) the same? different? | neither |
-| T3 | | (1 2) and (1 3) different? | yes |
-| T3 | | `N2 a (p value` N1's sequence`)`? | no |
-| T4 | `code` inverse functional; `a code (1 2) . b code (1 2)` | `a sameAs b`? | no; with `HasKey( ra:Sequence () ( ra:length d_1 d_2 ) )`, yes |
-| T5 | `FromOrigin ≡ pts some ra:tupleOf ( ra:tupleOf ( 0 0 ) ( ra:Sequence and ra:length value 2 ) )` | `seg pts ((0 0) (1 0))`, `seg2 pts ((1 1) (1 0))` in FromOrigin? | seg yes, seg2 no |
-| T6 | `Swatch ⊑ rgb only (ra:length value 3)`; `red a Swatch ; rgb (255 0)` | inconsistent? | yes |
-| T8 | hybrid: `ByAdaL ≡ authorList some T`, `T ⊑ ra:tupleOf ({adaL} alan grace)`; the occurrence of (ada alan grace) asserted into its own tuple class; `ada sameAs adaL` | `paper a ByAdaL`? | no: the hybrid's incompleteness |
-| T8 | | `paper a authorList some ra:tupleOf ({adaL} alan grace)` (structural)? | yes |
+| # | Name | Premises | Question | Result |
+|---|---|---|---|---|
+| T1 | RedThing | `RedThing ≡ ex:rgb some ra:tupleOf ( 255 0 0 )`; `x rgb (255 0 0)`, `y rgb (0 0 255)`, `z rgb (255 0)` | x, y, z a RedThing? | x yes; y, z no |
+| T1 | RedThing | `rgbF` functional, `RedF ≡ rgbF some ra:tupleOf ( 255 0 0 )`; `w rgbF (0 0 255)` | `w a not RedF`? | yes |
+| T1 | RedThing | the occurrences of (255 0 0), (0 0 255) and (255 0) | different from each other? | yes, by element and by length |
+| T2 | element sameAs | `paper authorList (ada alan grace)`, `ada sameAs adaL` | `paper a authorList some ra:tupleOf ({adaL} alan grace)`? | yes; with `alan` and `ada` swapped, no |
+| T3 | two (1 2) | `N1 p (1 2) . N2 p (1 2) . N3 p (1 3)` | the two (1 2) the same? different? | neither |
+| T3 | two (1 2) | | (1 2) and (1 3) different? | yes |
+| T3 | two (1 2) | | `N2 a (p value` N1's sequence`)`? | no |
+| T4 | key | `code` inverse functional; `a code (1 2) . b code (1 2)` | `a sameAs b`? | no; with `HasKey( ra:Sequence () ( ra:length d_1 d_2 ) )`, yes |
+| T4 | key | control: `HasKey( Person () ( ssn ) )`; `c1 ssn "1" . c2 ssn "1"` | `c1 sameAs c2`? | yes |
+| T5 | nested | `FromOrigin ≡ pts some ra:tupleOf ( ra:tupleOf ( 0 0 ) ( ra:Sequence and ra:length value 2 ) )` | `seg pts ((0 0) (1 0))`, `seg2 pts ((1 1) (1 0))` in FromOrigin? | seg yes, seg2 no |
+| T6 | length | `Swatch ⊑ rgb only (ra:length value 3)`; `red a Swatch ; rgb (255 0)` | inconsistent? | yes |
+| T7 | min 2 | `Many ≡ rgb min 2 ra:tupleOf ( 255 0 0 )`; `m a Many` | consistent? | yes: two occurrences may differ |
+| T7 | min 2 | `m2 rgb (255 0 0), (255 0 0)` | `m2 a Many`? | no: without unique names the two occurrences may be one |
+| T7 | min 2 | with `HasKey( ra:Sequence () ( ra:length d_1 d_2 d_3 ) )` | inconsistent? | no: a key equates only named individuals, and `m`'s two fillers are not named |
+| T8 | hybrid | hybrid: `ByAdaL ≡ authorList some T`, `T ⊑ ra:tupleOf ({adaL} alan grace)`; the occurrence of (ada alan grace) asserted into its own tuple class; `ada sameAs adaL` | `paper a ByAdaL`? | no: the hybrid's incompleteness |
+| T8 | hybrid | | `paper a authorList some ra:tupleOf ({adaL} alan grace)` (structural)? | yes |
 
 #### 10.4.3 Reasoning cost
 
@@ -645,7 +655,8 @@ than HermiT were timed.
 - **Completeness of the hybrid expansion** with individual elements: whether to fall back to the
   structural form for a tuple whose elements take part in `owl:sameAs`, functional properties or
   keys, and what that costs.
-- **Other reasoners** (ELK, JFact, Pellet, Konclude), and the cost of B+K's key at scale.
+- **Other reasoners.** §10.4.2 holds under JFact except where it needs a key. ELK, Openllet and
+  Konclude are not tried, no reasoner but HermiT is timed, and the cost of B+K's key at scale is open.
 - **OWL 2 Full.** The RDF-Based Semantics is not addressed (§3.1). Design B needs no
   extensionality condition there, where design A would have needed one.
 
