@@ -67,9 +67,12 @@ The lexer adds `...`, `GAPVAR` (`...?rest`, one token), `UNNEST`, `AT`, `SEQ`, `
   already differ.
 - **`UNNEST(expr AS ?x AT ?i)`** yields one solution per member of the sequence that `expr` evaluates to,
   binding `?x` to the member and `?i` to its position, counting from 1, like `for $x at $i in` in XQuery
-  and `UNNEST … WITH ORDINALITY` in SQL. Two UNNESTs reach the cells of a matrix, and an UNNEST of a
-  list of tuples, followed by `?x[j]`, reads one field of each tuple. When `expr` is unbound or not a
-  sequence, there is no solution.
+  and `UNNEST … WITH ORDINALITY` in SQL. Counting from 1 is what SPARQL already does where it has a
+  position, `SUBSTR`, which takes XPath's `fn:substring` and its first character at 1; it is XPath and
+  XQuery's rule for sequences (`$s[1]`, `position()`, `fn:subsequence`) and RDF's for container members,
+  whose first is `rdf:_1`; SQL's arrays agree, and JavaScript, JSON, Cypher and Python count from 0 (§6).
+  Two UNNESTs reach the cells of a matrix, and an UNNEST of a list of tuples, followed by `?x[j]`, reads
+  one field of each tuple. When `expr` is unbound or not a sequence, there is no solution.
 - **`expr[i]`** is the i-th member, counting from 1, and chains: `?rows[2][3]`. An index out of range, or
   applied to something other than a sequence, is an error, so a BIND leaves its variable unbound.
 - **`expr[m...n]`** is the sequence of the members m to n, both included: `?pts[1...2]` is the first two,
