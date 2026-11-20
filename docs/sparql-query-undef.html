@@ -116,7 +116,7 @@
     // 'SEQ' ExpressionList: the token and the nonterminal are two elements, so the link is replaced as such.
     var seqArgs = h.rule('BuiltInCall').querySelectorAll('a[href="#rExpressionList"]'), seqLink = seqArgs[seqArgs.length - 1];
     h.remove(seqLink, "19.7 [141]: SEQ's ExpressionList goes");
-    h.insAfter(seqLink, N('SeqArgList'), "19.7 [141]: SEQ takes a SeqArgList, with 'UNDEF'");
+    h.insAfter(seqLink, ' ' + N('SeqArgList'), "19.7 [141]: SEQ takes a SeqArgList, with 'UNDEF'");
     h.ruleRow('BuiltInCall', '141a', 'SeqArgList', N('NIL') + ' | ' + T("'('") + ' ( ' + N('Expression') + ' | ' + T("'UNDEF'") + ' ) ( ' + T("','") + ' ( ' + N('Expression') + ' | ' + T("'UNDEF'") + ' ) )* ' + T("')'"),
       '19.7 [141a]: SeqArgList');
   }
