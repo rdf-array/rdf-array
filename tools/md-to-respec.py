@@ -72,7 +72,8 @@ def inline(text):
         codes.append(fragment)
         return '\0%d\0' % (len(codes) - 1)
 
-    text = INLINE_CODE.sub(lambda m: stash('<code>%s</code>' % html.escape(m.group(1), quote=False)), text)
+    # `[[` in a code span is split by an empty element: ReSpec reads `[[x]]` in any text node as a citation.
+    text = INLINE_CODE.sub(lambda m: stash('<code>%s</code>' % html.escape(m.group(1), quote=False).replace('[[', '[<span></span>[')), text)
     text = HTML_TAG.sub(lambda m: stash(m.group(0)), text)
     text = html.escape(text, quote=False)
     text = IMAGE.sub(r'<img src="\2" alt="\1" style="max-width: 100%">', text)
