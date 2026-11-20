@@ -28,11 +28,11 @@
             while ((t = walker.nextNode())) texts.push(t);
             texts.forEach(function (t, i) {
               t.data = t.data.replace(/\s+/g, ' ');
-              if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+              if (/^ [,.;:)']/.test(t.data)) t.data = t.data.slice(1);
               if (t.data === ' ') {
                 var j = i + 1;
                 while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
-                if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+                if (texts[j] && /^\s*[,.;:)']/.test(texts[j].data)) t.data = '';
               }
             });
           });

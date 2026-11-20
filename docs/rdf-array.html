@@ -10,6 +10,46 @@
       shortName: "rdf-array",
       editors: [{ name: "Eric Prud'hommeaux" }],
       edDraftURI: "https://rdf-array.github.io/rdf-array/docs/rdf-array.html",
+      publishDate: "2026-10-23",
+      otherLinks: [
+        {
+          "key": "Status:",
+          "data": [
+            {
+              "value": "a working spike, not a standard"
+            }
+          ]
+        },
+        {
+          "key": "History:",
+          "data": [
+            {
+              "value": "rdf-array was called RDF- (\"RDF minus\") until October 2026, and its syntaxes Turtle-, SPARQL-, ShEx- and JSON-LD-; the forks were always <project>-array"
+            }
+          ]
+        },
+        {
+          "key": "Sources:",
+          "data": [
+            {
+              "value": "rdf-array.md",
+              "href": "https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/rdf-array.md"
+            },
+            {
+              "value": "in the organisation's meta-repository",
+              "join": true
+            },
+            {
+              "value": "rdf-array.html",
+              "href": "https://rdf-array.github.io/rdf-array/docs/rdf-array.html"
+            },
+            {
+              "value": ", its rendering",
+              "join": true
+            }
+          ]
+        }
+      ],
       latestVersion: null,
       postProcess: [function (config, doc) {
         // An otherLinks entry is lines of text and links: ReSpec gives every run its own <dd>, so a
@@ -28,11 +68,11 @@
             while ((t = walker.nextNode())) texts.push(t);
             texts.forEach(function (t, i) {
               t.data = t.data.replace(/\s+/g, ' ');
-              if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+              if (/^ [,.;:)']/.test(t.data)) t.data = t.data.slice(1);
               if (t.data === ' ') {
                 var j = i + 1;
                 while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
-                if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+                if (texts[j] && /^\s*[,.;:)']/.test(texts[j].data)) t.data = '';
               }
             });
           });
@@ -75,7 +115,7 @@
   </section>
   <section class="introductory" id="introduction">
     <h2>Introduction</h2>
-    <p><em>An overview, 2026-10-23. rdf-array was called RDF- ("RDF minus") until October 2026, and its syntaxes Turtle-, SPARQL-, ShEx- and JSON-LD-; the forks were always <code>&lt;project&gt;-array</code>. Everything here is a working spike, not a standard.</em></p>
+
   </section>
   <section id="why">
   <h2>Why</h2>

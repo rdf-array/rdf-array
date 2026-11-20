@@ -10,6 +10,59 @@
       shortName: "array-syntax",
       editors: [{ name: "Eric Prud'hommeaux" }],
       edDraftURI: "https://rdf-array.github.io/rdf-array/docs/array-syntax.html",
+      publishDate: "2026-10-31",
+      otherLinks: [
+        {
+          "key": "Implementations:",
+          "data": [
+            {
+              "value": "on 2026-11-01, jena-array, shex.js-array, lezer-shexc-array, traqula-array and comunica-array, pyshexc, ShExJSG-array and PyShEx-array, rdflib-array, oxigraph-array and rudof-array, with the shared suites rewritten to it"
+            }
+          ]
+        },
+        {
+          "key": "Sources:",
+          "data": [
+            {
+              "value": "array-syntax.md",
+              "href": "https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/array-syntax.md"
+            },
+            {
+              "value": "in the organisation's meta-repository",
+              "join": true
+            },
+            {
+              "value": "array-syntax.html",
+              "href": "https://rdf-array.github.io/rdf-array/docs/array-syntax.html"
+            },
+            {
+              "value": ", its rendering",
+              "join": true
+            }
+          ]
+        },
+        {
+          "key": "See also:",
+          "data": [
+            {
+              "value": "tools/array-syntax/",
+              "href": "https://github.com/rdf-array/rdf-array/tree/rdf-sequences/tools/array-syntax"
+            },
+            {
+              "value": ", the grammars, the harness and the examples",
+              "join": true
+            },
+            {
+              "value": "array-syntax-uses.md",
+              "href": "../management/array-syntax-uses.md"
+            },
+            {
+              "value": ", the files that adopting a new syntax would rewrite",
+              "join": true
+            }
+          ]
+        }
+      ],
       latestVersion: null,
       postProcess: [function (config, doc) {
         // An otherLinks entry is lines of text and links: ReSpec gives every run its own <dd>, so a
@@ -28,11 +81,11 @@
             while ((t = walker.nextNode())) texts.push(t);
             texts.forEach(function (t, i) {
               t.data = t.data.replace(/\s+/g, ' ');
-              if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+              if (/^ [,.;:)']/.test(t.data)) t.data = t.data.slice(1);
               if (t.data === ' ') {
                 var j = i + 1;
                 while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
-                if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+                if (texts[j] && /^\s*[,.;:)']/.test(texts[j].data)) t.data = '';
               }
             });
           });
@@ -68,14 +121,14 @@
 </head>
 <body>
   <section id="abstract">
-    <p>The strawman spelled positions in SPARQL and member constraints in ShEx alike, as <code>(( … ))[ … ]</code>. The two languages need different things, though. A SPARQL query matches members and binds variables to them and to their positions; a ShEx schema constrains every member, often by position, as in a tuple. Other languages keep the two apart: SQL, Cypher and JSONPath for the first; RELAX NG, CDDL, ASN.1 and JSON Schema for the second. This note takes one design from each side, checks that it parses without conflicts as part of the whole grammar, runs it on nested data (lists of lists, tuples of tuples and recursion), and measures it against those languages (§6).</p>
+    <p>This note proposes the syntax to replace the <code>((x))[i]</code> position patterns of SPARQL-array and the <code>((shapeExpr))[m, n]</code> Collection shape expression of ShEx-array, which <a href="rdf-array.html#open-questions">rdf-array.md</a> listed as expected to change.</p>
   </section>
   <section id="sotd">
     <p>This is a working document of the <a href="https://github.com/rdf-array">rdf-array</a> project, generated from <a href="https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/array-syntax.md">docs/array-syntax.md</a> by <code>tools/md-to-respec.py</code> in the same repository. It is not a W3C document and has no standing anywhere.</p>
   </section>
   <section class="introductory" id="introduction">
     <h2>Introduction</h2>
-    <p><em>Design note, 2026-10-31. Proposes the syntax to replace the <code>((x))[i]</code> position patterns of SPARQL-array and the <code>((shapeExpr))[m, n]</code> Collection shape expression of ShEx-array, which <a href="rdf-array.html#open-questions">rdf-array.md</a> listed as expected to change. Implemented on 2026-11-01 in jena-array, shex.js-array, lezer-shexc-array, traqula-array and comunica-array, pyshexc, ShExJSG-array and PyShEx-array, rdflib-array, oxigraph-array and rudof-array, with the shared suites rewritten to it. The grammars, the harness and the examples are in <a href="https://github.com/rdf-array/rdf-array/tree/rdf-sequences/tools/array-syntax">tools/array-syntax/</a>, and <a href="../management/array-syntax-uses.md">array-syntax-uses.md</a> lists the files that adopting a new syntax would rewrite.</em></p>
+    <p>The strawman spelled positions in SPARQL and member constraints in ShEx alike, as <code>(( … ))[ … ]</code>. The two languages need different things, though. A SPARQL query matches members and binds variables to them and to their positions; a ShEx schema constrains every member, often by position, as in a tuple. Other languages keep the two apart: SQL, Cypher and JSONPath for the first; RELAX NG, CDDL, ASN.1 and JSON Schema for the second. This note takes one design from each side, checks that it parses without conflicts as part of the whole grammar, runs it on nested data (lists of lists, tuples of tuples and recursion), and measures it against those languages (§6).</p>
     <p>The proposals, in short:</p>
     <ul><li><strong>SPARQL-array.</strong> <code>UNNEST(expr AS ?x AT ?i)</code> binds each member and its 1-based position. <code>...</code> inside a pattern's <code>( … )</code> matches any run of members, and <code>...?rest</code> binds that run. <code>expr[i]</code> indexes and <code>expr[m...n]</code> slices. <code>?x IN ?seq</code> tests membership. <code>SEQ(…)</code>, <code>SEQLEN(…)</code> and <code>isSEQ(…)</code> build and inspect sequences. <code>()</code> is the empty sequence.</li><li><strong>ShEx-array.</strong> <code>LIST</code> takes two forms: - <code>LIST ( regex )</code> takes a regular expression over the members, with <code>;</code>, <code>|</code>, groups and cardinalities, as in a triple expression. - <code>LIST * x</code>, <code>LIST + x</code>, <code>LIST {m,n} x</code> take that many members, each matching x.</li></ul>
     <p>Both add no conflicts to their grammars (§3). On the examples (§4) they give the results expected.</p>

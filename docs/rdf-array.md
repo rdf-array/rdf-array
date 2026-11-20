@@ -1,8 +1,12 @@
 # rdf-array: RDF with sequences as terms
 
-*An overview, 2026-10-23. rdf-array was called RDF- ("RDF minus") until October 2026, and its
-syntaxes Turtle-, SPARQL-, ShEx- and JSON-LD-; the forks were always `<project>-array`. Everything
-here is a working spike, not a standard.*
+- Published: 2026-10-23
+- Status: a working spike, not a standard
+- History: rdf-array was called RDF- ("RDF minus") until October 2026, and its syntaxes Turtle-,
+  SPARQL-, ShEx- and JSON-LD-; the forks were always `<project>-array`
+- Sources:
+  - [rdf-array.md](https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/rdf-array.md) in the organisation's meta-repository
+  - [rdf-array.html](https://rdf-array.github.io/rdf-array/docs/rdf-array.html), its rendering
 
 rdf-array is RDF whose data model has one more kind of term, the **sequence**: `(1 2 3)` in Turtle
 is one term holding three literals in order, `()` is the empty sequence, and a sequence may hold

@@ -10,6 +10,72 @@
       shortName: "rdfc-array",
       editors: [{ name: "Eric Prud'hommeaux" }],
       edDraftURI: "https://rdf-array.github.io/rdf-array/docs/rdfc-array.html",
+      publishDate: "2026-11-03",
+      otherLinks: [
+        {
+          "key": "Implementations:",
+          "data": [
+            {
+              "value": "rdf-canonize-array",
+              "href": "https://github.com/rdf-array/rdf-canonize-array"
+            },
+            {
+              "value": "oxigraph-array",
+              "href": "https://github.com/rdf-array/oxigraph-array"
+            },
+            {
+              "value": ", oxrdf",
+              "join": true
+            },
+            {
+              "value": "the two agree on the tests of"
+            },
+            {
+              "value": "rdf-tests-contrib",
+              "href": "https://github.com/rdf-array/rdf-tests-contrib",
+              "join": true
+            },
+            {
+              "value": "'s rdf/rdf-canon; neither yet follows the data model adopted on 2026-11-03: a subject sequence is still accepted, and equal quads are still one (item 6 below)",
+              "join": true
+            }
+          ]
+        },
+        {
+          "key": "Sources:",
+          "data": [
+            {
+              "value": "rdfc-array.md",
+              "href": "https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/rdfc-array.md"
+            },
+            {
+              "value": "in the organisation's meta-repository",
+              "join": true
+            },
+            {
+              "value": "rdfc-array.html",
+              "href": "https://rdf-array.github.io/rdf-array/docs/rdfc-array.html"
+            },
+            {
+              "value": ", its rendering",
+              "join": true
+            }
+          ]
+        },
+        {
+          "key": "See also:",
+          "data": [
+            {
+              "value": "rdf-array.md",
+              "href": "rdf-array.html"
+            },
+            {
+              "value": ", the change from RDF to rdf-array",
+              "join": true
+            }
+          ]
+        }
+      ],
       latestVersion: null,
       postProcess: [function (config, doc) {
         // An otherLinks entry is lines of text and links: ReSpec gives every run its own <dd>, so a
@@ -28,11 +94,11 @@
             while ((t = walker.nextNode())) texts.push(t);
             texts.forEach(function (t, i) {
               t.data = t.data.replace(/\s+/g, ' ');
-              if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+              if (/^ [,.;:)']/.test(t.data)) t.data = t.data.slice(1);
               if (t.data === ' ') {
                 var j = i + 1;
                 while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
-                if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+                if (texts[j] && /^\s*[,.;:)']/.test(texts[j].data)) t.data = '';
               }
             });
           });
@@ -75,7 +141,7 @@
   </section>
   <section class="introductory" id="introduction">
     <h2>Introduction</h2>
-    <p><em>Definition, 2026-11-03. Implemented in <a href="https://github.com/rdf-array/rdf-canonize-array">rdf-canonize-array</a> and in <a href="https://github.com/rdf-array/oxigraph-array">oxigraph-array</a>'s <code>oxrdf</code>, which agree on the tests of <a href="https://github.com/rdf-array/rdf-tests-contrib">rdf-tests-contrib</a>'s <code>rdf/rdf-canon</code>. <a href="rdf-array.html">rdf-array.md</a> describes the change from RDF to rdf-array. Neither implementation yet follows the data model adopted that day: a subject sequence is still accepted, and equal quads are still one (item 6 below).</em></p>
+
   </section>
   <section id="the-canonical-spelling">
   <h2>The canonical spelling</h2>

@@ -1,12 +1,21 @@
 # Array syntax: candidates for SPARQL-array and ShEx-array, checked
 
-*Design note, 2026-10-31. Proposes the syntax to replace the `((x))[i]` position patterns of
-SPARQL-array and the `((shapeExpr))[m, n]` Collection shape expression of ShEx-array, which
-[rdf-array.md](rdf-array.html#open-questions) listed as expected to change. Implemented on 2026-11-01 in
-jena-array, shex.js-array, lezer-shexc-array, traqula-array and comunica-array, pyshexc, ShExJSG-array and
-PyShEx-array, rdflib-array, oxigraph-array and rudof-array, with the shared suites rewritten to it. The grammars, the harness and the examples are in
-[tools/array-syntax/](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/tools/array-syntax), and
-[array-syntax-uses.md](../management/array-syntax-uses.md) lists the files that adopting a new syntax would rewrite.*
+- Published: 2026-10-31
+- Implementations: on 2026-11-01, jena-array, shex.js-array, lezer-shexc-array, traqula-array and
+  comunica-array, pyshexc, ShExJSG-array and PyShEx-array, rdflib-array, oxigraph-array and
+  rudof-array, with the shared suites rewritten to it
+- Sources:
+  - [array-syntax.md](https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/array-syntax.md) in the organisation's meta-repository
+  - [array-syntax.html](https://rdf-array.github.io/rdf-array/docs/array-syntax.html), its rendering
+- See also:
+  - [tools/array-syntax/](https://github.com/rdf-array/rdf-array/tree/rdf-sequences/tools/array-syntax),
+    the grammars, the harness and the examples
+  - [array-syntax-uses.md](../management/array-syntax-uses.md), the files that adopting a new syntax
+    would rewrite
+
+This note proposes the syntax to replace the `((x))[i]` position patterns of SPARQL-array and the
+`((shapeExpr))[m, n]` Collection shape expression of ShEx-array, which
+[rdf-array.md](rdf-array.html#open-questions) listed as expected to change.
 
 The strawman spelled positions in SPARQL and member constraints in ShEx alike, as `(( … ))[ … ]`. The two
 languages need different things, though. A SPARQL query matches members and binds variables to them and
