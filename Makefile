@@ -57,14 +57,16 @@ check-docs:
 	@status=0; for html in $(DOC_HTML) $(EXAMPLE_HTML); do \
 	  case $$html in docs/*) md=$${html%.html}.md;; *) md=$$(dirname $$html)/README.md;; esac; \
 	  $(RESPEC) --check $$md $$html || status=1; \
-	done; exit $$status
+	done; \
+	[ $$status = 0 ] || echo "a rendering is out of date: run make on that branch and commit the HTML" >&2; \
+	exit $$status
 
 check-repos:
 	$(PYTHON) tools/manifest-check.py --offline
 
 check-lists:
-	$(PYTHON) tools/contrib-duplicates.py --check
-	$(PYTHON) tools/array-syntax-uses.py --check
+	@$(PYTHON) tools/contrib-duplicates.py --check && $(PYTHON) tools/array-syntax-uses.py --check \
+	  || { echo "a management list is out of date: run make lists on rdf-sequences, with the suites beside this repository on rdf-sequences, and commit it" >&2; exit 1; }
 
 # .tools/ is ignored by git. cp.txt is jena-array's classpath, the modules' target/classes and their
 # jars, colon-separated, written once by hand (Maven is not always available to print it).
