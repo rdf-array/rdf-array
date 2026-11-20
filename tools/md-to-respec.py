@@ -342,12 +342,12 @@ TEMPLATE = '''<!DOCTYPE html>
             var walker = doc.createTreeWalker(dd, NodeFilter.SHOW_TEXT), t, texts = [];
             while ((t = walker.nextNode())) texts.push(t);
             texts.forEach(function (t, i) {
-              t.data = t.data.replace(/\s+/g, ' ');
+              t.data = t.data.replace(/\\s+/g, ' ');
               if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
               if (t.data === ' ') {
                 var j = i + 1;
-                while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
-                if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+                while (texts[j] && /^\\s*$/.test(texts[j].data)) j++;
+                if (texts[j] && /^\\s*[,.;:)]/.test(texts[j].data)) t.data = '';
               }
             });
           });
