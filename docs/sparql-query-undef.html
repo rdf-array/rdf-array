@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPARQL 1.2 Query Language, rdf-undef redline</title>
+<!--
+  A redline of the SPARQL 1.2 Query Language for the rdf-undef branch: what empty slots change, over
+  SPARQL-array. The page fetches the W3C Working Draft of 2026-11-19 from w3.org when it is opened;
+  sparql-query.js applies SPARQL-array's changes to it first, as accepted text, and then the changes
+  below, which are marked, new text as <ins> and removed text as <del>. The design is rdf-undef.md §1 to §3.
+-->
+<link rel="stylesheet" href="redline.css">
+<script src="sparql-query.js"></script>
+</head>
+<body>
+<div id="ra-banner">
+  <p><strong>rdf-undef redline</strong> of the <a href="https://www.w3.org/TR/2026/WD-sparql12-query-20261119/">SPARQL 1.2 Query Language</a> (the W3C Working Draft of 19 November 2026, pinned), over SPARQL-array.
+    <span class="key"><ins class="ra">Green</ins> is new text and <del class="ra">red struck</del> text is removed.</span>
+    <a href="sparql-query-array.html">SPARQL-array's own changes</a> are already in the text;
+    <label><input type="checkbox" id="ra-show-acc"> show them in <ins class="acc">blue</ins></label>.
+    Only changes to what a query means or may say are marked.</p>
+  <p>rdf-undef adds one thing to a sequence: a position may be empty, written <span class="name">undef</span>. A slot is not a term and not an
+    unknown value; it is a position with nothing in it, and it counts. In SPARQL a variable at a slot stays unbound, as <span class="name">VALUES</span>'
+    <span class="name">UNDEF</span> leaves one, and a constant does not match a slot. The page fetches the draft from w3.org and applies the changes
+    in your browser, so the W3C text is the published one. The design is <a href="rdf-undef.html">rdf-undef.md</a> §1 to §3; the
+    <a href="owl-direct-semantics-undef.html">OWL redline</a> is the same device over the OWL 2 Direct Semantics.</p>
+  <details><summary>Changes (<span id="ra-count">0</span>)</summary><ol id="ra-list"></ol></details>
+</div>
+<script>
+(function () {
+  function T(s) { return '<span class="token">' + s + '</span>'; }
+  function N(s) { return '<a href="#r' + s + '">' + s + '</a>'; }
+
+  function RDF_UNDEF(h) {
+    var find = h.find, edit = h.edit, block = h.block, lastOf = h.lastOf, CODE = h.CODE;
+    var U = CODE('undef');
+    var DATA = '<pre class="nohighlight">:x :p ( 1 undef 3 ) .\n:y :p ( 1 2 3 ) .</pre>';
+
+    // 1 Introduction: the slot, and the data of the examples.
+    block(lastOf('introduction', 'div.acc-ins'), 'after',
+      '<p><b>rdf-undef.</b> A position of a sequence may be empty: ' + CODE('( 1 undef 3 )') + ' has three positions and nothing at the second. The marker ' + U +
+      ' is the word SPARQL already uses for "no value here" in ' + CODE('VALUES') + '. A slot is not a term: ' + U + ' occurs only as an element of a sequence, at any depth, ' +
+      'and a variable is never bound to it. It is not an unknown value: ' + CODE('( 1 _:b 3 )') + ' says that something is at the second position, ' + CODE('( 1 undef 3 )') +
+      ' that nothing is, so neither entails the other. It counts: ' + CODE('( 1 undef 3 )') + ' has length 3, and two sequences are equal when their elements and their slots line up. ' +
+      'The examples below use this data:</p>' + DATA,
+      '1 Introduction: the empty slot', true);
+
+    // 4.1.5: where undef may be written.
+    block(lastOf('syntaxTerms', 'div.acc-ins'), 'after',
+      '<p>An element of a sequence may be the marker ' + U + ', in any case, as ' + CODE('UNDEF') + ' is in ' + CODE('VALUES') + ': in a sequence pattern, in a template, in ' +
+      CODE('INSERT DATA') + ' and as an argument of ' + CODE('SEQ') + ', ' + CODE('( ?a undef ?c )') + ', ' + CODE('SEQ(1, undef, 3)') + '. It is not an expression elsewhere: ' +
+      CODE('BIND(undef AS ?x)') + ' is a syntax error, and ' + CODE('VALUES ?x { UNDEF }') + ' keeps its meaning. A prefix may still be called ' + CODE('undef:') + '.</p>',
+      '4.1.5: undef as an element');
+
+    // 4.2.3: matching at a slot.
+    block(lastOf('collections', 'div.acc-ins'), 'after',
+      '<p>The rule for a variable at a slot comes from ' + CODE('VALUES') + ': ' + CODE('UNDEF') + ' there leaves the variable unbound, and an unbound variable joins with anything. ' +
+      'A slot does the same. A written constant does not match a slot, and ' + U + ' in a pattern matches only a slot. Over the data of the introduction:</p>' +
+      '<table><tr><th>Query part</th><th>Result</th></tr>' +
+      '<tr><td>' + CODE('?s :p ( ?a ?b ?c )') + '</td><td>at ' + CODE(':x') + ', ' + CODE('?a') + ' is 1, ' + CODE('?c') + ' is 3 and ' + CODE('?b') + ' is unbound; at ' + CODE(':y') + ' all three are bound</td></tr>' +
+      '<tr><td>' + CODE('?s :p ( ?a undef ?c )') + '</td><td>only ' + CODE(':x') + ': ' + U + ' matches only a slot</td></tr>' +
+      '<tr><td>' + CODE('?s :p ( 1 2 3 )') + '</td><td>only ' + CODE(':y') + ': a constant does not match a slot</td></tr>' +
+      '<tr><td>' + CODE('?s :p ( ?a ?b )') + '</td><td>nothing: the length still has to match</td></tr>' +
+      '<tr><td>' + CODE('VALUES ?b { 5 } ?s :p ( ?a ?b ?c )') + '</td><td>' + CODE(':x') + ' with ' + CODE('?b') + ' 5, joined as with any unbound variable; not ' + CODE(':y') + ', which has 2</td></tr>' +
+      '<tr><td>' + CODE(':x :p ( ... ?m ... )') + '</td><td>three solutions, one with ' + CODE('?m') + ' unbound</td></tr>' +
+      '<tr><td>' + CODE(':x :p ( ?h ...?t )') + '</td><td>' + CODE('?t') + ' is ' + CODE('( undef 3 )') + ': a named gap keeps slots</td></tr></table>',
+      '4.2.3: a variable at a slot stays unbound', true);
+
+    // 10.3 UNNEST at a slot.
+    block(lastOf('assignment', 'div.acc-ins'), 'after',
+      '<p>At a slot, ' + CODE('UNNEST') + ' yields a solution in which the element variable is unbound and the position variable is bound: ' +
+      CODE(':x :p ?s . UNNEST(?s AS ?m AT ?i)') + ' gives three solutions, and at ' + CODE('?i') + ' = 2 ' + CODE('?m') + ' is unbound; ' + CODE('FILTER(BOUND(?m))') + ' drops it.</p>',
+      '10.3 UNNEST: a slot is a solution with the element unbound');
+
+    // 15.1 ORDER BY: a slot is lowest within a sequence.
+    edit(find('modOrderBy', 'li', 'Two sequences are ordered element by element'), 'element by element', ', a slot before every element,', '15.1 ORDER BY: a slot sorts first');
+
+    // 16.2 CONSTRUCT: an unbound variable in a template's sequence writes a slot.
+    block(lastOf('construct', 'div.acc-ins, p'), 'after',
+      '<p>An unbound variable inside a sequence of the template is a slot, not a reason to drop the triple: ' + CODE('CONSTRUCT { ?s :q ( ?c ?b ?a ) } WHERE { ?s :p ( ?a ?b ?c ) }') +
+      ' builds ' + CODE(':x :q ( 3 undef 1 )') + ', so what a pattern reads, a template writes back. A triple with an unbound variable outside a sequence is dropped as before.</p>',
+      '16.2 CONSTRUCT: an unbound variable in a sequence writes a slot');
+
+    // 17.4.8: the functions at a slot.
+    block(lastOf('SparqlOps', 'div.acc-ins'), 'after',
+      '<p>With slots: ' + CODE('SEQLEN') + ' counts them. ' + CODE('s[i]') + ' at a slot is an error, as an index out of range is, so ' + CODE('BIND') + ' leaves its variable unbound and ' +
+      CODE('COALESCE(?s[2], 0)') + ' gives a default; a slice keeps slots, ' + CODE('?s[2...3]') + ' is ' + CODE('( undef 3 )') + '. In ' + CODE('SEQ') + ', an unbound variable is a slot, ' +
+      CODE('SEQ(?c, ?b, ?a)') + ' is ' + CODE('( 3 undef 1 )') + ' when ' + CODE('?b') + ' is unbound; any other error in an argument is the error of the whole. ' +
+      CODE('IN') + ' looks at elements, and a slot has none: ' + CODE('3 IN ?s') + ' is true over ' + CODE(':x') + ', ' + CODE('2 IN ?s') + ' false. seq-equal lines slots up with slots: ' +
+      CODE('?s = SEQ(1, undef, 3)') + ' is true over ' + CODE(':x') + ' and ' + CODE('?s = SEQ(1, 2, 3)') + ' false, not an error. In seq-less-than a slot is lower than every element.</p>',
+      '17.4.8: the functions at a slot');
+
+    // 18.1.3: the pattern may name a slot.
+    block(lastOf('sparqlTriplePatterns', 'div.acc-ins, p'), 'after',
+      '<p>An element <i>m<sub>i</sub></i> of a sequence pattern may also be the marker ' + U + '.</p>',
+      '18.1.3: undef in a sequence pattern');
+
+    // 18.4.1: matching with slots.
+    block(lastOf('BGPsparql', 'div.acc-ins'), 'after',
+      '<p>In the Definition of Matching a Sequence Pattern, a position of <i>s</i> may be a slot. At a slot: a variable matches, and <i>μ</i> leaves it unbound, so dom(<i>μ</i>) may lack a variable ' +
+      'that occurs inside a sequence pattern; an RDF term does not match; the marker ' + U + ' matches a slot and nothing else; a nested sequence pattern or triple pattern does not match. ' +
+      'A gap may cover slots, and a named gap keeps them in the run it binds. Compatibility is unchanged: a variable unbound at a slot is compatible with any binding of it elsewhere, which is how ' +
+      CODE('VALUES ?b { 5 } ?s :p ( ?a ?b ?c )') + ' finds ' + CODE(':x') + '. An engine that substitutes bindings into a pattern before matching has to keep the two cases apart: a bound ' +
+      'variable is compatible with a slot, a written constant is not.</p>',
+      '18.4.1: matching at a slot');
+
+    // 18.6 Unnest at a slot.
+    block(lastOf('sparqlAlgebra', 'div.acc-ins'), 'after',
+      '<p>In Unnest, when <var>e<sub>k</sub></var> is a slot the solution is merge(<var>μ</var>, { (<var>pos</var>, <var>k</var>) }): <var>var</var> stays unbound.</p>',
+      '18.6: Unnest at a slot');
+
+    // 19.7 Grammar.
+    h.ruleReplace('Collection', T("'('") + ' ( ' + N('GraphNode') + ' | ' + T("'UNDEF'") + ' )+ ' + T("')'"), "19.7 [107]: 'UNDEF' as an element of a collection");
+    h.ruleAppend('SeqMemberPath', T("'UNDEF'"), "19.7 [108a]: 'UNDEF' in a sequence pattern");
+    // 'SEQ' ExpressionList: the token and the nonterminal are two elements, so the link is replaced as such.
+    var seqArgs = h.rule('BuiltInCall').querySelectorAll('a[href="#rExpressionList"]'), seqLink = seqArgs[seqArgs.length - 1];
+    h.remove(seqLink, "19.7 [141]: SEQ's ExpressionList goes");
+    h.insAfter(seqLink, N('SeqArgList'), "19.7 [141]: SEQ takes a SeqArgList, with 'UNDEF'");
+    h.ruleRow('BuiltInCall', '141a', 'SeqArgList', N('NIL') + ' | ' + T("'('") + ' ( ' + N('Expression') + ' | ' + T("'UNDEF'") + ' ) ( ' + T("','") + ' ( ' + N('Expression') + ' | ' + T("'UNDEF'") + ' ) )* ' + T("')'"),
+      '19.7 [141a]: SeqArgList');
+  }
+  sparqlRedline.redline({ layers: [{ changes: sparqlRedline.SPARQL_ARRAY, mark: false }, { changes: RDF_UNDEF, mark: true }] });
+})();
+</script>
+</body>
+</html>
