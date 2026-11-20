@@ -1,10 +1,17 @@
 # RDFC-array: RDFC-1.0 over rdf-array
 
-*Definition, 2026-11-03. Implemented in [rdf-canonize-array](https://github.com/rdf-array/rdf-canonize-array) and in
-[oxigraph-array](https://github.com/rdf-array/oxigraph-array)'s `oxrdf`, which agree on the tests of
-[rdf-tests-contrib](https://github.com/rdf-array/rdf-tests-contrib)'s `rdf/rdf-canon`. [rdf-array.md](rdf-array.html) describes
-the change from RDF to rdf-array. Neither implementation yet follows the data model adopted that day: a subject sequence is still
-accepted, and equal quads are still one (item 6 below).*
+- Published: 2026-11-03
+- Implementations:
+  - [rdf-canonize-array](https://github.com/rdf-array/rdf-canonize-array)
+  - [oxigraph-array](https://github.com/rdf-array/oxigraph-array), `oxrdf`
+  - the two agree on the tests of [rdf-tests-contrib](https://github.com/rdf-array/rdf-tests-contrib)'s
+    `rdf/rdf-canon`; neither yet follows the data model adopted on 2026-11-03: a subject sequence is
+    still accepted, and equal quads are still one (item 6 below)
+- Sources:
+  - [rdfc-array.md](https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/rdfc-array.md) in the organisation's meta-repository
+  - [rdfc-array.html](https://rdf-array.github.io/rdf-array/docs/rdfc-array.html), its rendering
+- See also:
+  - [rdf-array.md](rdf-array.html), the change from RDF to rdf-array
 
 RDFC-array is [RDF Dataset Canonicalization](https://www.w3.org/TR/rdf-canon/) (RDFC-1.0) over a dataset whose objects may be
 sequences, and in which a quad holding a sequence may occur more than once. A dataset with no sequence gives exactly what RDFC-1.0 gives, byte for byte: every change below applies

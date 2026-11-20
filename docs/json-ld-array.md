@@ -1,14 +1,15 @@
 # JSON-LD-array: mapping conventional JSON to rdf-array
 
-*Design sketch, 2026-10-23 (begun as a tutorial on 2026-10-21). Implemented in
-[jsonld.js-array](https://github.com/rdf-array/jsonld.js-array) (`jsonld.arrayToRDF`, with a
-[playground](https://rdf-array.github.io/jsonld.js-array/)), whose doc/rdf-array.md lists the
-decisions the implementation added. This document is
-[json-ld-array.md](https://github.com/rdf-array/rdf-array) in the organisation's meta-repository,
-rendered at <https://rdf-array.github.io/rdf-array/docs/json-ld-array.html>; [rdf-array.md](rdf-array.html)
-there describes the change from RDF to rdf-array. The
-names follow the rdf-array organisation: rdf-array is RDF whose data model has sequences as terms,
-and Turtle-array, SPARQL-array, ShEx-array and JSON-LD-array are its syntaxes.*
+- Published: 2026-10-23
+- Implementations:
+  - [jsonld.js-array](https://github.com/rdf-array/jsonld.js-array), `jsonld.arrayToRDF`, with a
+    [playground](https://rdf-array.github.io/jsonld.js-array/); its doc/rdf-array.md lists the decisions
+    the implementation added
+- Sources:
+  - [json-ld-array.md](https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/json-ld-array.md) in the organisation's meta-repository
+  - [json-ld-array.html](https://rdf-array.github.io/rdf-array/docs/json-ld-array.html), its rendering
+- See also:
+  - [rdf-array.md](rdf-array.html), the change from RDF to rdf-array
 
 JSON-LD-array is a mapping language that turns **conventional JSON** — the JSON an API already
 produces — into **rdf-array**. It keeps the one idea of JSON-LD that conventional JSON needs, *a map

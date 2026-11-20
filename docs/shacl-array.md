@@ -1,11 +1,14 @@
 # SHACL-array: SHACL over rdf-array
 
-*Definition, 2026-10-25. Implemented in [jena-array](https://github.com/rdf-array/jena-array)'s
-`jena-shacl`. This document is [shacl-array.md](https://github.com/rdf-array/rdf-array) in the
-organisation's meta-repository, rendered at
-<https://rdf-array.github.io/rdf-array/docs/shacl-array.html>; [rdf-array.md](rdf-array.html) describes
-the change from RDF to rdf-array, and [rdf-array#9](https://github.com/rdf-array/rdf-array/issues/9)
-holds the discussion this settles.*
+- Published: 2026-10-25
+- Implementations:
+  - [jena-array](https://github.com/rdf-array/jena-array), `jena-shacl`
+- Sources:
+  - [shacl-array.md](https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/shacl-array.md) in the organisation's meta-repository
+  - [shacl-array.html](https://rdf-array.github.io/rdf-array/docs/shacl-array.html), its rendering
+- See also:
+  - [rdf-array.md](rdf-array.html), the change from RDF to rdf-array
+  - [rdf-array#9](https://github.com/rdf-array/rdf-array/issues/9), the discussion this settles
 
 SHACL-array is SHACL ([SHACL], with the list constraints of [SHACL 1.2 Core]) over the rdf-array
 data model, in which `( … )` is one term, a *sequence*, and `()` is the empty sequence. It changes
