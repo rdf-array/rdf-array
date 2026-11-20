@@ -1,6 +1,5 @@
 # OWL-array: OWL over rdf-array
 
-- Kind: definition
 - Revised: 2026-11-06
 - Implementations:
   - [owlapi-array](https://github.com/rdf-array/owlapi-array), OWL API 4.5.29 (the version Protégé 5.6 loads)
