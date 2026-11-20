@@ -1,9 +1,11 @@
 # The generated files of this repository, which are tracked: `make` after editing a source,
 # then commit the rendering with it.
 #
-#   make             render every document whose HTML is older than its source:
+#   make             render every document whose HTML is not what its source gives:
 #                    docs/<doc>.html from docs/<doc>.md, examples/<x>/index.html from its README.md
-#                    (an example is published once it has an index.html), both by tools/md-to-respec.py
+#                    (an example is published once it has an index.html), both by tools/md-to-respec.py.
+#                    The renderer's --check decides, not timestamps: a branch switch gives every file
+#                    it rewrites one timestamp, and a page's figures feed the rendering too
 #   make check       what the Pages workflow asks of a push: every rendering current, repos.json
 #                    in step with repos.html's links (exit 1 otherwise, nothing written)
 #   make lists       regenerate management/contrib-duplicates.md and management/array-syntax-uses.md
@@ -36,16 +38,14 @@ all: docs
 
 docs: $(DOC_HTML) $(EXAMPLE_HTML)
 
-# The PNGs a document links to, as far as they exist: a page's figures carry their sizes, which
-# the renderer reads from the files. (No parenthesis in the pattern: make would count it.)
-figures = $(wildcard $(addprefix $(dir $(1)),$(shell grep -o '[A-Za-z0-9_./-]*\.png' $(1) | sort -u)))
+# Always run; render only when the committed HTML is not what the source gives now.
+docs/%.html: docs/%.md FORCE
+	@$(RESPEC) --check $< $@ >/dev/null || $(RESPEC) $< $@
 
-.SECONDEXPANSION:
-docs/%.html: docs/%.md tools/md-to-respec.py $$(call figures,docs/$$*.md)
-	$(RESPEC) $< $@
+examples/%/index.html: examples/%/README.md FORCE
+	@$(RESPEC) --check $< $@ >/dev/null || $(RESPEC) $< $@
 
-examples/%/index.html: examples/%/README.md tools/md-to-respec.py $$(call figures,examples/$$*/README.md)
-	$(RESPEC) $< $@
+FORCE:
 
 lists:
 	$(PYTHON) tools/contrib-duplicates.py
