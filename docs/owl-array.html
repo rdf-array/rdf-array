@@ -10,8 +10,7 @@
       shortName: "owl-array",
       editors: [{ name: "Eric Prud'hommeaux" }],
       edDraftURI: "https://rdf-array.github.io/rdf-array/docs/owl-array.html",
-      publishDate: "2026-10-26",
-      modificationDate: "2026-11-06",
+      publishDate: "2026-11-06",
       otherLinks: [
         {
           "key": "Kind:",
@@ -22,29 +21,15 @@
           ]
         },
         {
-          "key": "Revised:",
-          "data": [
-            {
-              "value": "to the identity of"
-            },
-            {
-              "value": "§10",
-              "href": "#identity-the-alternatives"
-            },
-            {
-              "value": ", which compares the alternatives and reports the experiments behind the choice"
-            }
-          ]
-        },
-        {
-          "key": "Implementation:",
+          "key": "Implementations:",
           "data": [
             {
               "value": "owlapi-array",
               "href": "https://github.com/rdf-array/owlapi-array"
             },
             {
-              "value": "(OWL API 4.5.29, the 4.5 line that Protégé 5.6 loads), 2026-10-26"
+              "value": ", OWL API 4.5.29 (the version Protégé 5.6 loads)",
+              "join": true
             }
           ]
         },
@@ -56,23 +41,29 @@
               "href": "../examples/fhir/index.html"
             },
             {
-              "value": ", a worked example over FHIR RDF, 2026-10-27"
+              "value": ", FHIR RDF reasoning with OWL-array",
+              "join": true
             }
           ]
         },
         {
-          "key": "Source:",
+          "key": "Sources:",
           "data": [
             {
               "value": "owl-array.md",
               "href": "https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/owl-array.md"
             },
             {
-              "value": "in the organisation's meta-repository, rendered at"
+              "value": "in the organisation's meta-repository",
+              "join": true
             },
             {
-              "value": "https://rdf-array.github.io/rdf-array/docs/owl-array.html",
+              "value": "owl-array.html",
               "href": "https://rdf-array.github.io/rdf-array/docs/owl-array.html"
+            },
+            {
+              "value": ", its rendering",
+              "join": true
             }
           ]
         },
@@ -84,14 +75,16 @@
               "href": "rdf-array.html"
             },
             {
-              "value": ", the change from RDF to rdf-array;"
+              "value": ", the change from RDF to rdf-array",
+              "join": true
             },
             {
               "value": "shacl-array.md",
               "href": "shacl-array.html"
             },
             {
-              "value": ", the same questions for SHACL"
+              "value": ", the same questions for SHACL",
+              "join": true
             }
           ]
         },
@@ -103,34 +96,41 @@
             },
             {
               "value": "owl-array skill",
-              "href": "https://github.com/rdf-array/rdf-array/blob/rdf-sequences/.claude/skills/owl-array/SKILL.md"
+              "href": "https://github.com/rdf-array/rdf-array/blob/rdf-sequences/.claude/skills/owl-array/SKILL.md",
+              "join": true
             },
             {
-              "value": "in the same repository"
+              "value": "in the same repository",
+              "join": true
             }
           ]
         }
       ],
       latestVersion: null,
       postProcess: [function (config, doc) {
-        // An otherLinks entry is one line of text and links, not one <dd> per run.
+        // An otherLinks entry is lines of text and links: ReSpec gives every run its own <dd>, so a
+        // run marked `join` is appended to the line before it.
         (config.otherLinks || []).forEach(function (entry) {
           var dt = Array.from(doc.querySelectorAll('.head dt')).find(function (e) { return e.textContent.trim() === entry.key; });
-          var dds = [];
+          var dds = [], line = null;
           for (var e = dt && dt.nextElementSibling; e && e.tagName === 'DD'; e = e.nextElementSibling) dds.push(e);
-          if (dds.length < 2) return;
-          dds.slice(1).forEach(function (dd) { dds[0].append(' '); while (dd.firstChild) dds[0].append(dd.firstChild); dd.remove(); });
+          dds.forEach(function (dd, i) {
+            if (line && entry.data[i] && entry.data[i].join) { line.append(' '); while (dd.firstChild) line.append(dd.firstChild); dd.remove(); }
+            else line = dd;
+          });
           // One space between runs, none before punctuation (the template leaves whitespace and comment nodes around).
-          var walker = doc.createTreeWalker(dds[0], NodeFilter.SHOW_TEXT), t, texts = [];
-          while ((t = walker.nextNode())) texts.push(t);
-          texts.forEach(function (t, i) {
-            t.data = t.data.replace(/\s+/g, ' ');
-            if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
-            if (t.data === ' ') {
-              var j = i + 1;
-              while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
-              if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
-            }
+          dds.filter(function (dd) { return dd.parentNode; }).forEach(function (dd) {
+            var walker = doc.createTreeWalker(dd, NodeFilter.SHOW_TEXT), t, texts = [];
+            while ((t = walker.nextNode())) texts.push(t);
+            texts.forEach(function (t, i) {
+              t.data = t.data.replace(/\s+/g, ' ');
+              if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+              if (t.data === ' ') {
+                var j = i + 1;
+                while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
+                if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+              }
+            });
           });
         });
       }],

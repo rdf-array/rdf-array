@@ -18,12 +18,13 @@ in the prose keep pointing at the right section. JSON is highlighted by ReSpec's
 Turtle and SPARQL by a small script of their own.
 
 A bullet list of `- Key: text` items right after the H1 is the document's status, and goes into
-ReSpec's header (respecConfig) rather than the introduction: `Published: YYYY-MM-DD` is publishDate
-and `Revised: YYYY-MM-DD[, text]` modificationDate; every other key, and the text after a Revised
-date, is an entry of otherLinks under its key, as the runs of text and links of its value (a
-`[text](url)` link, a `[Name]` reference or a `<https://...>` autolink is a link; the rest is plain
-text, with code spans and emphasis flattened). Without such a list, a leading italic paragraph is
-the status note and opens the introduction, as before.
+ReSpec's header (respecConfig) rather than the introduction: `Revised: YYYY-MM-DD` (or
+`Published:`) is publishDate, and with both, Revised is modificationDate, the in-place edit; every
+other key is an entry of otherLinks under its label, one header line per item: the key's own text,
+or its nested `  - ` items. A line is runs of text and links (a `[text](url)` link, a `[Name]`
+reference or a `<https://...>` autolink is a link; the rest is plain text, with code spans and
+emphasis flattened; the header holds no nested lists or tables). Without such a list, a leading
+italic paragraph is the status note and opens the introduction, as before.
 
 Front matter (`---` lines around `key: value` lines, at the very top; double-quote a value that holds
 ": ") with `template: page` makes a
@@ -326,24 +327,29 @@ TEMPLATE = '''<!DOCTYPE html>
       edDraftURI: "https://rdf-array.github.io/rdf-array/%(page_path)s",
 %(status)s      latestVersion: null,
       postProcess: [function (config, doc) {
-        // An otherLinks entry is one line of text and links, not one <dd> per run.
+        // An otherLinks entry is lines of text and links: ReSpec gives every run its own <dd>, so a
+        // run marked `join` is appended to the line before it.
         (config.otherLinks || []).forEach(function (entry) {
           var dt = Array.from(doc.querySelectorAll('.head dt')).find(function (e) { return e.textContent.trim() === entry.key; });
-          var dds = [];
+          var dds = [], line = null;
           for (var e = dt && dt.nextElementSibling; e && e.tagName === 'DD'; e = e.nextElementSibling) dds.push(e);
-          if (dds.length < 2) return;
-          dds.slice(1).forEach(function (dd) { dds[0].append(' '); while (dd.firstChild) dds[0].append(dd.firstChild); dd.remove(); });
+          dds.forEach(function (dd, i) {
+            if (line && entry.data[i] && entry.data[i].join) { line.append(' '); while (dd.firstChild) line.append(dd.firstChild); dd.remove(); }
+            else line = dd;
+          });
           // One space between runs, none before punctuation (the template leaves whitespace and comment nodes around).
-          var walker = doc.createTreeWalker(dds[0], NodeFilter.SHOW_TEXT), t, texts = [];
-          while ((t = walker.nextNode())) texts.push(t);
-          texts.forEach(function (t, i) {
-            t.data = t.data.replace(/\s+/g, ' ');
-            if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
-            if (t.data === ' ') {
-              var j = i + 1;
-              while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
-              if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
-            }
+          dds.filter(function (dd) { return dd.parentNode; }).forEach(function (dd) {
+            var walker = doc.createTreeWalker(dd, NodeFilter.SHOW_TEXT), t, texts = [];
+            while ((t = walker.nextNode())) texts.push(t);
+            texts.forEach(function (t, i) {
+              t.data = t.data.replace(/\s+/g, ' ');
+              if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+              if (t.data === ' ') {
+                var j = i + 1;
+                while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
+                if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+              }
+            });
           });
         });
       }],
@@ -477,24 +483,31 @@ def render_page_sections(entries):
     return '\n'.join(parts)
 
 
-STATUS_ITEM = re.compile(r'^- ([A-Z][\w ]*?): (.*)$')
+STATUS_ITEM = re.compile(r'^- ([A-Z][\w ]*?):(?: (.*))?$')
 AUTOLINK = re.compile(r'<(https?://[^>\s]+)>')
 DATE = re.compile(r'^(\d{4}-\d{2}-\d{2})(?:[,;:]?\s+(.*))?$', re.S)
 
 
 def status_list(md):
-    """The `- Key: text` list right after the H1, if the document has one, as [(key, text)] with
-    continuation lines joined, and the document without it."""
+    """The `- Key: text` list right after the H1, if the document has one, as [(key, lines)], each
+    item's text or its nested `  - ` items as lines with continuation lines joined, and the
+    document without it."""
     m = re.match(r'(# [^\n]*\n\n+)((?:- [^\n]*\n(?:[ ]{2,}[^\n]*\n)*)+)\n', md)
     if not m:
         return [], md
     items = []
     for item in re.split(r'\n(?=- )', m.group(2).rstrip('\n')):
-        text = ' '.join(l.strip() for l in item.split('\n'))
-        k = STATUS_ITEM.match(text)
+        lines = []
+        for l in item.split('\n'):
+            if lines and not re.match(r'^[ ]{2,}- ', l):
+                lines[-1] += ' ' + l.strip()    # a continuation line
+            else:
+                lines.append(l.strip())
+        k = STATUS_ITEM.match(lines[0])
         if not k:
             return [], md    # a list that is not all `Key: text` is content, not status
-        items.append((k.group(1), k.group(2).strip()))
+        nested = [l[2:].strip() for l in lines[1:]]
+        items.append((k.group(1), ([k.group(2).strip()] if k.group(2) else []) + nested))
     for line in md.split('\n'):    # reference-style definitions, for `[Name]` links in the values
         ref = REF_DEF.match(line)
         if ref:
@@ -535,17 +548,28 @@ def header_runs(text):
 
 
 def status_config(items):
-    """The respecConfig lines for a status list: publishDate, modificationDate and otherLinks."""
+    """The respecConfig lines for a status list: publishDate, modificationDate and otherLinks.
+    An entry's data is one item per header line; a run that continues a line is marked `join`,
+    for the template's postProcess (ReSpec itself gives every run a line)."""
     config = []
     other = []
-    for key, text in items:
-        date = DATE.match(text) if key in ('Published', 'Revised') else None
+    keys = [k for k, _ in items]
+    for key, lines in items:
+        date = DATE.match(lines[0]) if key in ('Published', 'Revised') and len(lines) == 1 else None
         if date:
-            config.append('%s: %s,' % ({'Published': 'publishDate', 'Revised': 'modificationDate'}[key], json.dumps(date.group(1))))
-            text = date.group(2) or ''
-            if not text:
+            # Revised alone dates the draft; with Published, it is the in-place edit of that draft.
+            field = 'publishDate' if key == 'Published' or 'Published' not in keys else 'modificationDate'
+            config.append('%s: %s,' % (field, json.dumps(date.group(1))))
+            lines = [date.group(2)] if date.group(2) else []
+            if not lines:
                 continue
-        other.append({'key': key + ':', 'data': header_runs(text)})   # the colon, as ReSpec's own labels have
+        data = []
+        for line in lines:
+            runs = header_runs(line)
+            for run in runs[1:]:
+                run['join'] = True
+            data += runs
+        other.append({'key': key + ':', 'data': data})   # the colon, as ReSpec's own labels have
     if other:
         config.append('otherLinks: ' + json.dumps(other, ensure_ascii=False, indent=2).replace('\n', '\n      ') + ',')
     return ''.join('      %s\n' % line for line in config)

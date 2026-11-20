@@ -12,24 +12,29 @@
       edDraftURI: "https://rdf-array.github.io/rdf-array/examples/fhir/index.html",
       latestVersion: null,
       postProcess: [function (config, doc) {
-        // An otherLinks entry is one line of text and links, not one <dd> per run.
+        // An otherLinks entry is lines of text and links: ReSpec gives every run its own <dd>, so a
+        // run marked `join` is appended to the line before it.
         (config.otherLinks || []).forEach(function (entry) {
           var dt = Array.from(doc.querySelectorAll('.head dt')).find(function (e) { return e.textContent.trim() === entry.key; });
-          var dds = [];
+          var dds = [], line = null;
           for (var e = dt && dt.nextElementSibling; e && e.tagName === 'DD'; e = e.nextElementSibling) dds.push(e);
-          if (dds.length < 2) return;
-          dds.slice(1).forEach(function (dd) { dds[0].append(' '); while (dd.firstChild) dds[0].append(dd.firstChild); dd.remove(); });
+          dds.forEach(function (dd, i) {
+            if (line && entry.data[i] && entry.data[i].join) { line.append(' '); while (dd.firstChild) line.append(dd.firstChild); dd.remove(); }
+            else line = dd;
+          });
           // One space between runs, none before punctuation (the template leaves whitespace and comment nodes around).
-          var walker = doc.createTreeWalker(dds[0], NodeFilter.SHOW_TEXT), t, texts = [];
-          while ((t = walker.nextNode())) texts.push(t);
-          texts.forEach(function (t, i) {
-            t.data = t.data.replace(/\s+/g, ' ');
-            if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
-            if (t.data === ' ') {
-              var j = i + 1;
-              while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
-              if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
-            }
+          dds.filter(function (dd) { return dd.parentNode; }).forEach(function (dd) {
+            var walker = doc.createTreeWalker(dd, NodeFilter.SHOW_TEXT), t, texts = [];
+            while ((t = walker.nextNode())) texts.push(t);
+            texts.forEach(function (t, i) {
+              t.data = t.data.replace(/\s+/g, ' ');
+              if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+              if (t.data === ' ') {
+                var j = i + 1;
+                while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
+                if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+              }
+            });
           });
         });
       }],
