@@ -401,7 +401,7 @@
     <tr><td><code>{ "tags": ["rdf", "json"] }</code></td><td><code>"tags": "ex:tags"</code></td><td><code>[] ex:tags ( "rdf" "json" ) .</code></td></tr>
     <tr><td><code>{ "tags": [] }</code></td><td>same</td><td><code>[] ex:tags () .</code> (JSON-LD: no triple at all, or <code>rdf:nil</code> under <code>@list</code>)</td></tr>
     <tr><td><code>{ "tags": ["rdf"] }</code></td><td>same</td><td><code>[] ex:tags ( "rdf" ) .</code> (a one-element sequence is not the element)</td></tr>
-    <tr><td><code>{ "matrix": [[1, 2], [3, 4]] }</code></td><td><code>"matrix": "ex:matrix"</code></td><td><code>[] ex:matrix ( (1 2) (3 4) ) .</code> (JSON-LD 1.0: "list of lists" error)</td></tr>
+    <tr><td><code>{ "matrix": [<span></span>[1, 2], [3, 4]] }</code></td><td><code>"matrix": "ex:matrix"</code></td><td><code>[] ex:matrix ( (1 2) (3 4) ) .</code> (JSON-LD 1.0: "list of lists" error)</td></tr>
     <tr><td><code>{ "members": [ { "name": "A" }, { "name": "B" } ] }</code></td><td><code>"members": { "iri": "ex:members", "propertyMap": { "name": "schema:name" } }</code></td><td><code>[] ex:members ( [ schema:name "A" ] [ schema:name "B" ] ) .</code></td></tr>
     <tr><td><code>{ "codes": ["A1", "B2"] }</code></td><td><code>"codes": { "iri": "ex:code", "valueType": "identifier" }</code></td><td><code>[] ex:code ( &lt;https://example.org/people/A1&gt; &lt;https://example.org/people/B2&gt; ) .</code></td></tr>
     <tr><td><code>{ "names": ["Dog", "Hund"] }</code></td><td><code>"names": { "iri": "rdfs:label", "language": "en" }</code></td><td><code>[] rdfs:label ( "Dog"@en "Hund"@en ) .</code> (one language per property; a dictionary gives one per value, §5.4)</td></tr>
