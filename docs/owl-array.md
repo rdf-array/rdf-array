@@ -1,15 +1,18 @@
 # OWL-array: OWL over rdf-array
 
-*Definition, 2026-10-26; implemented in
-[owlapi-array](https://github.com/rdf-array/owlapi-array) (OWL API 4.5.29, the 4.5 line that
-Protégé 5.6 loads), 2026-10-26; a worked example over FHIR RDF, [examples/fhir](../examples/fhir/index.html),
-2026-10-27; revised 2026-11-06 to the identity of [§10](#identity-the-alternatives), which compares
-the alternatives and reports the experiments behind the choice. This document is
-[owl-array.md](https://github.com/rdf-array/rdf-array) in the organisation's meta-repository, rendered
-at <https://rdf-array.github.io/rdf-array/docs/owl-array.html>; [rdf-array.md](rdf-array.html)
-describes the change from RDF to rdf-array, and [shacl-array.md](shacl-array.html) settles the same
-questions for SHACL. The `.claude/skills/owl-array` skill in the same repository carries the
-implementation plan.*
+- Kind: definition
+- Published: 2026-10-26
+- Revised: 2026-11-06, to the identity of [§10](#identity-the-alternatives), which compares the
+  alternatives and reports the experiments behind the choice
+- Implementation: [owlapi-array](https://github.com/rdf-array/owlapi-array) (OWL API 4.5.29, the 4.5
+  line that Protégé 5.6 loads), 2026-10-26
+- Example: [examples/fhir](../examples/fhir/index.html), a worked example over FHIR RDF, 2026-10-27
+- Source: [owl-array.md](https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/owl-array.md)
+  in the organisation's meta-repository, rendered at <https://rdf-array.github.io/rdf-array/docs/owl-array.html>
+- See also: [rdf-array.md](rdf-array.html), the change from RDF to rdf-array;
+  [shacl-array.md](shacl-array.html), the same questions for SHACL
+- Plan: the [owl-array skill](https://github.com/rdf-array/rdf-array/blob/rdf-sequences/.claude/skills/owl-array/SKILL.md)
+  in the same repository
 
 OWL-array is OWL 2 over rdf-array, the RDF data model with sequences as terms. OWL's own lists are
 read as sequences, and a sequence in the data is an individual of the class `ra:Sequence` whose

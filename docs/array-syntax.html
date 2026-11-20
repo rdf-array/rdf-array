@@ -11,6 +11,28 @@
       editors: [{ name: "Eric Prud'hommeaux" }],
       edDraftURI: "https://rdf-array.github.io/rdf-array/docs/array-syntax.html",
       latestVersion: null,
+      postProcess: [function (config, doc) {
+        // An otherLinks entry is one line of text and links, not one <dd> per run.
+        (config.otherLinks || []).forEach(function (entry) {
+          var dt = Array.from(doc.querySelectorAll('.head dt')).find(function (e) { return e.textContent.trim() === entry.key; });
+          var dds = [];
+          for (var e = dt && dt.nextElementSibling; e && e.tagName === 'DD'; e = e.nextElementSibling) dds.push(e);
+          if (dds.length < 2) return;
+          dds.slice(1).forEach(function (dd) { dds[0].append(' '); while (dd.firstChild) dds[0].append(dd.firstChild); dd.remove(); });
+          // One space between runs, none before punctuation (the template leaves whitespace and comment nodes around).
+          var walker = doc.createTreeWalker(dds[0], NodeFilter.SHOW_TEXT), t, texts = [];
+          while ((t = walker.nextNode())) texts.push(t);
+          texts.forEach(function (t, i) {
+            t.data = t.data.replace(/\s+/g, ' ');
+            if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+            if (t.data === ' ') {
+              var j = i + 1;
+              while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
+              if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+            }
+          });
+        });
+      }],
       overrideCopyright: "<p class='copyright'>Copyright &copy; 2026 the rdf-array project. This document is licensed under a <a href='https://creativecommons.org/licenses/by/4.0/'>Creative Commons Attribution 4.0 License</a>.</p>",
       lint: { "no-unused-dfns": false },
       localBiblio: {

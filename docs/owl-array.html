@@ -10,7 +10,130 @@
       shortName: "owl-array",
       editors: [{ name: "Eric Prud'hommeaux" }],
       edDraftURI: "https://rdf-array.github.io/rdf-array/docs/owl-array.html",
+      publishDate: "2026-10-26",
+      modificationDate: "2026-11-06",
+      otherLinks: [
+        {
+          "key": "Kind:",
+          "data": [
+            {
+              "value": "definition"
+            }
+          ]
+        },
+        {
+          "key": "Revised:",
+          "data": [
+            {
+              "value": "to the identity of"
+            },
+            {
+              "value": "§10",
+              "href": "#identity-the-alternatives"
+            },
+            {
+              "value": ", which compares the alternatives and reports the experiments behind the choice"
+            }
+          ]
+        },
+        {
+          "key": "Implementation:",
+          "data": [
+            {
+              "value": "owlapi-array",
+              "href": "https://github.com/rdf-array/owlapi-array"
+            },
+            {
+              "value": "(OWL API 4.5.29, the 4.5 line that Protégé 5.6 loads), 2026-10-26"
+            }
+          ]
+        },
+        {
+          "key": "Example:",
+          "data": [
+            {
+              "value": "examples/fhir",
+              "href": "../examples/fhir/index.html"
+            },
+            {
+              "value": ", a worked example over FHIR RDF, 2026-10-27"
+            }
+          ]
+        },
+        {
+          "key": "Source:",
+          "data": [
+            {
+              "value": "owl-array.md",
+              "href": "https://github.com/rdf-array/rdf-array/blob/rdf-sequences/docs/owl-array.md"
+            },
+            {
+              "value": "in the organisation's meta-repository, rendered at"
+            },
+            {
+              "value": "https://rdf-array.github.io/rdf-array/docs/owl-array.html",
+              "href": "https://rdf-array.github.io/rdf-array/docs/owl-array.html"
+            }
+          ]
+        },
+        {
+          "key": "See also:",
+          "data": [
+            {
+              "value": "rdf-array.md",
+              "href": "rdf-array.html"
+            },
+            {
+              "value": ", the change from RDF to rdf-array;"
+            },
+            {
+              "value": "shacl-array.md",
+              "href": "shacl-array.html"
+            },
+            {
+              "value": ", the same questions for SHACL"
+            }
+          ]
+        },
+        {
+          "key": "Plan:",
+          "data": [
+            {
+              "value": "the"
+            },
+            {
+              "value": "owl-array skill",
+              "href": "https://github.com/rdf-array/rdf-array/blob/rdf-sequences/.claude/skills/owl-array/SKILL.md"
+            },
+            {
+              "value": "in the same repository"
+            }
+          ]
+        }
+      ],
       latestVersion: null,
+      postProcess: [function (config, doc) {
+        // An otherLinks entry is one line of text and links, not one <dd> per run.
+        (config.otherLinks || []).forEach(function (entry) {
+          var dt = Array.from(doc.querySelectorAll('.head dt')).find(function (e) { return e.textContent.trim() === entry.key; });
+          var dds = [];
+          for (var e = dt && dt.nextElementSibling; e && e.tagName === 'DD'; e = e.nextElementSibling) dds.push(e);
+          if (dds.length < 2) return;
+          dds.slice(1).forEach(function (dd) { dds[0].append(' '); while (dd.firstChild) dds[0].append(dd.firstChild); dd.remove(); });
+          // One space between runs, none before punctuation (the template leaves whitespace and comment nodes around).
+          var walker = doc.createTreeWalker(dds[0], NodeFilter.SHOW_TEXT), t, texts = [];
+          while ((t = walker.nextNode())) texts.push(t);
+          texts.forEach(function (t, i) {
+            t.data = t.data.replace(/\s+/g, ' ');
+            if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+            if (t.data === ' ') {
+              var j = i + 1;
+              while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
+              if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+            }
+          });
+        });
+      }],
       overrideCopyright: "<p class='copyright'>Copyright &copy; 2026 the rdf-array project. This document is licensed under a <a href='https://creativecommons.org/licenses/by/4.0/'>Creative Commons Attribution 4.0 License</a>.</p>",
       lint: { "no-unused-dfns": false },
       localBiblio: {
@@ -48,7 +171,6 @@
   </section>
   <section class="introductory" id="introduction">
     <h2>Introduction</h2>
-    <p><em>Definition, 2026-10-26; implemented in <a href="https://github.com/rdf-array/owlapi-array">owlapi-array</a> (OWL API 4.5.29, the 4.5 line that Protégé 5.6 loads), 2026-10-26; a worked example over FHIR RDF, <a href="../examples/fhir/index.html">examples/fhir</a>, 2026-10-27; revised 2026-11-06 to the identity of <a href="#identity-the-alternatives">§10</a>, which compares the alternatives and reports the experiments behind the choice. This document is <a href="https://github.com/rdf-array/rdf-array">owl-array.md</a> in the organisation's meta-repository, rendered at &lt;https://rdf-array.github.io/rdf-array/docs/owl-array.html&gt;; <a href="rdf-array.html">rdf-array.md</a> describes the change from RDF to rdf-array, and <a href="shacl-array.html">shacl-array.md</a> settles the same questions for SHACL. The <code>.claude/skills/owl-array</code> skill in the same repository carries the implementation plan.</em></p>
     <p>OWL-array is OWL 2 (<a href="https://www.w3.org/TR/owl2-direct-semantics/">OWL 2 Direct Semantics</a>, <a href="https://www.w3.org/TR/owl2-mapping-to-rdf/">OWL 2 Mapping to RDF Graphs</a>) over the rdf-array data model, in which <code>( … )</code> is one term, a <em>sequence</em>, and <code>()</code> is the empty sequence. It changes two things and adds one small vocabulary:</p>
     <ol><li><strong>OWL's own lists are sequences.</strong> The RDF mapping of OWL 2 spells the arguments of <code>owl:unionOf</code>, <code>owl:intersectionOf</code>, <code>owl:oneOf</code>, <code>owl:members</code>, <code>owl:propertyChainAxiom</code>, <code>owl:hasKey</code>, <code>owl:disjointUnionOf</code>, <code>owl:withRestrictions</code> and SWRL's <code>swrl:body</code> and <code>swrl:head</code> as RDF lists. Read with Turtle-array they are sequences, and a sequence is the only list: an <code>rdf:first</code>/<code>rdf:rest</code> ladder is triples (§2).</li><li><strong>A sequence in the data is an individual with built-in structure.</strong> <code>ex:paper bibo:authorList ( ex:ada ex:alan )</code> holds one term. OWL-array reads that term as an individual of the class <code>ra:Sequence</code> whose members, length, first and last element are given by properties with a meaning the semantics fixes: <code>ra:member</code>, <code>ra:memberValue</code>, <code>ra:length</code>, <code>ra:first</code>, <code>ra:last</code>. Two sequences with the same elements are not thereby one individual; the class <code>ra:tupleOf ( … )</code> picks out the sequences with given elements. Nothing about the term is asserted in triples, nothing is reserved vocabulary, and a class expression can constrain the members of a list-valued property while staying in OWL 2 DL (§3).</li></ol>
     <p>The second is the reason to do it. FHIR RDF writes a repeated element as a list, and its ontology could not say what the list holds; in OWL-array it says so with a restriction on a restriction:</p>
