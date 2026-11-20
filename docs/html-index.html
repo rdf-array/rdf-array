@@ -40,6 +40,8 @@
     <dd>rdf-undef, this branch: a position of a sequence may be empty, <code>( 1 undef 3 )</code>. A slot is not a term and not an unknown value; it counts. What it means in each syntax, in SPARQL, in OWL (<code>ra:holes</code>, <code>ra:DenseSequence</code>) and in the rest of the stack, and the decisions still open.</dd>
     <dt><a href="owl-direct-semantics-undef.html">owl-direct-semantics-undef.html</a></dt>
     <dd>rdf-undef's model theory as a redline of the OWL 2 Direct Semantics over OWL-array's: <em>el</em> becomes partial, <code>ra:holes</code> and <code>ra:DenseSequence</code> are built in, <code>undef</code> names a slot in <code>ObjectTupleOf</code>, and a slot is not an unknown in either direction of entailment. OWL-array's own changes are in the text, accepted, and can be shown.</dd>
+    <dt><a href="sparql-query-undef.html">sparql-query-undef.html</a></dt>
+    <dd>The redline of the SPARQL 1.2 Query Language for empty slots, over SPARQL-array's changes: <code>undef</code> as an element of a sequence, a variable at a slot left unbound as <code>VALUES</code>' <code>UNDEF</code> leaves one, a constant that does not match a slot, <code>UNNEST</code>, <code>CONSTRUCT</code> and the functions at a slot, and the grammar.</dd>
     <dt><a href="protege-undef.html">protege-undef.html</a></dt>
     <dd>Protégé reasons about days off: the <a href="../examples/roster/">roster example</a>, a week's shifts with days off as slots, in Protégé 5.6.9 with protege-owl-array's rdf-undef build, step by step with screenshots.</dd>
     <dt><a href="array-syntax.html">array-syntax.html</a></dt>
