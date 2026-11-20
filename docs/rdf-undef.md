@@ -1,9 +1,17 @@
 # rdf-undef: empty slots in sequences
 
-*Design note, 2026-11-01, on the `rdf-undef` branch of the repositories, which branches from
-`rdf-sequences`. Prototyped in jena-array (the tests in `TestUndefSlots`), owlapi-array
-(`UndefReasoningTestCase`) and protege-owl-array (the [roster](../examples/roster/) walk-through), each
-on its branch `rdf-undef`. This is a strawman: §6 lists the decisions that are still open.*
+- Published: 2026-11-01
+- Status: a strawman, on the `rdf-undef` branch of the repositories, which branches from
+  `rdf-sequences`; §6 lists the decisions that are still open
+- Implementations:
+  - [jena-array](https://github.com/rdf-array/jena-array), the tests in `TestUndefSlots`, on its branch `rdf-undef`
+  - [owlapi-array](https://github.com/rdf-array/owlapi-array), `UndefReasoningTestCase`, on its branch `rdf-undef`
+  - [protege-owl-array](https://github.com/rdf-array/protege-owl-array), the [roster](../examples/roster/) walk-through, on its branch `rdf-undef`
+- Sources:
+  - [rdf-undef.md](https://github.com/rdf-array/rdf-array/blob/rdf-undef/docs/rdf-undef.md) in the organisation's meta-repository
+  - [rdf-undef.html](https://rdf-array.github.io/rdf-array/rdf-undef/docs/rdf-undef.html), its rendering
+- See also:
+  - [rdf-array.md](rdf-array.html), the data model this extends
 
 rdf-undef extends the data model of [rdf-array.md](rdf-array.html) with one thing: a position in a
 sequence may be empty.

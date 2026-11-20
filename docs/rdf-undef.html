@@ -10,6 +10,89 @@
       shortName: "rdf-undef",
       editors: [{ name: "Eric Prud'hommeaux" }],
       edDraftURI: "https://rdf-array.github.io/rdf-array/docs/rdf-undef.html",
+      publishDate: "2026-11-01",
+      otherLinks: [
+        {
+          "key": "Status:",
+          "data": [
+            {
+              "value": "a strawman, on the rdf-undef branch of the repositories, which branches from rdf-sequences; §6 lists the decisions that are still open"
+            }
+          ]
+        },
+        {
+          "key": "Implementations:",
+          "data": [
+            {
+              "value": "jena-array",
+              "href": "https://github.com/rdf-array/jena-array"
+            },
+            {
+              "value": ", the tests in TestUndefSlots, on its branch rdf-undef",
+              "join": true
+            },
+            {
+              "value": "owlapi-array",
+              "href": "https://github.com/rdf-array/owlapi-array"
+            },
+            {
+              "value": ", UndefReasoningTestCase, on its branch rdf-undef",
+              "join": true
+            },
+            {
+              "value": "protege-owl-array",
+              "href": "https://github.com/rdf-array/protege-owl-array"
+            },
+            {
+              "value": ", the",
+              "join": true
+            },
+            {
+              "value": "roster",
+              "href": "../examples/roster/",
+              "join": true
+            },
+            {
+              "value": "walk-through, on its branch rdf-undef",
+              "join": true
+            }
+          ]
+        },
+        {
+          "key": "Sources:",
+          "data": [
+            {
+              "value": "rdf-undef.md",
+              "href": "https://github.com/rdf-array/rdf-array/blob/rdf-undef/docs/rdf-undef.md"
+            },
+            {
+              "value": "in the organisation's meta-repository",
+              "join": true
+            },
+            {
+              "value": "rdf-undef.html",
+              "href": "https://rdf-array.github.io/rdf-array/rdf-undef/docs/rdf-undef.html"
+            },
+            {
+              "value": ", its rendering",
+              "join": true
+            }
+          ]
+        },
+        {
+          "key": "See also:",
+          "data": [
+            {
+              "value": "rdf-array.md",
+              "href": "rdf-array.html"
+            },
+            {
+              "value": ", the data model this extends",
+              "join": true
+            }
+          ]
+        }
+      ],
       latestVersion: null,
       postProcess: [function (config, doc) {
         // An otherLinks entry is lines of text and links: ReSpec gives every run its own <dd>, so a
@@ -28,11 +111,11 @@
             while ((t = walker.nextNode())) texts.push(t);
             texts.forEach(function (t, i) {
               t.data = t.data.replace(/\s+/g, ' ');
-              if (/^ [,.;:)]/.test(t.data)) t.data = t.data.slice(1);
+              if (/^ [,.;:)']/.test(t.data)) t.data = t.data.slice(1);
               if (t.data === ' ') {
                 var j = i + 1;
                 while (texts[j] && /^\s*$/.test(texts[j].data)) j++;
-                if (texts[j] && /^\s*[,.;:)]/.test(texts[j].data)) t.data = '';
+                if (texts[j] && /^\s*[,.;:)']/.test(texts[j].data)) t.data = '';
               }
             });
           });
@@ -75,7 +158,6 @@
   </section>
   <section class="introductory" id="introduction">
     <h2>Introduction</h2>
-    <p><em>Design note, 2026-11-01, on the <code>rdf-undef</code> branch of the repositories, which branches from <code>rdf-sequences</code>. Prototyped in jena-array (the tests in <code>TestUndefSlots</code>), owlapi-array (<code>UndefReasoningTestCase</code>) and protege-owl-array (the <a href="../examples/roster/">roster</a> walk-through), each on its branch <code>rdf-undef</code>. This is a strawman: §6 lists the decisions that are still open.</em></p>
     <pre class="example turtle nohighlight">:x :p ( 1 undef 3 ) .</pre>
     <p>That sequence has three positions and nothing at the second. The marker is <code>undef</code>, the word SPARQL already uses for "no value here" in <code>VALUES</code>.</p>
   </section>
