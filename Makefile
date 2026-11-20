@@ -12,8 +12,9 @@
 #   make check-lists exit 1 if either list differs from what the checkouts beside this one give
 #   make jena-tool   compile tools/JenaArray.java into .tools/ for tools/rewrite-rdf-syntax.py
 #
-# Not built here: docs/html-index.html, docs/owl-direct-semantics-*.html (a banner; the page
-# fetches the Recommendation and redlines it in the browser), management/repos.html (renders
+# Not built here: docs/html-index.html, the redlines docs/owl-direct-semantics-*.html and
+# docs/sparql-query-*.html (a banner; the page fetches the W3C text and redlines it in the
+# browser), management/repos.html (renders
 # repos.json in the browser) and vocab/index.html are written by hand.
 #
 # The lists are not part of `make`: they read the test-suite checkouts beside this repository,

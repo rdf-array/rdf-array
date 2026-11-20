@@ -12,12 +12,13 @@
   - [shacl-array.md](shacl-array.html), the same questions for SHACL
 - Plan: the [owl-array skill](https://github.com/rdf-array/rdf-array/blob/rdf-sequences/.claude/skills/owl-array/SKILL.md) in the same repository
 
-OWL-array is OWL 2 over rdf-array, the RDF data model with sequences as terms. OWL's own lists are
-read as sequences, and a sequence in the data is an individual of the class `ra:Sequence` whose
-members, length, first and last element the semantics fixes: one individual per occurrence, not one
-per set of elements, with `ra:tupleOf ( … )` the class of the sequences with given elements. A small
-vocabulary and a redline of the OWL 2 Direct Semantics give the meaning; owlapi-array implements it
-for the OWL API that Protégé loads.
+`rdf-array` is an extension of RDF to include sequences as terms in the RDF graph.
+`OWL-array` is OWL 2 over rdf-array, including using RDF array sequences in OWL structures.
+In OWL-array, a sequence in the data is an individual of the class `ra:Sequence`, and the semantics determines its members, length, first and last element.
+Each occurrence of a sequence is an individual of its own; `ra:tupleOf ( … )` is the class of the sequences with given elements.
+A small vocabulary names these classes and properties.
+The redline of the OWL 2 Direct Semantics (a copy of the spec with OWL-array's changes marked as insertions and deletions) is the model theory that fixes their interpretation.
+owlapi-array implements it for the OWL API that Protégé loads.
 
 OWL-array is OWL 2 ([OWL 2 Direct Semantics], [OWL 2 Mapping to RDF Graphs]) over the rdf-array data
 model, in which `( … )` is one term, a *sequence*, and `()` is the empty sequence. It changes two
@@ -37,8 +38,10 @@ things and adds one small vocabulary:
    Nothing about the term is asserted in triples, nothing is reserved vocabulary, and a class
    expression can constrain the members of a list-valued property while staying in OWL 2 DL (§3).
 
-The second is the reason to do it. FHIR RDF writes a repeated element as a list, and its ontology
-could not say what the list holds; in OWL-array it says so with a restriction on a restriction:
+The second point motivates the creation of `rdf-array` and `OWL-array`.
+In OWL 2 DL, `rdf:first` and `rdf:rest` are reserved vocabulary: the mapping to RDF consumes their triples only inside OWL's own constructs, and a graph that holds a list of the data's own is not OWL 2 DL at all, nor may an ontology restrict them (`owl:onProperty rdf:first` is not DL).
+So an ontology for data that uses RDF collections, FHIR RDF, BIBO, SKOS, is OWL Full from its first list, before it says anything, and once there it still cannot say what the list holds.
+In OWL-array, the list is a term, the document stays in DL, and the ontology captures list member constraints with a restriction on a restriction:
 
 ```turtle
 PREFIX fhir: <http://hl7.org/fhir/>
@@ -52,13 +55,11 @@ fhir:CodeableConcept rdfs:subClassOf
 ex:cc fhir:coding ( [ fhir:system [ fhir:v "http://loinc.org"^^xsd:anyURI ] ; fhir:code [ fhir:v "8480-6" ] ] ) .
 ```
 
-In Manchester syntax, `fhir:coding only (ra:member only fhir:Coding)`. No construct in that axiom
-is new: the OWL API, Protégé's expression editor and every OWL 2 DL reasoner accept it today,
-treating `ra:member` as an ordinary object property. What is new is the meaning of `ra:member`,
-and of the `( … )` term in the data it constrains; from the two, a reasoner concludes that the
-blank node inside the list is a `fhir:Coding`. A worked example, the SWAT4LS 2016 FHIR reasoning
-process over today's FHIR RDF, is [examples/fhir](../examples/fhir/index.html); [OWL-array in
-Protégé](protege-array.html) is a demo of it in Protégé.
+In Manchester syntax, this would be `fhir:coding only (ra:member only fhir:Coding)`.
+No construct in that axiom is new: the OWL API, Protégé's expression editor and every OWL 2 DL reasoner accept it today, treating `ra:member` as an ordinary object property.
+What is new are the meanings of `ra:member` and the `( … )` term in the data it constrains.
+From the two, a reasoner concludes that the blank node inside the list is a `fhir:Coding`.
+A worked example, the SWAT4LS 2016 FHIR reasoning process over today's FHIR RDF, is [examples/fhir](../examples/fhir/index.html); [OWL-array in Protégé](protege-array.html) is a demo of it in Protégé.
 
 ## 1. Why
 
@@ -89,6 +90,8 @@ from triples. rdf-array makes the list a term; OWL-array gives the term a meanin
 
 ## 2. Lists in OWL's syntax
 
+rdf-array parsers (Trig and Turtle and RDF/XML) generate RDF graphs with sequences wherever RDF 1.1 parsers would generate RDF Collections.
+OWL-array parsers consume those sequences where OWL 2 parsers consumed OWL constructs encoded as RDF Collections.
 Everywhere the RDF mapping of OWL 2 reads a list, OWL-array reads a sequence term:
 
 | Vocabulary | In Turtle-array |
@@ -104,8 +107,8 @@ Everywhere the RDF mapping of OWL 2 reads a list, OWL-array reads a sequence ter
 | `ra:tupleOf` (§3.2, new in OWL-array) | `[ ra:tupleOf ( 255 xsd:integer ex:Zero ) ]` |
 | SWRL `swrl:body`, `swrl:head`, `swrl:arguments` | `[ a swrl:Imp ; swrl:body ( … ) ; swrl:head ( … ) ]` |
 
-Written in Turtle-array these are sequences already, so an OWL ontology written in Turtle reads
-unchanged. As in SHACL-array, three consequences follow:
+The fact that OWL-array ontologies consume RDF Collections means that the OWL ontology interpreted from a Turtle file remains unchanged.
+As in SHACL-array, three consequences follow:
 
 - **A ladder is not a list.** An ontology document that spells a list as `rdf:first`/`rdf:rest`
   triples (N-Triples written by an RDF 1.1 tool, say) leaves those triples [unconsumed](https://www.w3.org/TR/owl2-mapping-to-rdf/#Parsing_of_Axioms), exactly as a
@@ -116,7 +119,7 @@ unchanged. As in SHACL-array, three consequences follow:
 - **Lists hold no blank-node structure.** `owl:unionOf ( [ a owl:Restriction ; … ] )` is a sequence
   holding a blank node whose own triples are ordinary triples of the document.
 
-What a processor writes follows: the RDF renderers spell every OWL list as `( … )` in Turtle and
+When encoding an OWL ontology as RDF, the RDF serializer renders every OWL list as `( … )` in Turtle and
 as `rdf:parseType="Collection"` in RDF/XML, and never as a ladder. The Functional-style, OWL/XML and
 Manchester syntaxes have no RDF lists and are unchanged by this part.
 
@@ -350,9 +353,14 @@ syntaxes in its first cut, and labels such a node ID `_:seq…`. A sequence neve
 - **No ladder reading.** `rdf:first`/`rdf:rest` triples are triples in OWL's syntax and in the data,
   and leave an ontology outside OWL 2 DL as they always did. OWL-array does not fold them.
 - **No `ra:rest`.** A property to the sequence of the remaining elements would rebuild the ladder
-  as individuals, with every limit of §1: it is left out on purpose. `ra:first` and `ra:last` cover
-  the positions ontologies ask for; the remaining ones are reached, for now, by SPARQL-array's
-  position patterns rather than by class expressions.
+  as individuals: every tail of a sequence of length *n* is an individual of its own, with its own
+  members, length and ends, *n* of them per sequence, and the limits of §1 return in computed rather
+  than asserted form. It is left out on purpose. What it would buy is a fixed position by chaining,
+  `ra:rest o ra:first` for the second element; what it could not buy is the last one, since OWL 2 DL
+  cannot iterate `ra:rest` to a depth it does not know, which is why `ra:last` is a built-in rather
+  than a derived property. `ra:first` and `ra:last` cover the positions ontologies ask for; the
+  remaining ones are reached, for now, by SPARQL-array's position patterns rather than by class
+  expressions, and a content model (next bullet) is the layer that would give them in OWL.
 - **No content model.** `ra:tupleOf` fixes the length; a regular content model over members
   (`( Person+ Org? )`) is the natural next layer, as it is for SHACL-array and ShEx-array.
 - **No positional properties in the vocabulary.** The expansion (§6) has a property per position;
