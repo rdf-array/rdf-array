@@ -1,4 +1,4 @@
-/* The redlines of the OWL 2 Direct Semantics (owl-direct-semantics-*.html): the marks of the
+/* The redline pages (owl-direct-semantics-*.html, sparql-query-*.html): the marks of the
    changes under review (.ra) and of the changes of an earlier layer, accepted into the text (.acc),
    which body.ra-show-acc shows in blue. */
 ins.ra, div.ra-ins, tr.ra-ins td, li.ra-ins { background: #e6ffec; text-decoration: none; }
@@ -41,3 +41,11 @@ div.acc-ins td, div.acc-ins th { border-color: #ccc; }
 #ra-nav span { align-self: center; background: #fff; border: 1px solid #9fd5ad; border-radius: 4px; padding: 6px 8px; color: #1a7f37; }
 .ra-current { outline: 3px solid #d4a72c; outline-offset: 2px; }
 #ra-status { font: 16px/1.5 system-ui, sans-serif; padding: 2em; max-width: 44em; }
+
+/* A removed block (a paragraph or an example struck as a whole) */
+del.ra-block { display: block; }
+body:not(.ra-show-acc) del.acc-block { display: none; }
+body.ra-show-acc del.acc-block { display: block; }
+/* Over the W3C 2021 stylesheet: keep the banner and the navigation above the document's own fixed TOC */
+#ra-banner, #ra-nav { position: relative; z-index: 20; }
+#ra-nav { position: fixed; }

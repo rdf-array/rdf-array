@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPARQL 1.2 Query Language, SPARQL-array redline</title>
+<!--
+  A redline of the SPARQL 1.2 Query Language for SPARQL-array. This file holds only the banner: the
+  page fetches the W3C Working Draft of 2026-11-19 from w3.org when it is opened and sparql-query.js applies
+  SPARQL-array's changes to it in the reader's browser, marking new text as <ins> and removed text as <del>.
+  The design is rdf-array.md ("What changes") and array-syntax.md §1.
+-->
+<link rel="stylesheet" href="redline.css">
+<script src="sparql-query.js"></script>
+</head>
+<body>
+<div id="ra-banner">
+  <p><strong>SPARQL-array redline</strong> of the <a href="https://www.w3.org/TR/2026/WD-sparql12-query-20261119/">SPARQL 1.2 Query Language</a>, the W3C Working Draft of 19 November 2026 (SPARQL 1.2 is not yet a Recommendation; the draft is pinned so that the changes keep their places).
+    <span class="key"><ins class="ra">Green</ins> is new text and <del class="ra">red struck</del> text is removed.</span>
+    Only changes to what a query means or may say are marked; the section numbers of new sections are informal.</p>
+  <p>rdf-array adds one kind of term to RDF, the sequence, <span class="name">( 1 2 3 )</span>, and SPARQL-array is SPARQL over it: a collection in a
+    pattern is a sequence pattern with gaps <span class="name">...</span> and named gaps <span class="name">...?rest</span>, <span class="name">UNNEST</span>
+    walks a sequence, and expressions index and slice it. The page fetches the draft from w3.org and applies the changes in your browser,
+    so the W3C text is the published one. The design is <a href="rdf-array.html">rdf-array.md</a> and <a href="array-syntax.html">array-syntax.md</a>;
+    the data model is rdf-array.md's, and the <a href="owl-direct-semantics-array.html">OWL-array redline</a> is the same device over the OWL 2 Direct Semantics.</p>
+  <details><summary>Changes (<span id="ra-count">0</span>)</summary><ol id="ra-list"></ol></details>
+</div>
+<script>sparqlRedline.redline({ layers: [{ changes: sparqlRedline.SPARQL_ARRAY, mark: true }] });</script>
+</body>
+</html>
