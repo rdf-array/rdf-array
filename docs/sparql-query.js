@@ -93,7 +93,8 @@
       throw new Error('text not found: ' + text);
     };
     h.remove = function (el, label) {
-      var del = document.createElement('del'); del.className = cls + ' ' + cls + '-block';
+      var inline = /^(A|SPAN|CODE|VAR|I|B|EM|STRONG)$/.test(el.tagName);   // an inline element stays inline
+      var del = document.createElement('del'); del.className = cls + (inline ? '' : ' ' + cls + '-block');
       while (el.firstChild) del.appendChild(el.firstChild);
       el.appendChild(del);
       return mark(del, label);
