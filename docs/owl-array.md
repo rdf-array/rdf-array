@@ -3,13 +3,20 @@
 *Definition, 2026-10-26; implemented in
 [owlapi-array](https://github.com/rdf-array/owlapi-array) (OWL API 4.5.29, the 4.5 line that
 Protégé 5.6 loads), 2026-10-26; a worked example over FHIR RDF, [examples/fhir](../examples/fhir/index.html),
-2026-10-27; revised 2026-11-06: a sequence is an individual per occurrence, not identified by its
-elements, and `ra:tupleOf` names the sequences with given elements ([§10](#identity-the-alternatives)
-compares the alternatives and reports the experiments behind the choice). This document is [owl-array.md](https://github.com/rdf-array/rdf-array) in the
-organisation's meta-repository, rendered at <https://rdf-array.github.io/rdf-array/docs/owl-array.html>;
-[rdf-array.md](rdf-array.html) describes the change from RDF to rdf-array, and
-[shacl-array.md](shacl-array.html) settles the same questions for SHACL. The `.claude/skills/owl-array`
-skill in the same repository carries the implementation plan.*
+2026-10-27; revised 2026-11-06 to the identity of [§10](#identity-the-alternatives), which compares
+the alternatives and reports the experiments behind the choice. This document is
+[owl-array.md](https://github.com/rdf-array/rdf-array) in the organisation's meta-repository, rendered
+at <https://rdf-array.github.io/rdf-array/docs/owl-array.html>; [rdf-array.md](rdf-array.html)
+describes the change from RDF to rdf-array, and [shacl-array.md](shacl-array.html) settles the same
+questions for SHACL. The `.claude/skills/owl-array` skill in the same repository carries the
+implementation plan.*
+
+OWL-array is OWL 2 over rdf-array, the RDF data model with sequences as terms. OWL's own lists are
+read as sequences, and a sequence in the data is an individual of the class `ra:Sequence` whose
+members, length, first and last element the semantics fixes: one individual per occurrence, not one
+per set of elements, with `ra:tupleOf ( … )` the class of the sequences with given elements. A small
+vocabulary and a redline of the OWL 2 Direct Semantics give the meaning; owlapi-array implements it
+for the OWL API that Protégé loads.
 
 OWL-array is OWL 2 ([OWL 2 Direct Semantics], [OWL 2 Mapping to RDF Graphs]) over the rdf-array data
 model, in which `( … )` is one term, a *sequence*, and `()` is the empty sequence. It changes two

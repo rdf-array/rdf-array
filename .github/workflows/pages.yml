@@ -18,6 +18,9 @@ name: pages
 # and committed, as is each examples/*/README.md that has an index.html, so nothing is built here
 # beyond the front page and the redirects from the pages' addresses before docs/ and management/.
 # docs/html-index.html is hand-written. A push to either branch deploys both, each from its own tip.
+# The checks are the Makefile's: `make check` on each branch (renderings current, repos.json in
+# step), and `make check-lists` on rdf-sequences against the test suites cloned beside the checkout
+# (management/ changes only on rdf-sequences; the lists link to the suites' rdf-sequences branches).
 # Modelled on shex.js-array's pages.yml.
 #
 # One-time setup: Settings -> Pages -> Source: "GitHub Actions" (configure-pages
@@ -44,24 +47,19 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: rdf-sequences
+      - name: check the management lists against the test suites (before rdf-undef is checked out below, which the scan would see)
+        run: |
+          for r in rdf-tests-array json-ld-api-array json-ld-streaming-array shexTest-array \
+                   rdf-tests-contrib json-ld-api-contrib shexTest-contrib data-shapes-contrib; do
+            git clone -q --depth 1 --branch rdf-sequences "https://github.com/rdf-array/$r.git" "../$r"
+          done
+          make check-lists
       - uses: actions/checkout@v7
         with:
           ref: rdf-undef
           path: rdf-undef
-      - name: check that the HTML renderings are current, on both branches
-        run: |
-          for root in . rdf-undef; do (
-            cd "$root"
-            for src in docs/*.md examples/*/README.md; do
-              case "$src" in docs/*) dst="${src%.md}.html";; *) dst="$(dirname "$src")/index.html"; [ -f "$dst" ] || continue;; esac
-              if ! python3 tools/md-to-respec.py --check "$src" "$dst"; then
-                echo "$root/$dst is out of date: run python3 tools/md-to-respec.py $src $dst on that branch" >&2
-                exit 1
-              fi
-            done
-          ) || exit 1; done
-      - name: check repos.json and the links into repos.html
-        run: python3 tools/manifest-check.py --offline
+      - name: check that the renderings are current and repos.json is in step, on both branches
+        run: make check && make -C rdf-undef check
       - name: the front page
         run: |
           cat > index.html <<'HTML'
